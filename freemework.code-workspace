@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../freemework.dart.cancellation"
+		},
+		{
+			"path": "../freemework.dart.http"
+		}
+	],
+	"settings": {}
+}
