@@ -15,7 +15,7 @@ workload last error is "Exception: error3"
 */
 
 import 'package:freemework/freemework.dart'
-    show AggregateException, FrameworkException;
+    show AggregateException, FreemeworkException;
 
 void main() {
   try {
@@ -33,13 +33,13 @@ void main() {
 
 void workload() {
   final workers = <Function>[error1, error2, error3];
-  final errors = <FrameworkException>[];
+  final errors = <FreemeworkException>[];
 
   for (final worker in workers) {
     try {
       worker();
     } catch (e) {
-      errors.add(FrameworkException.wrapIfNeeded(e));
+      errors.add(FreemeworkException.wrapIfNeeded(e));
     }
   }
 

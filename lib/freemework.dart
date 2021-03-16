@@ -6,7 +6,7 @@ library freemework;
 
 export 'errors/AggregateException.dart';
 export 'errors/CancellationException.dart';
-export 'errors/FrameworkException.dart';
+export 'errors/FreemeworkException.dart';
 export 'errors/InvalidOperationException.dart';
 export 'CancellationToken.dart';
 export 'Disposable.dart';

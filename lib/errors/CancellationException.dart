@@ -2,11 +2,9 @@
 // file for details. All rights reserved. Use of this source code is governed
 // by a BSD-style license that can be found in the LICENSE file.
 
-import 'package:freemework/freemework.dart';
+import 'FreemeworkException.dart' show FreemeworkException;
 
-import 'FrameworkException.dart' show FrameworkException;
-
-class CancellationException extends FrameworkException {
+class CancellationException extends FreemeworkException {
   ///
   /// An exception that hold stackTrace where a user activates operation cancellation.
   /// 

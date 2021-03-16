@@ -2,17 +2,17 @@
 // file for details. All rights reserved. Use of this source code is governed
 // by a BSD-style license that can be found in the LICENSE file.
 
-class FrameworkException extends Error {
+class FreemeworkException extends Error {
   final String message;
-  final FrameworkException innerException;
-  FrameworkException([this.message, this.innerException]);
+  final FreemeworkException innerException;
+  FreemeworkException([this.message, this.innerException]);
 
-  static FrameworkException wrapIfNeeded(dynamic e) {
+  static FreemeworkException wrapIfNeeded(dynamic e) {
     if (e == null) {
-      return FrameworkException();
+      return FreemeworkException();
     }
 
-    if (e is FrameworkException) {
+    if (e is FreemeworkException) {
       return e;
     }
 
@@ -24,16 +24,16 @@ class FrameworkException extends Error {
       return _ErrorAdapter(e);
     }
 
-    return FrameworkException(e.toString());
+    return FreemeworkException(e.toString());
   }
 }
 
-class _ErrorAdapter implements FrameworkException {
+class _ErrorAdapter implements FreemeworkException {
   final Error wrap;
   _ErrorAdapter(this.wrap);
 
   @override
-  FrameworkException get innerException => null;
+  FreemeworkException get innerException => null;
 
   @override
   String get message => wrap.toString();

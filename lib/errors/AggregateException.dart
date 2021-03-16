@@ -2,12 +2,10 @@
 // file for details. All rights reserved. Use of this source code is governed
 // by a BSD-style license that can be found in the LICENSE file.
 
-import 'package:freemework/freemework.dart';
+import 'FreemeworkException.dart' show FreemeworkException;
 
-import 'FrameworkException.dart' show FrameworkException;
-
-class AggregateException extends FrameworkException {
-  static void throwIfNeeded(Iterable<FrameworkException> innerExceptions) {
+class AggregateException extends FreemeworkException {
+  static void throwIfNeeded(Iterable<FreemeworkException> innerExceptions) {
     if (innerExceptions.isNotEmpty) {
       if (innerExceptions.length == 1) {
         throw innerExceptions.first;
@@ -16,8 +14,8 @@ class AggregateException extends FrameworkException {
     }
   }
 
-  final Iterable<FrameworkException> innerExceptions;
-  factory AggregateException(Iterable<FrameworkException> innerExceptions,
+  final Iterable<FreemeworkException> innerExceptions;
+  factory AggregateException(Iterable<FreemeworkException> innerExceptions,
       [String message]) {
     assert(innerExceptions != null);
     assert(innerExceptions.isNotEmpty);
@@ -26,7 +24,7 @@ class AggregateException extends FrameworkException {
   }
 
   AggregateException._internal(
-      String message, List<FrameworkException> innerExceptions)
+      String message, List<FreemeworkException> innerExceptions)
       : innerExceptions = innerExceptions,
         super(message, innerExceptions.first);
 
