@@ -2,6 +2,9 @@ name: freemework
 description: Freemework
 version: 0.0.1
 homepage: https://freemework.org
+repository: https://github.com/freemework/dart
+issue_tracker: https://github.com/freemework/dart/issues
+documentation: https://freemework.org/#common?lang=dart
 
 environment:
   sdk: '>=2.10.5 <3.0.0'

@@ -16,15 +16,16 @@ class FreemeworkException extends Error {
       return e;
     }
 
-    // if (e is Exception) {
-    //   return FrameworkException(e.toString());
-    // }
-
     if (e is Error) {
       return _ErrorAdapter(e);
     }
 
     return FreemeworkException(e.toString());
+  }
+
+  @override
+  String toString() {
+    return message ?? super.toString();
   }
 }
 
