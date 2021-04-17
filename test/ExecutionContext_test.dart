@@ -19,7 +19,7 @@ import 'package:test/test.dart'
 
 void main() {
   group('ExecutionContext tests', () {
-    ExecutionContext executionContext;
+    ExecutionContext? executionContext;
 
     setUp(() {
       executionContext = ExecutionContext.EMPTY;
@@ -32,30 +32,34 @@ void main() {
     test('Default ExecutionContext should has cancel CancellationToken.DUMMY',
         () {
       expect(
-          executionContext.cancellationToken, equals(CancellationToken.DUMMY));
+          executionContext!.cancellationToken, equals(CancellationToken.DUMMY));
     });
 
     test('Default ExecutionContext should has no Logger Properties', () {
-      expect(executionContext.loggerProperties, isEmpty);
+      expect(executionContext!.loggerProperties, isEmpty);
     });
 
-    test('Inner ExecutionContext should produce new ExecutionContext by call WithLoggerProperty', () {
+    test(
+        'Inner ExecutionContext should produce new ExecutionContext by call WithLoggerProperty',
+        () {
       final innerExecutionContext =
-          executionContext.WithLoggerProperty('testName', 'testValue');
+          executionContext!.WithLoggerProperty('testName', 'testValue');
       expect(innerExecutionContext, isNotNull);
       expect(innerExecutionContext, isNot(equals(executionContext)));
     });
 
-    test('Inner ExecutionContext should produce new ExecutionContext by call WithCancellationToken', () {
+    test(
+        'Inner ExecutionContext should produce new ExecutionContext by call WithCancellationToken',
+        () {
       final innerExecutionContext =
-          executionContext.WithCancellationToken(_TestCancellationToken());
+          executionContext!.WithCancellationToken(_TestCancellationToken());
       expect(innerExecutionContext, isNotNull);
       expect(innerExecutionContext, isNot(equals(executionContext)));
     });
 
     test('Inner ExecutionContext should produce new logger property', () {
       final innerExecutionContext =
-          executionContext.WithLoggerProperty('testName', 'testValue');
+          executionContext!.WithLoggerProperty('testName', 'testValue');
       expect(innerExecutionContext, isNotNull);
       expect(innerExecutionContext, isNot(equals(executionContext)));
       expect(innerExecutionContext.loggerProperties, isNotEmpty);
@@ -66,8 +70,9 @@ void main() {
     test('Inner ExecutionContext should produce new cancellation token', () {
       final newCancellationToken = _TestCancellationToken();
       final innerExecutionContext =
-          executionContext.WithCancellationToken(newCancellationToken);
-      expect(innerExecutionContext.cancellationToken, equals(newCancellationToken));
+          executionContext!.WithCancellationToken(newCancellationToken);
+      expect(innerExecutionContext.cancellationToken,
+          equals(newCancellationToken));
     });
   });
 }

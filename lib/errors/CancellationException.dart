@@ -7,19 +7,19 @@ import 'FreemeworkException.dart' show FreemeworkException;
 class CancellationException extends FreemeworkException {
   ///
   /// An exception that hold stackTrace where a user activates operation cancellation.
-  /// 
+  ///
   /// It slould be passed by cancellationToken uses code via `CancellationException.withCancellationOrigin`
-  /// 
-  final CancellationException cancellationOriginException;
+  ///
+  final CancellationException? cancellationOriginException;
 
-  CancellationException([String message])
+  CancellationException([String? message])
       : cancellationOriginException = null,
         super(_messageFormatter(message));
 
   CancellationException.withCancellationOrigin(this.cancellationOriginException,
-      [String message])
+      [String? message])
       : super(_messageFormatter(message));
 
-  static String _messageFormatter(String message) =>
+  static String _messageFormatter(String? message) =>
       message ?? 'An operation was cancelled by an user.';
 }

@@ -24,7 +24,7 @@ void main() {
     if (e is AggregateException) {
       print('workload failure with AggregateException');
       print('workload produce ${e.innerExceptions.length} errors.');
-      print('workload inner error is "${e.innerException.message}" (this is first error)');
+      print('workload inner error is "${e.innerException!.message}" (this is first error)');
       print('workload first error is "${e.innerExceptions.first.message}"');
       print('workload last error is "${e.innerExceptions.last.message}"');
     }

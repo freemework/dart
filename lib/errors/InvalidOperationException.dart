@@ -6,6 +6,6 @@ import 'FreemeworkException.dart' show FreemeworkException;
 
 class InvalidOperationException extends FreemeworkException {
   InvalidOperationException(
-      [String message, FreemeworkException innerException])
+      [String? message, FreemeworkException? innerException])
       : super(message, innerException);
 }

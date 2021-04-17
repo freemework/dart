@@ -16,15 +16,14 @@ class AggregateException extends FreemeworkException {
 
   final Iterable<FreemeworkException> innerExceptions;
   factory AggregateException(Iterable<FreemeworkException> innerExceptions,
-      [String message]) {
-    assert(innerExceptions != null);
+      [String? message]) {
     assert(innerExceptions.isNotEmpty);
     return AggregateException._internal(
         message ?? innerExceptions.first.message, innerExceptions);
   }
 
   AggregateException._internal(
-      String message, List<FreemeworkException> innerExceptions)
+      String? message, Iterable<FreemeworkException> innerExceptions)
       : innerExceptions = innerExceptions,
         super(message, innerExceptions.first);
 

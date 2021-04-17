@@ -3,8 +3,8 @@
 // by a BSD-style license that can be found in the LICENSE file.
 
 class FreemeworkException extends Error {
-  final String message;
-  final FreemeworkException innerException;
+  final String? message;
+  final FreemeworkException? innerException;
   FreemeworkException([this.message, this.innerException]);
 
   static FreemeworkException wrapIfNeeded(dynamic e) {
@@ -34,11 +34,11 @@ class _ErrorAdapter implements FreemeworkException {
   _ErrorAdapter(this.wrap);
 
   @override
-  FreemeworkException get innerException => null;
+  FreemeworkException? get innerException => null;
 
   @override
   String get message => wrap.toString();
 
   @override
-  StackTrace get stackTrace => wrap.stackTrace;
+  StackTrace? get stackTrace => wrap.stackTrace;
 }
