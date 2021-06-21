@@ -17,11 +17,31 @@ Available for [Dart](https://pub.dev/packages/freemework_enum_currency), [C#](TD
 
 ## Supported Currencies
 
-| Code  | Exponent  | Iso4217             | Fiat                | Crypto              | CryptoPeer          | CryptoUtxo          | Title                            | Reference URL                                       |
-|-------|-----------|---------------------|---------------------|---------------------|---------------------|---------------------|----------------------------------|-----------------------------------------------------|
-| ADA   | 8         | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:  | Cardano                          | https://cardano.org/                                |
-| BTC   | 8         | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:  | Bitcoin                          | https://bitcoin.org/                                |
-| USD   | 2         | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:  | United States dollar             | https://en.wikipedia.org/wiki/United_States_dollar  |
+| Code  | Exponent  | Iso4217  | Fiat                | Crypto              | Title                            | Reference URL                                       |
+|-------|-----------|----------|---------------------|---------------------|----------------------------------|-----------------------------------------------------|
+| ADA   | 8         |          |                     | :heavy_check_mark:  | Cardano                          | https://cardano.org/                                |
+| ATOM  | 6         |          |                     | :heavy_check_mark:  | ATOM                             | https://cosmos.network/                             |
+| BAT   | 8         |          |                     | :heavy_check_mark:  | BAT                              | https://basicattentiontoken.org/                    |
+| BCH   | 8         |          |                     | :heavy_check_mark:  | Bitcoin Cash                     | https://bitcoincash.org/                            |
+| BTC   | 8         |          |                     | :heavy_check_mark:  | Bitcoin                          | https://bitcoin.org/                                |
+| BTT   | 6         |          |                     | :heavy_check_mark:  | BitTorrent Token                 | https://www.bittorrent.com/token/btt/               |
+| DASH  | 8         |          |                     | :heavy_check_mark:  | Dash                             | https://www.dash.org/                               |
+| ETH   | 18        |          |                     | :heavy_check_mark:  | Ethereum                         | https://ethereum.org/                               |
+| EUR   | 2         | 978      | :heavy_check_mark:  |                     | Euro                             | https://en.wikipedia.org/wiki/Euro                  |
+| GBP   | 2         | 826      | :heavy_check_mark:  |                     | Pound sterling                   | https://en.wikipedia.org/wiki/Pound_sterling        |
+| LTC   | 8         |          |                     | :heavy_check_mark:  | Litecoin                         | https://litecoin.com/                               |
+| MHC   | 6         |          |                     | :heavy_check_mark:  | MetaHash                         | https://metahash.org/                               |
+| NEO   | 8         |          |                     | :heavy_check_mark:  | NEO                              | https://neo.org/                                    |
+| ONG   | 6         |          |                     | :heavy_check_mark:  | Ontology Gas                     | https://ont.io/                                     |
+| ONT   | 6         |          |                     | :heavy_check_mark:  | Ontology                         | https://ont.io/                                     |
+| RUB   | 2         | 643      | :heavy_check_mark:  |                     | Russian Rouble                   | https://en.wikipedia.org/wiki/Russian_ruble         |
+| TRX   | 6         |          |                     | :heavy_check_mark:  | TRON                             | https://tron.network/                               |
+| USD   | 2         | 840      | :heavy_check_mark:  |                     | United States dollar             | https://en.wikipedia.org/wiki/United_States_dollar  |
+| USDT  | 18        |          |                     | :heavy_check_mark:  | Tether                           | https://tether.to/                                  |
+| XLM   | 7         |          |                     | :heavy_check_mark:  | Stellar                          | https://www.stellar.org/                            |
+| XRP   | 7         |          |                     | :heavy_check_mark:  | Ripple                           | https://ripple.com/xrp                              |
+| XTZ   | 6         |          |                     | :heavy_check_mark:  | Tezos                            | https://tezos.com/                                  |
+| UAH   | 2         | 980      | :heavy_check_mark:  |                     | Ukrainian hryvnia                | https://en.wikipedia.org/wiki/Ukrainian_hryvnia     |
 
 ## Refrences
 

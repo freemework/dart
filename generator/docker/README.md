@@ -1,0 +1,1 @@
+docker build -t enum_currency_builder_csharp -f generator/docker/csharp.Dockerfile . && docker run --rm -it -v $PWD:/build enum_currency_builder_csharp
