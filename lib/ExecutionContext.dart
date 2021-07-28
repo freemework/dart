@@ -6,8 +6,12 @@ import 'CancellationToken.dart' show CancellationToken;
 import 'LoggerProperty.dart' show LoggerProperty;
 
 abstract class ExecutionContext {
-  static const ExecutionContext EMPTY = _ExecutionContext(CancellationToken.DUMMY, []);
+  static const ExecutionContext EMPTY =
+      SimpleExecutionContext(CancellationToken.DUMMY, []);
 
+  List<T> traceOf<T extends ExecutionContext>();
+
+  ExecutionContext? get prevContext;
   CancellationToken get cancellationToken;
   Iterable<LoggerProperty> get loggerProperties;
 
@@ -15,27 +19,61 @@ abstract class ExecutionContext {
   ExecutionContext WithLoggerProperty(String propertyName, propertyValue);
 }
 
-class _ExecutionContext implements ExecutionContext {
+class SimpleExecutionContext implements ExecutionContext {
   @override
   final CancellationToken cancellationToken;
- 
+
   @override
   final Iterable<LoggerProperty> loggerProperties;
 
-  const _ExecutionContext(this.cancellationToken, this.loggerProperties);
+  @override
+  final ExecutionContext? prevContext;
+
+  const SimpleExecutionContext(
+    this.cancellationToken,
+    this.loggerProperties, [
+    this.prevContext,
+  ]);
+
+  @override
+  List<T> traceOf<T extends ExecutionContext>() {
+    final frames = <T>[];
+
+    final ExecutionContext _this = this;
+    if (_this is T) {
+      frames.add(_this);
+    }
+
+    final _trace = prevContext;
+    if (_trace != null && _trace is T) {
+      frames.add(_trace);
+    }
+
+    return frames;
+  }
 
   @override
   ExecutionContext WithCancellationToken(CancellationToken cancellationToken) {
-    return _ExecutionContext(cancellationToken, loggerProperties);
+    return SimpleExecutionContext(
+      cancellationToken,
+      loggerProperties,
+      this,
+    );
   }
 
   @override
   ExecutionContext WithLoggerProperty(String propertyName, propertyValue) {
-    final loggerProperty =
-        LoggerProperty(propertyName, propertyValue);
+    final loggerProperty = LoggerProperty(
+      propertyName,
+      propertyValue,
+    );
 
     Iterable<LoggerProperty> innerLoggerProperties =
         loggerProperties.toList(growable: true)..add(loggerProperty);
-    return _ExecutionContext(cancellationToken, innerLoggerProperties);
+    return SimpleExecutionContext(
+      cancellationToken,
+      innerLoggerProperties.toList(growable: false),
+      this,
+    );
   }
 }
