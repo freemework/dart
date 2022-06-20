@@ -1,4 +1,4 @@
-import { FException } from "./FException";
+import { FException } from "../FException";
 
 export class FCancelledException extends FException {
 }

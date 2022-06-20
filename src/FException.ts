@@ -1,5 +1,5 @@
 export class FException extends Error {
-	public static wrapErrorIfNeeded(likeError: any): FException {
+	public static wrapIfNeeded(likeError: any): FException {
 		if (likeError) {
 			if (likeError instanceof FException) {
 				return likeError;
@@ -27,7 +27,7 @@ export class FException extends Error {
 			if (typeof first === "string") {
 				super(first);
 				if (second !== undefined && second !== null) {
-					this.innerException = FException.wrapErrorIfNeeded(second);
+					this.innerException = FException.wrapIfNeeded(second);
 				} else {
 					this.innerException = null;
 				}

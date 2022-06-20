@@ -1,14 +1,5 @@
 import { FException } from "./FException";
 
-export interface FLoggerProperty {
-	readonly name: string;
-	readonly value: number | string | boolean;
-}
-
-export interface FLoggerContext {
-	readonly [name: string]: number | string | boolean;
-}
-
 export interface FLogger {
 	readonly isTraceEnabled: boolean;
 	readonly isDebugEnabled: boolean;
@@ -17,12 +8,12 @@ export interface FLogger {
 	readonly isErrorEnabled: boolean;
 	readonly isFatalEnabled: boolean;
 
-	trace(loggerContext: FLoggerContext, message: string, ex?: FException): void;
-	debug(loggerContext: FLoggerContext, message: string, ex?: FException): void;
-	info(loggerContext: FLoggerContext, message: string): void;
-	warn(loggerContext: FLoggerContext, message: string): void;
-	error(loggerContext: FLoggerContext, message: string): void;
-	fatal(loggerContext: FLoggerContext, message: string): void;
+	trace(message: string, ex?: FException): void;
+	debug(message: string, ex?: FException): void;
+	info(message: string): void;
+	warn(message: string): void;
+	error(message: string): void;
+	fatal(message: string): void;
 
 	/**
 	 * Get sub-logger that belong to this logger
@@ -45,33 +36,33 @@ class _FConsoleLogger implements FLogger {
 	public get isErrorEnabled(): boolean { return true; }
 	public get isFatalEnabled(): boolean { return true; }
 
-	public trace(loggerContext: FLoggerContext, message: string, ex?: FException): void {
-		const msg: string = this._formatMessage(loggerContext, message);
+	public trace(message: string, ex?: FException): void {
+		const msg: string = this._formatMessage(message);
 		if (ex !== undefined) {
 			console.trace(msg, ex);
 		} else {
 			console.trace(msg);
 		}
 	}
-	public debug(loggerContext: FLoggerContext, message: string, ex?: FException): void {
-		const msg: string = this._formatMessage(loggerContext, message);
+	public debug(message: string, ex?: FException): void {
+		const msg: string = this._formatMessage(message);
 		if (ex !== undefined) {
 			console.debug(msg, ex);
 		} else {
 			console.debug(msg);
 		}
 	}
-	public info(loggerContext: FLoggerContext, message: string): void {
-		console.info(this._formatMessage(loggerContext, message));
+	public info(message: string): void {
+		console.info(this._formatMessage(message));
 	}
-	public warn(loggerContext: FLoggerContext, message: string): void {
-		console.warn(this._formatMessage(loggerContext, message));
+	public warn(message: string): void {
+		console.warn(this._formatMessage(message));
 	}
-	public error(loggerContext: FLoggerContext, message: string): void {
-		console.error(this._formatMessage(loggerContext, message));
+	public error(message: string): void {
+		console.error(this._formatMessage(message));
 	}
-	public fatal(loggerContext: FLoggerContext, message: string): void {
-		console.error(this._formatMessage(loggerContext, message));
+	public fatal(message: string): void {
+		console.error(this._formatMessage(message));
 	}
 
 	public getLogger(name: string): FLogger {
@@ -82,10 +73,9 @@ class _FConsoleLogger implements FLogger {
 		return new _FConsoleLogger(loggerName);
 	}
 
-	private _formatMessage(loggerContext: FLoggerContext, message: string): string {
+	private _formatMessage(message: string): string {
 		const loggerName: string = this._loggerName !== null ? this._loggerName : "Unnamed Logger";
-		const ctx: string = JSON.stringify({ ...loggerContext });
-		const msg: string = `[${loggerName}] ${ctx}: ${message}`;
+		const msg: string = `[${loggerName}]: ${message}`;
 		return msg;
 	}
 }
@@ -99,12 +89,12 @@ export namespace FLogger {
 		get isErrorEnabled(): boolean { return false; },
 		get isFatalEnabled(): boolean { return false; },
 
-		trace(loggerContext: FLoggerContext, message: string, ex?: FException): void { },
-		debug(loggerContext: FLoggerContext, message: string, ex?: FException): void { },
-		info(loggerContext: FLoggerContext, message: string): void { },
-		warn(loggerContext: FLoggerContext, message: string): void { },
-		error(loggerContext: FLoggerContext, message: string): void { },
-		fatal(loggerContext: FLoggerContext, message: string): void { },
+		trace(message: string, ex?: FException): void { },
+		debug(message: string, ex?: FException): void { },
+		info(message: string): void { },
+		warn(message: string): void { },
+		error(message: string): void { },
+		fatal(message: string): void { },
 
 		getLogger(name: string): FLogger { return FLogger.None; }
 	});

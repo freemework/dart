@@ -19,16 +19,16 @@ export function FAssertModuleVersion(packageInfo: { readonly name: string; reado
 }
 FAssertModuleVersion(require("../package.json"));
 
+export * from "./cancellation";
+export * from "./execution_context";
+export * from "./lifecycle";
+
 export { FAggregateException } from "./FAggregateException";
 export { FArgumentException } from "./FArgumentException";
-export { FCancellationToken } from "./FCancellationToken";
-export { FCancelledException } from "./FCancelledException";
 export { FConfiguration } from "./FConfiguration";
 export { FConfigurationException } from "./FConfigurationException";
-export { FDisposable } from "./FDisposable";
 export { FException } from "./FException";
-export { FExecutionContext } from "./FExecutionContext";
-export { FExecutionContextLogger } from "./FExecutionContextLogger";
-export { FInitable } from "./FInitable";
 export { FInvalidOperationException } from "./FInvalidOperationException";
-export { FLogger, FLoggerContext, FLoggerProperty } from "./FLogger";
+export { FLogger } from "./FLogger";
+export { FLoggerExt, FLoggerProperties, FLoggerProperty } from "./FLoggerExt";
+export { Fsleep } from "./Fsleep";
