@@ -15,14 +15,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      # Setup .npmrc file to publish to npm
-      - uses: actions/setup-node@v3
+      - name: Set Up NodeJS
+        uses: actions/setup-node@v3
         with:
           node-version: '16.x'
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '${{ github.repository.owner }}'
 
-      - run: npm ci
+      - name: Build Package
+        run: |
+          npm install
+          npm run build:package
 
-      - run: npm publish
+      - name: Publish Package
+        run: |
+          cd .dist
+          npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
