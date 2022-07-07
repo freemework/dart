@@ -22,9 +22,12 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
           scope: '${{ github.repository.owner }}'
 
-      - name: Build Package
+      - name: Install Dependencies
         run: |
           npm install
+
+      - name: Build Package
+        run: |
           npm run build:package
 
       - name: Publish Package
