@@ -142,9 +142,8 @@ class _FConsoleLogger extends FLoggerContainer {
 	}
 
 	private _formatMessage(message: string): string {
-		const loggerName: string = this._loggerName !== null ? this._loggerName : "Unnamed Logger";
-		const ctx: string = JSON.stringify({ ...this._context });
-		const msg: string = `[${loggerName}] ${ctx}: ${message}`;
+		const logger: string = this._loggerName !== null ? this._loggerName : "Unnamed Logger";
+		const msg: string = JSON.stringify({ ...this._context, logger, message, });
 		return msg;
 	}
 }
