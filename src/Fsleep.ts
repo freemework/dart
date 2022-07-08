@@ -1,5 +1,6 @@
 import { FCancellationToken } from "./cancellation";
 import { FExceptionCancelled } from "./exception";
+import { FExecutionContext, FExecutionContextCancellation } from "./execution_context";
 
 /**
  * Provide a "sleeping" `Promise` that completes via timeout or cancellationToken
@@ -15,8 +16,18 @@ import { FExceptionCancelled } from "./exception";
  * const cancellationTokenSource = new FCancellationTokenSourceManual();
  * ...
  * await Fsleep(cancellationTokenSource.token); // Suspend infinitely while cancellationTokenSource activates
+ * @example
+ * const executionContext: FExecutionContext = ...;
+ * ...
+ * await Fsleep(executionContext); // Cancellation token will extracted from execution context
  */
-export function Fsleep(cancellationToken: FCancellationToken, ms?: number): Promise<void> {
+export function Fsleep(cancellationToken: FCancellationToken, ms?: number): Promise<void>;
+export function Fsleep(executionContext: FExecutionContext, ms?: number): Promise<void>;
+export function Fsleep(data: FExecutionContext | FCancellationToken, ms?: number): Promise<void> {
+	const cancellationToken: FCancellationToken = data instanceof FExecutionContext
+		? FExecutionContextCancellation.of(data).cancellationToken
+		: data;
+
 	return new Promise<void>((resolve, reject) => {
 		if (cancellationToken.isCancellationRequested) {
 			return reject(new FExceptionCancelled());
