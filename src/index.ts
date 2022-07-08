@@ -20,15 +20,10 @@ export function FAssertModuleVersion(packageInfo: { readonly name: string; reado
 FAssertModuleVersion(require("../package.json"));
 
 export * from "./cancellation";
+export * from "./exception";
 export * from "./execution_context";
 export * from "./lifecycle";
 
-export { FAggregateException } from "./FAggregateException";
-export { FArgumentException } from "./FArgumentException";
 export { FConfiguration } from "./FConfiguration";
-export { FConfigurationException } from "./FConfigurationException";
-// export { FContextLogger, FContextLoggerProperties, FContextLoggerProperty } from "./FContextLogger";
-export { FException } from "./FException";
-export { FInvalidOperationException } from "./FInvalidOperationException";
 export { FLogger } from "./FLogger";
 export { Fsleep } from "./Fsleep";

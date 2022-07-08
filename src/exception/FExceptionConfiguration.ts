@@ -1,6 +1,6 @@
 import { FException } from "./FException";
 
-export class FConfigurationException extends FException {
+export class FExceptionConfiguration extends FException {
 	public readonly source: string | null;
 	public readonly key: string | null;
 

@@ -1,7 +1,6 @@
 import { FCancellationTokenAggregated } from "../cancellation";
 import { FCancellationToken } from "../cancellation/FCancellationToken";
-import { FArgumentException } from "../FArgumentException";
-import { FInvalidOperationException } from "../FInvalidOperationException";
+import { FExceptionArgument, FExceptionInvalidOperation } from "../exception";
 import { FLogger } from "../FLogger";
 
 export abstract class FExecutionContext {
@@ -22,7 +21,7 @@ export abstract class FExecutionContext {
 		if (chainItem !== null) {
 			return chainItem;
 		}
-		throw new FInvalidOperationException(`Execution context '${clz.name}' is not presented on the chain.`);
+		throw new FExceptionInvalidOperation(`Execution context '${clz.name}' is not presented on the chain.`);
 	}
 }
 
@@ -136,7 +135,7 @@ export class FExecutionContextLogger extends FExecutionContextBase {
 
 			this._logger = loggerExCtx.logger.getLogger(loggerContext);
 		} else {
-			throw new FArgumentException();
+			throw new FExceptionArgument();
 		}
 	}
 

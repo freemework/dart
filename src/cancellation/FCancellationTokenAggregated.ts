@@ -1,5 +1,5 @@
-import { FAggregateException } from "../FAggregateException";
-import { FException } from "../FException";
+import { FException, FExceptionAggregate } from "../exception";
+
 import { FCancellationToken } from "./FCancellationToken";
 
 /**
@@ -33,7 +33,7 @@ export class FCancellationTokenAggregated implements FCancellationToken {
 				});
 			}
 			if (errors.length > 0) {
-				throw new FAggregateException(errors);
+				throw new FExceptionAggregate(errors);
 			}
 		};
 		for (const innerToken of tokens) {

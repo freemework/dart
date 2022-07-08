@@ -1,6 +1,6 @@
 import { FException } from "./FException";
 
-export class FAggregateException extends FException {
+export class FExceptionAggregate extends FException {
 	public readonly innerErrors: ReadonlyArray<FException>;
 	public constructor(innerErrors: ReadonlyArray<FException>) {
 		let friendlyInnerError: FException | null;
@@ -13,7 +13,7 @@ export class FAggregateException extends FException {
 		} else {
 			friendlyInnerErrors = [];
 			friendlyInnerError = null;
-			friendlyMessage = "FAggregateException";
+			friendlyMessage = "FExceptionAggregate";
 		}
 
 		if (friendlyInnerError !== null) {

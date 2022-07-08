@@ -1,8 +1,7 @@
-import { FAggregateException } from "../FAggregateException";
-import { FException } from "../FException";
+import { FException, FExceptionAggregate, FExceptionCancelled } from "../exception";
+
 import { FCancellationToken } from "./FCancellationToken";
 import { FCancellationTokenSource } from "./FCancellationTokenSource";
-import { FCancelledException } from "./FCancelledException";
 
 export class FCancellationTokenSourceManual implements FCancellationTokenSource {
 	private readonly _token: FCancellationToken;
@@ -42,7 +41,7 @@ export class FCancellationTokenSourceManual implements FCancellationTokenSource 
 			});
 		}
 		if (errors.length > 0) {
-			throw new FAggregateException(errors);
+			throw new FExceptionAggregate(errors);
 		}
 	}
 
@@ -59,7 +58,7 @@ export class FCancellationTokenSourceManual implements FCancellationTokenSource 
 
 	private throwIfCancellationRequested(): void {
 		if (this.isCancellationRequested) {
-			throw new FCancelledException();
+			throw new FExceptionCancelled();
 		}
 	}
 }

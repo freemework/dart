@@ -1,5 +1,4 @@
-import { FArgumentException } from "./FArgumentException";
-import { FException } from "./FException";
+import { FException, FExceptionArgument } from "./exception";
 
 export interface FLogger {
 	readonly context: FLogger.Context;
@@ -89,7 +88,7 @@ export abstract class FLoggerContainer implements FLogger {
 				: name;
 			return this.createSubLogger(loggerName, { ...this._context, ...context });
 		} else {
-			throw new FArgumentException();
+			throw new FExceptionArgument();
 		}
 	}
 
