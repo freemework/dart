@@ -85,7 +85,7 @@ export class FExecutionContextCancellation extends FExecutionContextBase {
 
 	public get cancellationToken(): FCancellationToken { return this._cancellationToken; }
 }
-export class FExecutionElementCancellation extends FExecutionElement<FExecutionContextCancellation> {
+export class FExecutionElementCancellation<TFExecutionContextCancellation extends FExecutionContextCancellation = FExecutionContextCancellation> extends FExecutionElement<TFExecutionContextCancellation> {
 	public get cancellationToken(): FCancellationToken { return this.owner.cancellationToken; }
 }
 
@@ -141,6 +141,6 @@ export class FExecutionContextLogger extends FExecutionContextBase {
 
 	public get logger(): FLogger { return this._logger; }
 }
-export class FExecutionElementLogger extends FExecutionElement<FExecutionContextLogger> {
+export class FExecutionElementLogger<TFExecutionContextLogger extends FExecutionContextLogger = FExecutionContextLogger> extends FExecutionElement<TFExecutionContextLogger> {
 	public get logger(): FLogger { return this.owner.logger; }
 }
