@@ -1,6 +1,159 @@
-import { FDisposable } from "./FDisposable";
+import { FDisposable, FDisposableBase } from "./FDisposable";
 import { FExecutionContext } from "../execution_context/FExecutionContext";
 
 export interface FInitable extends FDisposable {
 	init(executionContext: FExecutionContext): Promise<void>;
+}
+
+export abstract class FInitableBase implements FInitable {
+	private _initialized?: boolean;
+	private _initializingPromise?: Promise<void>;
+	private _disposed?: boolean;
+	private _disposingPromise?: Promise<void>;
+
+	public get initialized(): boolean { return this._initialized === true; }
+	public get initializing(): boolean { return this._initializingPromise !== undefined; }
+	public get disposed(): boolean { return this._disposed === true; }
+	public get disposing(): boolean { return this._disposingPromise !== undefined; }
+
+	public init(executionContext: FExecutionContext): Promise<void> {
+		this.verifyNotDisposed();
+		if (!this._initialized) {
+			if (this._initializingPromise === undefined) {
+				const onInitializeResult = this.onInit(executionContext);
+				if (onInitializeResult instanceof Promise) {
+					this._initializingPromise = onInitializeResult
+						.finally(() => {
+							delete this._initializingPromise;
+							this._initialized = true;
+						});
+				} else {
+					this._initialized = true;
+					return Promise.resolve();
+				}
+			}
+			return this._initializingPromise;
+		}
+		return Promise.resolve();
+	}
+
+	public dispose(): Promise<void> {
+		if (this._disposed !== true) {
+			if (this._disposingPromise === undefined) {
+				if (this._initializingPromise !== undefined) {
+					this._disposingPromise = this._initializingPromise
+						.then(async () => this.onDispose())
+						.finally(() => {
+							delete this._disposingPromise;
+							this._disposed = true;
+						});
+				} else {
+					const onDisposeResult = this.onDispose();
+					if (onDisposeResult instanceof Promise) {
+						this._disposingPromise = onDisposeResult.finally(() => {
+							delete this._disposingPromise;
+							this._disposed = true;
+						});
+					} else {
+						this._disposed = true;
+						return Promise.resolve();
+					}
+				}
+			}
+			return this._disposingPromise;
+		}
+		return Promise.resolve();
+	}
+
+	public static async initAll(executionContext: FExecutionContext, ...instances: ReadonlyArray<FInitable>): Promise<void> {
+		const intializedInstances: Array<FInitable> = [];
+		try {
+			for (const instance of instances) {
+				await instance.init(executionContext);
+				intializedInstances.push(instance);
+			}
+		} catch (e) {
+			for (const intializedInstance of intializedInstances.reverse()) {
+				await FDisposableBase.safeDispose(intializedInstance);
+			}
+			throw e;
+		}
+	}
+
+	protected abstract onInit(executionContext: FExecutionContext): void | Promise<void>;
+	protected abstract onDispose(): void | Promise<void>;
+
+
+	protected verifyInitialized() {
+		if (!this.initialized) {
+			throw new Error("Wrong operation on non-initialized object");
+		}
+	}
+
+	protected verifyNotDisposed() {
+		if (this.disposed || this.disposing) {
+			throw new Error("Wrong operation on disposed object");
+		}
+	}
+
+	protected verifyInitializedAndNotDisposed() {
+		this.verifyInitialized();
+		this.verifyNotDisposed();
+	}
+}
+
+export class FInitableMixin extends FInitableBase {
+	public static applyMixin(targetClass: any): void {
+		Object.getOwnPropertyNames(FInitableBase.prototype).forEach(name => {
+			const propertyDescr = Object.getOwnPropertyDescriptor(FInitableBase.prototype, name);
+
+			if (name === "constructor") {
+				// Skip constructor
+				return;
+			}
+
+			if (propertyDescr !== undefined) {
+				Object.defineProperty(targetClass.prototype, name, propertyDescr);
+			}
+		});
+
+		Object.getOwnPropertyNames(FInitableMixin.prototype).forEach(name => {
+			const propertyDescr = Object.getOwnPropertyDescriptor(FInitableMixin.prototype, name);
+
+			if (name === "constructor") {
+				// Skip constructor
+				return;
+			}
+			if (name === "onInit" || name === "onDispose") {
+				// Add NOP methods into mixed only if it not implements its
+				if (propertyDescr !== undefined) {
+					const existingPropertyDescr = Object.getOwnPropertyDescriptor(targetClass.prototype, name);
+					if (existingPropertyDescr === undefined) {
+						Object.defineProperty(targetClass.prototype, name, propertyDescr);
+					}
+				}
+				return;
+			}
+
+			if (propertyDescr !== undefined) {
+				Object.defineProperty(targetClass.prototype, name, propertyDescr);
+			}
+		});
+	}
+
+	protected onInit(executionContext: FExecutionContext): void | Promise<void> {
+		// Do nothing here by design. Users will override this method.
+	}
+
+	protected onDispose(): void | Promise<void> {
+		// Do nothing here by design. Users will override this method.
+	}
+
+	private constructor() {
+		super();
+		// Never called, due mixin
+		// Private constructor has two kinds of responsibility
+		// 1) Restrict to extends the mixin
+		// 2) Restrict to make instances of the mixin
+	}
 }

@@ -1,2 +1,3 @@
-export { FDisposable } from "./FDisposable";
-export { FInitable } from "./FInitable";
+export { FDisposable, FDisposableBase, FDisposableMixin } from "./FDisposable";
+export { FInitable, FInitableBase, FInitableMixin } from "./FInitable";
+export { Fusing } from "./Fusing";
