@@ -1,6 +1,5 @@
 import { FDisposable } from "./FDisposable";
 import { FInitable } from "./FInitable";
-import { FCancellationToken } from "../cancellation/FCancellationToken";
 import { FExecutionContext } from "../execution_context/FExecutionContext";
 
 export namespace Fusing {

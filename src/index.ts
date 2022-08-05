@@ -1,5 +1,3 @@
-const { name: packageName, version: packageVersion } = require("../package.json");
-
 export function FAssertModuleVersion(packageInfo: { readonly name: string; readonly version: string; }) {
 	const { name: packageName, version: packageVersion } = packageInfo;
 	const G: any = global || window || {};
@@ -20,6 +18,7 @@ export function FAssertModuleVersion(packageInfo: { readonly name: string; reado
 FAssertModuleVersion(require("../package.json"));
 
 export * from "./cancellation";
+export * from "./channel";
 export * from "./exception";
 export * from "./execution_context";
 export * from "./lifecycle";

@@ -2,8 +2,8 @@ import { assert } from "chai";
 
 import { Fsleep, FCancellationTokenSourceManual, FCancellationTokenSourceTimeout, FExceptionCancelled } from "../src/index";
 
-describe("ManualCancellationTokenSource tests", function () {
-	it("Should cancel sleep() before started", async () => {
+describe("Fsleep tests", function () {
+	it("Should cancel Fsleep() before started", async () => {
 		let expectedError;
 
 		const cancellationTokenSource = new FCancellationTokenSourceManual();
@@ -14,7 +14,7 @@ describe("ManualCancellationTokenSource tests", function () {
 		assert.isDefined(expectedError);
 		assert.instanceOf(expectedError, FExceptionCancelled);
 	});
-	it("Should cancel sleep() after start", async () => {
+	it("Should cancel Fsleep() after start", async () => {
 		let expectedError;
 
 		const cancellationTokenSource = new FCancellationTokenSourceManual();
@@ -28,7 +28,7 @@ describe("ManualCancellationTokenSource tests", function () {
 		assert.isDefined(expectedError);
 		assert.instanceOf(expectedError, FExceptionCancelled);
 	});
-	it("Should cancel sleep() via cancellationToken", async () => {
+	it("Should cancel Fsleep() via cancellationToken", async () => {
 		let expectedError;
 
 		const cancellationTokenSource = new FCancellationTokenSourceManual();
@@ -47,7 +47,7 @@ describe("ManualCancellationTokenSource tests", function () {
 		assert.isDefined(expectedError);
 		assert.instanceOf(expectedError, FExceptionCancelled);
 	});
-	it("Should cancel sleep() via Timeout", async () => {
+	it("Should cancel Fsleep() via Timeout", async () => {
 		let expectedError;
 
 		const cancellationTokenSource = new FCancellationTokenSourceTimeout(25);
@@ -62,7 +62,7 @@ describe("ManualCancellationTokenSource tests", function () {
 		assert.isDefined(expectedError);
 		assert.instanceOf(expectedError, FExceptionCancelled);
 	});
-	it("Should cancel sleep() via Timeout before start", async () => {
+	it("Should cancel Fsleep() via Timeout before start", async () => {
 		let expectedError;
 
 		const cancellationTokenSource = new FCancellationTokenSourceTimeout(24 * 60 * 60 * 1000/* long timeout */);
@@ -77,7 +77,7 @@ describe("ManualCancellationTokenSource tests", function () {
 		assert.isDefined(expectedError);
 		assert.instanceOf(expectedError, FExceptionCancelled);
 	});
-	it("Should cancel sleep() via Timeout + call cancel()", async () => {
+	it("Should cancel Fsleep() via Timeout + call cancel()", async () => {
 		let expectedError;
 
 		const cancellationTokenSource = new FCancellationTokenSourceTimeout(24 * 60 * 60 * 1000/* long timeout */);

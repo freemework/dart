@@ -40,6 +40,10 @@ export class FException extends Error {
 		}
 	}
 
+	public get name(): string {
+		return this.constructor.name;
+	}
+
 	public toString(): string {
 		if (this.innerException !== null) {
 			return [super.toString(), this.innerException.toString()].join("\n");
