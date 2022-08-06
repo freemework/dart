@@ -22,6 +22,7 @@ export * from "./channel";
 export * from "./exception";
 export * from "./execution_context";
 export * from "./lifecycle";
+export * from "./primitive";
 
 export { FConfiguration } from "./FConfiguration";
 export { FLogger } from "./FLogger";
