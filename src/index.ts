@@ -23,6 +23,7 @@ export * from "./exception";
 export * from "./execution_context";
 export * from "./lifecycle";
 export * from "./primitive";
+export * from "./sql";
 
 export { FConfiguration } from "./FConfiguration";
 export { FLogger } from "./FLogger";
