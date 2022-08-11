@@ -13,14 +13,14 @@ export abstract class FDecimal {
 	private static get backend(): FDecimal.Backend { return FDecimal.cfg.backend; }
 	public static get settings(): FDecimal.Settings { return FDecimal.cfg.settings; }
 
-	public static configure(backend: FDecimal.Backend, settings: FDecimal.Settings): void {
+	public static configure(backend: FDecimal.Backend): void {
 		if (FDecimal._cfg !== null) {
 			throw new FExceptionInvalidOperation(`Cannot ${FDecimal.name}.configure() twice. By design you have to call ${FDecimal.name}.configure() once.`);
 		}
 		this._cfg = Object.freeze({
 			backend,
 			settings: Object.freeze({
-				...settings
+				...backend.settings
 			})
 		});
 	}
