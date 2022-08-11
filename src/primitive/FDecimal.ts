@@ -31,9 +31,9 @@ export abstract class FDecimal {
 	 */
 	public static abs(value: FDecimal): FDecimal { return FDecimal.backend.abs(value); }
 	public static add(left: FDecimal, right: FDecimal): FDecimal { return FDecimal.backend.add(left, right); }
-	public static divide(left: FDecimal, right: FDecimal, roundMode?: FDecimal.RoundMode): FDecimal { return FDecimal.backend.divide(left, right); }
+	public static divide(left: FDecimal, right: FDecimal, roundMode?: FDecimal.RoundMode): FDecimal { return FDecimal.backend.divide(left, right, roundMode); }
 	public static equals(left: FDecimal, right: FDecimal): boolean { return FDecimal.backend.equals(left, right); }
-	public static fromFloat(value: number, roundMode?: FDecimal.RoundMode): FDecimal { return FDecimal.backend.fromFloat(value); }
+	public static fromFloat(value: number, roundMode?: FDecimal.RoundMode): FDecimal { return FDecimal.backend.fromFloat(value, roundMode); }
 	public static fromInt(value: number): FDecimal { return FDecimal.backend.fromInt(value); }
 	public static gt(left: FDecimal, right: FDecimal): boolean { return FDecimal.backend.gt(left, right); }
 	public static gte(left: FDecimal, right: FDecimal): boolean { return FDecimal.backend.gte(left, right); }
