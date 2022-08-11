@@ -4,6 +4,23 @@ import { FExecutionContext } from "../execution_context/FExecutionContext";
 export interface FInitable extends FDisposable {
 	init(executionContext: FExecutionContext): Promise<void>;
 }
+export namespace FInitable {
+	export async function initAll(executionContext: FExecutionContext, ...instances: ReadonlyArray<FInitable>): Promise<void> {
+		const intializedInstances: Array<FInitable> = [];
+		try {
+			for (const instance of instances) {
+				await instance.init(executionContext);
+				intializedInstances.push(instance);
+			}
+		} catch (e) {
+			for (const intializedInstance of intializedInstances.reverse()) {
+				await FDisposableBase.safeDispose(intializedInstance);
+			}
+			throw e;
+		}
+	}
+
+}
 
 export abstract class FInitableBase implements FInitable {
 	private _initialized?: boolean;
@@ -63,21 +80,6 @@ export abstract class FInitableBase implements FInitable {
 			return this._disposingPromise;
 		}
 		return Promise.resolve();
-	}
-
-	public static async initAll(executionContext: FExecutionContext, ...instances: ReadonlyArray<FInitable>): Promise<void> {
-		const intializedInstances: Array<FInitable> = [];
-		try {
-			for (const instance of instances) {
-				await instance.init(executionContext);
-				intializedInstances.push(instance);
-			}
-		} catch (e) {
-			for (const intializedInstance of intializedInstances.reverse()) {
-				await FDisposableBase.safeDispose(intializedInstance);
-			}
-			throw e;
-		}
 	}
 
 	protected abstract onInit(executionContext: FExecutionContext): void | Promise<void>;

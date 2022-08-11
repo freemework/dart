@@ -18,8 +18,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "${{ matrix.node-version }}"
-          registry-url: "https://npm.pkg.github.com"
-          scope: "${{ github.repository.owner }}"
+
+      - name: Bump NPM to latest version
+        run: |
+          npm -g install npm
 
       - name: Install Dependencies
         run: |
