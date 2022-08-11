@@ -16,7 +16,7 @@ export class FException extends Error {
 
 	public constructor();
 	public constructor(message: string);
-	public constructor(message: string, innerEx: FException);
+	public constructor(message: string, innerEx?: FException);
 	public constructor(innerEx: FException);
 
 	public constructor(first?: any, second?: any) {

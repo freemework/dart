@@ -13,8 +13,8 @@ export interface FSqlData {
 	readonly asNumber: number;
 	readonly asNullableNumber: number | null;
 
-	readonly asFinancial: FDecimal;
-	readonly asNullableFinancial: FDecimal | null;
+	readonly asDecimal: FDecimal;
+	readonly asNullableDecimal: FDecimal | null;
 
 	readonly asDate: Date;
 	readonly asNullableDate: Date | null;
