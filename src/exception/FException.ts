@@ -4,7 +4,7 @@ export class FException extends Error {
 			if (likeError instanceof FException) {
 				return likeError;
 			} else if (likeError instanceof Error) {
-				return new FNativeErrorException(likeError);
+				return new FExceptionNativeErrorWrapper(likeError);
 			} else {
 				return new FException(`${likeError}`);
 			}
@@ -53,11 +53,11 @@ export class FException extends Error {
 }
 
 
-export class FNativeErrorException extends FException {
+class FExceptionNativeErrorWrapper extends FException {
 	public readonly nativeError: Error;
 
 	public constructor(nativeError: Error) {
-		super();
+		super(nativeError.message);
 		this.nativeError = nativeError;
 	}
 }
