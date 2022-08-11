@@ -1,32 +1,32 @@
 import { FException } from "./FException";
 
 export class FExceptionAggregate extends FException {
-	public readonly innerErrors: ReadonlyArray<FException>;
-	public constructor(innerErrors: ReadonlyArray<FException>) {
-		let friendlyInnerError: FException | null;
-		let friendlyInnerErrors: Array<FException>;
+	public readonly innerExceptions: ReadonlyArray<FException>;
+	public constructor(innerExceptions: ReadonlyArray<FException>) {
+		let friendlyInnerException: FException | null;
+		let friendlyInnerExceptions: Array<FException>;
 		let friendlyMessage: string;
-		if (innerErrors.length > 0) {
-			friendlyInnerErrors = [...innerErrors];
-			friendlyInnerError = friendlyInnerErrors.length > 0 ? friendlyInnerErrors[0] : null;
-			friendlyMessage = innerErrors.map(e => e.message).join("\n");
+		if (innerExceptions.length > 0) {
+			friendlyInnerExceptions = [...innerExceptions];
+			friendlyInnerException = friendlyInnerExceptions.length > 0 ? friendlyInnerExceptions[0] : null;
+			friendlyMessage = innerExceptions.map(e => e.message).join("\n");
 		} else {
-			friendlyInnerErrors = [];
-			friendlyInnerError = null;
+			friendlyInnerExceptions = [];
+			friendlyInnerException = null;
 			friendlyMessage = "FExceptionAggregate";
 		}
 
-		if (friendlyInnerError !== null) {
-			super(friendlyMessage, friendlyInnerError);
+		if (friendlyInnerException !== null) {
+			super(friendlyMessage, friendlyInnerException);
 		} else {
 			super(friendlyMessage);
 		}
 
-		this.innerErrors = friendlyInnerErrors;
+		this.innerExceptions = friendlyInnerExceptions;
 	}
 
 	public toString(): string {
-		if (this.innerErrors.length === 0) { return super.toString(); }
-		return this.innerErrors.map(e => e.toString()).join("\n");
+		if (this.innerExceptions.length === 0) { return super.toString(); }
+		return this.innerExceptions.map(e => e.toString()).join("\n");
 	}
 }

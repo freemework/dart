@@ -67,10 +67,10 @@ describe("FEventChannelMixin tests", function () {
 		assert.equal(callCount, 2);
 		assert.isDefined(expectedError);
 		assert.instanceOf(expectedError, FExceptionAggregate);
-		assert.equal((expectedError as FExceptionAggregate).innerErrors.length, 2);
-		assert.instanceOf((expectedError as FExceptionAggregate).innerErrors[0], MyTestError);
-		assert.instanceOf((expectedError as FExceptionAggregate).innerErrors[1], MyTestError);
-		assert.equal((expectedError as FExceptionAggregate).innerErrors[0].message, "nonce");
-		assert.equal((expectedError as FExceptionAggregate).innerErrors[1].message, "nonce");
+		assert.equal((expectedError as FExceptionAggregate).innerExceptions.length, 2);
+		assert.instanceOf((expectedError as FExceptionAggregate).innerExceptions[0], MyTestError);
+		assert.instanceOf((expectedError as FExceptionAggregate).innerExceptions[1], MyTestError);
+		assert.equal((expectedError as FExceptionAggregate).innerExceptions[0].message, "nonce");
+		assert.equal((expectedError as FExceptionAggregate).innerExceptions[1].message, "nonce");
 	});
 });

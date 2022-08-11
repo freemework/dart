@@ -5,12 +5,11 @@ export class FExceptionConfiguration extends FException {
 	public readonly key: string | null;
 
 	public constructor(message: string, key: string | null, source: string | null);
-	public constructor(message: string, key: string | null, source: string | null, innerError: Error);
-	public constructor(message: string, key: string | null, source: string | null, innerError: any);
+	public constructor(message: string, key: string | null, source: string | null, innerException: FException);
 
-	public constructor(message: string, key: string | null, source: string | null, innerError?: any) {
-		if (innerError !== undefined) {
-			super(message, innerError);
+	public constructor(message: string, key: string | null, source: string | null, innerException?: any) {
+		if (innerException !== undefined) {
+			super(message, innerException);
 		} else {
 			super(message);
 		}

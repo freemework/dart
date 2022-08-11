@@ -3,7 +3,7 @@ import {
 	FExecutionContextCancellation, FExecutionElementCancellation, FCancellationToken,
 	FExecutionContext, FExecutionContextBase, FLogger,
 	FExecutionContextLogger, FExecutionElementLogger
-} from "../src/index";
+} from "../../src/index";
 
 import { assert } from "chai";
 

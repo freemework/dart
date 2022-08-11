@@ -1,15 +1,12 @@
 export class FException extends Error {
 	public static wrapIfNeeded(likeError: any): FException {
-		if (likeError) {
-			if (likeError instanceof FException) {
-				return likeError;
-			} else if (likeError instanceof Error) {
-				return new FExceptionNativeErrorWrapper(likeError);
-			} else {
-				return new FException(`${likeError}`);
-			}
+		if (likeError instanceof FException) {
+			return likeError;
+		} else if (likeError instanceof Error) {
+			return new FExceptionNativeErrorWrapper(likeError);
+		} else {
+			return new FExceptionNativeObjectWrapper(likeError);
 		}
-		return new FException();
 	}
 
 	public readonly innerException: FException | null;
@@ -52,8 +49,16 @@ export class FException extends Error {
 	}
 }
 
+export class FExceptionNativeObjectWrapper extends FException {
+	public readonly nativeObject: any;
 
-class FExceptionNativeErrorWrapper extends FException {
+	public constructor(nativeObject: any) {
+		super(`${nativeObject}`);
+		this.nativeObject = nativeObject;
+	}
+}
+
+export class FExceptionNativeErrorWrapper extends FException {
 	public readonly nativeError: Error;
 
 	public constructor(nativeError: Error) {

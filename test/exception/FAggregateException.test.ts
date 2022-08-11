@@ -1,4 +1,4 @@
-import { FException, FExceptionAggregate } from "../src/index";
+import { FException, FExceptionAggregate } from "../../src/index";
 
 import { assert } from "chai";
 

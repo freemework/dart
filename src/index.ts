@@ -21,7 +21,9 @@ export * from "./cancellation";
 export * from "./channel";
 export * from "./exception";
 export * from "./execution_context";
+export * from "./http";
 export * from "./lifecycle";
+export * from "./limit";
 export * from "./primitive";
 export * from "./sql";
 
