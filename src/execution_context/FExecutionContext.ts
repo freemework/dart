@@ -1,7 +1,8 @@
-import { FCancellationTokenAggregated } from "../cancellation";
-import { FCancellationToken } from "../cancellation/FCancellationToken";
-import { FExceptionArgument, FExceptionInvalidOperation } from "../exception";
+import { FCancellationToken } from "../cancellation";
+import { FExceptionInvalidOperation } from "../exception";
 import { FLogger } from "../FLogger";
+import { FExecutionContextCancellation } from "./FExecutionContextCancellation";
+import { FExecutionContextLogger } from "./FExecutionContextLogger";
 
 export abstract class FExecutionContext {
 	public abstract get prevContext(): FExecutionContext | null;
@@ -38,11 +39,35 @@ export abstract class FExecutionContextBase extends FExecutionContext {
 
 class _FExecutionContextRoot extends FExecutionContext {
 	public get prevContext(): FExecutionContext | null { return null; }
-	// public get cancellationToken(): FCancellationToken { return FCancellationToken.None; }
+}
+export namespace FExecutionContext {
+	/**
+	 * Provide empty execution context. Usually used as root of execution context chain.
+	 */
+	export const Empty: FExecutionContext = new _FExecutionContextRoot();
 }
 
+
+class _FExecutionContextNone extends FExecutionContextBase {
+	public constructor() {
+		super(
+			new FExecutionContextCancellation(
+				new FExecutionContextLogger(
+					FExecutionContext.Empty,
+					FLogger.None
+				),
+				FCancellationToken.None
+			)
+		);
+	}
+}
 export namespace FExecutionContext {
-	export const Empty: FExecutionContext = new _FExecutionContextRoot();
+	/**
+	 * Provide execution context with with:
+	 * * None logger
+	 * * None cancalletion token
+	 */
+	export const None: FExecutionContext = new _FExecutionContextNone();
 }
 
 export class FExecutionElement<TExecutionContext extends FExecutionContext> {
