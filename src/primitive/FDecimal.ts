@@ -38,7 +38,7 @@ export abstract class FDecimal {
 	public static gt(left: FDecimal, right: FDecimal): boolean { return FDecimal.backend.gt(left, right); }
 	public static gte(left: FDecimal, right: FDecimal): boolean { return FDecimal.backend.gte(left, right); }
 	public static inverse(value: FDecimal): FDecimal { return FDecimal.backend.inverse(value); }
-	public static isFinancial(test: any): test is FDecimal { return FDecimal.backend.isFinancial(test); }
+	public static isDecimal(test: any): test is FDecimal { return FDecimal.backend.isDecimal(test); }
 	public static isNegative(test: FDecimal): boolean { return FDecimal.backend.isNegative(test); }
 	public static isPositive(test: FDecimal): boolean { return FDecimal.backend.isPositive(test); }
 	public static isZero(test: FDecimal): boolean { return FDecimal.backend.isZero(test); }
@@ -96,7 +96,7 @@ export namespace FDecimal {
 		gt(left: FDecimal, right: FDecimal): boolean;
 		gte(left: FDecimal, right: FDecimal): boolean;
 		inverse(value: FDecimal): FDecimal;
-		isFinancial(test: any): test is FDecimal;
+		isDecimal(test: any): test is FDecimal;
 		isNegative(test: FDecimal): boolean;
 		isPositive(test: FDecimal): boolean;
 		isZero(test: FDecimal): boolean;
@@ -342,7 +342,7 @@ export class FDecimalBackendNumber implements FDecimal.Backend {
 		return new _FDecimalNumber(value.instance * -1, this);
 	}
 
-	public isFinancial(test: any): test is FDecimal {
+	public isDecimal(test: any): test is FDecimal {
 		return test instanceof _FDecimalNumber;
 	}
 
