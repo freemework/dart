@@ -1,7 +1,10 @@
+import { FException } from "../exception/FException";
 import { FExceptionArgument } from "../exception/FExceptionArgument";
 import { FExceptionInvalidOperation } from "../exception/FExceptionInvalidOperation";
 
 export abstract class FDecimal {
+	public static readonly REGEXP: RegExp = /^([+-]?)(0|[1-9][0-9]*)(\.([0-9]+))?$/;
+
 	private static _cfg: { readonly backend: FDecimal.Backend; readonly settings: FDecimal.Settings; } | null = null;
 	private static get cfg(): { readonly backend: FDecimal.Backend; readonly settings: FDecimal.Settings; } {
 		const cfg: { readonly backend: FDecimal.Backend; readonly settings: FDecimal.Settings; } | null = this._cfg;
@@ -79,6 +82,16 @@ export abstract class FDecimal {
 
 export namespace FDecimal {
 	export type FractionDigits = number;
+	export namespace FractionDigits {
+		export function isFraction(test: number): test is FDecimal.FractionDigits {
+			return Number.isSafeInteger(test) && test >= 0;
+		}
+		export function verifyFraction(test: FDecimal.FractionDigits): asserts test is FDecimal.FractionDigits {
+			if (!isFraction(test)) {
+				throw new FExceptionArgument("Wrong argument fraction. Expected integer >= 0");
+			}
+		}
+	}
 
 	export interface Backend {
 		readonly settings: FDecimal.Settings;
@@ -192,16 +205,22 @@ export namespace FDecimal {
 		readonly fractionalDigits: number;
 		readonly roundMode: FDecimal.RoundMode;
 	}
+
+	export class UnreachableRoundMode extends FException {
+		public constructor(roundMode: never) {
+			super(`Unsupported round mode: ${roundMode}`);
+		}
+	}
 }
 
 
-export class FDecimalBase<TInstance> implements FDecimal {
+export class FDecimalBase<TInstance, TBackend extends FDecimal.Backend> implements FDecimal {
 	private readonly _instance: TInstance;
-	private readonly _operation: FDecimal.Backend;
+	private readonly _backend: TBackend;
 
-	public constructor(instance: TInstance, operation: FDecimal.Backend) {
+	public constructor(instance: TInstance, backend: TBackend) {
 		this._instance = instance;
-		this._operation = operation;
+		this._backend = backend;
 	}
 
 	public get instance(): TInstance {
@@ -209,68 +228,70 @@ export class FDecimalBase<TInstance> implements FDecimal {
 	}
 
 	public abs(): FDecimal {
-		return this._operation.abs(this);
+		return this._backend.abs(this);
 	}
 
 	public add(value: FDecimal): FDecimal {
-		return this._operation.add(this, value);
+		return this._backend.add(this, value);
 	}
 
 	public divide(value: FDecimal, roundMode?: FDecimal.RoundMode): FDecimal {
-		return this._operation.divide(this, value, roundMode);
+		return this._backend.divide(this, value, roundMode);
 	}
 
 	public equals(value: FDecimal): boolean {
-		return this._operation.equals(this, value);
+		return this._backend.equals(this, value);
 	}
 
 	public inverse(): FDecimal {
-		return this._operation.inverse(this);
+		return this._backend.inverse(this);
 	}
 
 	public isNegative(): boolean {
-		return this._operation.isNegative(this);
+		return this._backend.isNegative(this);
 	}
 
 	public isPositive(): boolean {
-		return this._operation.isPositive(this);
+		return this._backend.isPositive(this);
 	}
 
 	public isZero(): boolean {
-		return this._operation.isZero(this);
+		return this._backend.isZero(this);
 	}
 
 	public mod(value: FDecimal): FDecimal {
-		return this._operation.mod(this, value);
+		return this._backend.mod(this, value);
 	}
 
 	public multiply(value: FDecimal, roundMode?: FDecimal.RoundMode): FDecimal {
-		return this._operation.multiply(this, value, roundMode);
+		return this._backend.multiply(this, value, roundMode);
 	}
 
 	public round(fractionDigits: FDecimal.FractionDigits, roundMode?: FDecimal.RoundMode): FDecimal {
-		return this._operation.round(this, fractionDigits, roundMode);
+		return this._backend.round(this, fractionDigits, roundMode);
 	}
 
 	public subtract(value: FDecimal): FDecimal {
-		return this._operation.subtract(this, value);
+		return this._backend.subtract(this, value);
 	}
 
 	public toNumber(): number {
-		return this._operation.toNumber(this);
+		return this._backend.toNumber(this);
 	}
 
 	public toString(): string {
-		return this._operation.toString(this);
+		return this._backend.toString(this);
 	}
 
 	public toJSON(): string {
 		return JSON.stringify(this._instance);
 	}
+
+	protected get backend(): TBackend { return this._backend; }
 }
 
 export class FDecimalBackendNumber implements FDecimal.Backend {
-	private static verifyFinancialFloat(test: FDecimal): asserts test is _FDecimalNumber {
+	private static verifyInstance(test: FDecimal): asserts test is _FDecimalNumber {
 		if (test instanceof _FDecimalNumber) { return; }
 		throw new FExceptionInvalidOperation(`Mixed '${FDecimal.name}' implementations detected.`);
 	}
@@ -293,27 +314,27 @@ export class FDecimalBackendNumber implements FDecimal.Backend {
 	}
 
 	public abs(value: FDecimal): FDecimal {
-		FDecimalBackendNumber.verifyFinancialFloat(value);
+		FDecimalBackendNumber.verifyInstance(value);
 		return new _FDecimalNumber(Math.abs(value.instance), this);
 	}
 
 	public add(left: FDecimal, right: FDecimal): FDecimal {
-		FDecimalBackendNumber.verifyFinancialFloat(left);
-		FDecimalBackendNumber.verifyFinancialFloat(right);
+		FDecimalBackendNumber.verifyInstance(left);
+		FDecimalBackendNumber.verifyInstance(right);
 		return new _FDecimalNumber(left.instance + right.instance, this);
 	}
 
 	public divide(left: FDecimal, right: FDecimal, roundMode?: FDecimal.RoundMode | undefined): FDecimal {
-		FDecimalBackendNumber.verifyFinancialFloat(left);
-		FDecimalBackendNumber.verifyFinancialFloat(right);
+		FDecimalBackendNumber.verifyInstance(left);
+		FDecimalBackendNumber.verifyInstance(right);
 		const divideValueInstance: number = left.instance / right.instance;
 		const roundedDivideValueInstance = this._round(divideValueInstance, this.settings.fractionalDigits, roundMode);
 		return new _FDecimalNumber(roundedDivideValueInstance, this);
 	}
 
 	public equals(left: FDecimal, right: FDecimal): boolean {
-		FDecimalBackendNumber.verifyFinancialFloat(left);
-		FDecimalBackendNumber.verifyFinancialFloat(right);
+		FDecimalBackendNumber.verifyInstance(left);
+		FDecimalBackendNumber.verifyInstance(right);
 		return left.instance === right.instance;
 	}
 
@@ -326,19 +347,19 @@ export class FDecimalBackendNumber implements FDecimal.Backend {
 	}
 
 	public gt(left: FDecimal, right: FDecimal): boolean {
-		FDecimalBackendNumber.verifyFinancialFloat(left);
-		FDecimalBackendNumber.verifyFinancialFloat(right);
+		FDecimalBackendNumber.verifyInstance(left);
+		FDecimalBackendNumber.verifyInstance(right);
 		return left.instance > right.instance;
 	}
 
 	public gte(left: FDecimal, right: FDecimal): boolean {
-		FDecimalBackendNumber.verifyFinancialFloat(left);
-		FDecimalBackendNumber.verifyFinancialFloat(right);
+		FDecimalBackendNumber.verifyInstance(left);
+		FDecimalBackendNumber.verifyInstance(right);
 		return left.instance >= right.instance;
 	}
 
 	public inverse(value: FDecimal): FDecimal {
-		FDecimalBackendNumber.verifyFinancialFloat(value);
+		FDecimalBackendNumber.verifyInstance(value);
 		return new _FDecimalNumber(value.instance * -1, this);
 	}
 
@@ -347,55 +368,55 @@ export class FDecimalBackendNumber implements FDecimal.Backend {
 	}
 
 	public isNegative(test: FDecimal): boolean {
-		FDecimalBackendNumber.verifyFinancialFloat(test);
+		FDecimalBackendNumber.verifyInstance(test);
 		return test.instance < 0;
 	}
 
 	public isPositive(test: FDecimal): boolean {
-		FDecimalBackendNumber.verifyFinancialFloat(test);
+		FDecimalBackendNumber.verifyInstance(test);
 		return test.instance > 0;
 	}
 
 	public isZero(test: FDecimal): boolean {
-		FDecimalBackendNumber.verifyFinancialFloat(test);
+		FDecimalBackendNumber.verifyInstance(test);
 		return test.instance == 0;
 	}
 
 	public lt(left: FDecimal, right: FDecimal): boolean {
-		FDecimalBackendNumber.verifyFinancialFloat(left);
-		FDecimalBackendNumber.verifyFinancialFloat(right);
+		FDecimalBackendNumber.verifyInstance(left);
+		FDecimalBackendNumber.verifyInstance(right);
 		return left.instance < right.instance;
 	}
 
 	public lte(left: FDecimal, right: FDecimal): boolean {
-		FDecimalBackendNumber.verifyFinancialFloat(left);
-		FDecimalBackendNumber.verifyFinancialFloat(right);
+		FDecimalBackendNumber.verifyInstance(left);
+		FDecimalBackendNumber.verifyInstance(right);
 		return left.instance <= right.instance;
 	}
 
 	public max(left: FDecimal, right: FDecimal): FDecimal {
-		FDecimalBackendNumber.verifyFinancialFloat(left);
-		FDecimalBackendNumber.verifyFinancialFloat(right);
+		FDecimalBackendNumber.verifyInstance(left);
+		FDecimalBackendNumber.verifyInstance(right);
 		return new _FDecimalNumber(Math.max(left.instance, right.instance), this);
 	}
 
 	public min(left: FDecimal, right: FDecimal): FDecimal {
-		FDecimalBackendNumber.verifyFinancialFloat(left);
-		FDecimalBackendNumber.verifyFinancialFloat(right);
+		FDecimalBackendNumber.verifyInstance(left);
+		FDecimalBackendNumber.verifyInstance(right);
 		return new _FDecimalNumber(Math.min(left.instance, right.instance), this);
 	}
 
 	public mod(left: FDecimal, right: FDecimal, roundMode?: FDecimal.RoundMode): FDecimal {
-		FDecimalBackendNumber.verifyFinancialFloat(left);
-		FDecimalBackendNumber.verifyFinancialFloat(right);
+		FDecimalBackendNumber.verifyInstance(left);
+		FDecimalBackendNumber.verifyInstance(right);
 		const modValueInstance: number = left.instance % right.instance;
 		const roundedModValueInstance = this._round(modValueInstance, this.settings.fractionalDigits, roundMode);
 		return new _FDecimalNumber(roundedModValueInstance, this);
 	}
 
 	public multiply(left: FDecimal, right: FDecimal, roundMode?: FDecimal.RoundMode | undefined): FDecimal {
-		FDecimalBackendNumber.verifyFinancialFloat(left);
-		FDecimalBackendNumber.verifyFinancialFloat(right);
+		FDecimalBackendNumber.verifyInstance(left);
+		FDecimalBackendNumber.verifyInstance(right);
 		const multiplyValueInstance: number = left.instance * right.instance;
 		const roundedMultiplyValueInstance = this._round(multiplyValueInstance, this.settings.fractionalDigits, roundMode);
 		return new _FDecimalNumber(roundedMultiplyValueInstance, this);
@@ -406,7 +427,7 @@ export class FDecimalBackendNumber implements FDecimal.Backend {
 	}
 
 	public round(value: FDecimal, fractionDigits: number, roundMode?: FDecimal.RoundMode | undefined): FDecimal {
-		FDecimalBackendNumber.verifyFinancialFloat(value);
+		FDecimalBackendNumber.verifyInstance(value);
 
 		const roundedValueInstance = this._round(value.instance, fractionDigits, roundMode);
 
@@ -444,20 +465,20 @@ export class FDecimalBackendNumber implements FDecimal.Backend {
 	}
 
 	public subtract(left: FDecimal, right: FDecimal): FDecimal {
-		FDecimalBackendNumber.verifyFinancialFloat(left);
-		FDecimalBackendNumber.verifyFinancialFloat(right);
+		FDecimalBackendNumber.verifyInstance(left);
+		FDecimalBackendNumber.verifyInstance(right);
 		return new _FDecimalNumber(left.instance - right.instance, this);
 	}
 
 	public toNumber(value: FDecimal): number {
-		FDecimalBackendNumber.verifyFinancialFloat(value);
+		FDecimalBackendNumber.verifyInstance(value);
 		return value.instance;
 	}
 
 	public toString(value: FDecimal): string {
-		FDecimalBackendNumber.verifyFinancialFloat(value);
+		FDecimalBackendNumber.verifyInstance(value);
 		return value.instance.toFixed(this.settings.fractionalDigits);
 	}
 }
 
-class _FDecimalNumber extends FDecimalBase<number> { }
+class _FDecimalNumber extends FDecimalBase<number, FDecimalBackendNumber> { }
