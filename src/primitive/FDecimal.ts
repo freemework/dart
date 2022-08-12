@@ -284,7 +284,7 @@ export class FDecimalBase<TInstance, TBackend extends FDecimal.Backend> implemen
 	}
 
 	public toJSON(): string {
-		return JSON.stringify(this._instance);
+		return this.toString();
 	}
 
 	protected get backend(): TBackend { return this._backend; }
