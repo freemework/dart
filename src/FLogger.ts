@@ -108,38 +108,61 @@ class _FConsoleLogger extends FLoggerContainer {
 	public get isFatalEnabled(): boolean { return true; }
 
 	public trace(message: string, ex?: FException): void {
-		const msg: string = this._formatMessage(message, ex);
+		const msg: string = this._formatMessage("trace", message, ex);
 		console.log(msg);
 	}
 	public debug(message: string, ex?: FException): void {
-		const msg: string = this._formatMessage(message, ex);
+		const msg: string = this._formatMessage("debug", message, ex);
 		console.log(msg);
 	}
 	public info(message: string): void {
-		console.info(this._formatMessage(message));
+		console.info(this._formatMessage("info", message));
 	}
 	public warn(message: string): void {
-		console.warn(this._formatMessage(message));
+		console.warn(this._formatMessage("warn", message));
 	}
 	public error(message: string): void {
-		console.error(this._formatMessage(message));
+		console.error(this._formatMessage("error", message));
 	}
 	public fatal(message: string): void {
-		console.error(this._formatMessage(message));
+		console.error(this._formatMessage("fatal", message));
 	}
 
 	protected createSubLogger(loggerName: string, context: FLogger.Context): FLogger {
 		return new _FConsoleLogger(loggerName, context);
 	}
 
-	private _formatMessage(message: string, ex?: FException): string {
-		const logger: string = this._loggerName !== null ? this._loggerName : "Unnamed Logger";
-		const messageData: any = { ...this._context, logger, message, };
+	private _formatMessage(loggerLevel: string, message: string, ex?: FException): string {
+		const loggerName: string = this._loggerName !== null ? this._loggerName : "Unnamed Logger";
+		const messageData: any = { ...this._context, loggerLevel, loggerName, message, };
 		if (ex !== undefined) {
-			messageData["exceptionStack"] = ex.name;
-			messageData["exceptionStack"] = ex.message;
-			if (ex.stack !== undefined) {
-				messageData["exceptionStack"] = ex.stack;
+			messageData["exceptionName"] = ex.name;
+			let recursiveEx: FException | null = ex;
+			let message: string | null = null;
+			let stack: string | null = null;
+			while (recursiveEx !== null) {
+				const currStack = recursiveEx.stack;
+				if (currStack !== undefined) {
+					if (stack === null) {
+						stack = currStack;
+					} else {
+						stack += "\n" + currStack;
+					}
+				}
+
+				if (message === null) {
+					message = recursiveEx.message;
+				} else {
+					message += "\n" + recursiveEx.message;
+				}
+
+				recursiveEx = recursiveEx.innerException;
+			}
+			if (stack !== null) {
+				messageData["exceptionStack"] = stack;
+			}
+			if (message !== null) {
+				messageData["exceptionMessage"] = message;
 			}
 		}
 		const msg: string = JSON.stringify(messageData);
