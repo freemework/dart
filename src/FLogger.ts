@@ -140,7 +140,7 @@ class _FConsoleLogger extends FLoggerContainer {
 			let recursiveEx: FException | null = ex;
 			let message: string | null = null;
 			let stack: string | null = null;
-			while (recursiveEx !== null) {
+			while (recursiveEx !== null && recursiveEx !== undefined && recursiveEx instanceof FException) {
 				const currStack = recursiveEx.stack;
 				if (currStack !== undefined) {
 					if (stack === null) {
