@@ -108,20 +108,12 @@ class _FConsoleLogger extends FLoggerContainer {
 	public get isFatalEnabled(): boolean { return true; }
 
 	public trace(message: string, ex?: FException): void {
-		const msg: string = this._formatMessage(message);
-		if (ex !== undefined) {
-			console.trace(msg, ex);
-		} else {
-			console.trace(msg);
-		}
+		const msg: string = this._formatMessage(message, ex);
+		console.log(msg);
 	}
 	public debug(message: string, ex?: FException): void {
-		const msg: string = this._formatMessage(message);
-		if (ex !== undefined) {
-			console.debug(msg, ex);
-		} else {
-			console.debug(msg);
-		}
+		const msg: string = this._formatMessage(message, ex);
+		console.log(msg);
 	}
 	public info(message: string): void {
 		console.info(this._formatMessage(message));
@@ -140,9 +132,17 @@ class _FConsoleLogger extends FLoggerContainer {
 		return new _FConsoleLogger(loggerName, context);
 	}
 
-	private _formatMessage(message: string): string {
+	private _formatMessage(message: string, ex?: FException): string {
 		const logger: string = this._loggerName !== null ? this._loggerName : "Unnamed Logger";
-		const msg: string = JSON.stringify({ ...this._context, logger, message, });
+		const messageData: any = { ...this._context, logger, message, };
+		if (ex !== undefined) {
+			messageData["exceptionStack"] = ex.name;
+			messageData["exceptionStack"] = ex.message;
+			if (ex.stack !== undefined) {
+				messageData["exceptionStack"] = ex.stack;
+			}
+		}
+		const msg: string = JSON.stringify(messageData);
 		return msg;
 	}
 }
