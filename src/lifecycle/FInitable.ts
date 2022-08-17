@@ -29,11 +29,14 @@ export abstract class FInitableBase implements FInitable {
 	private _disposingPromise?: Promise<void>;
 	private _initExecutionContext: FExecutionContext | null;
 
-
 	public get initialized(): boolean { return this._initialized === true; }
 	public get initializing(): boolean { return this._initializingPromise !== undefined; }
 	public get disposed(): boolean { return this._disposed === true; }
 	public get disposing(): boolean { return this._disposingPromise !== undefined; }
+
+	public constructor() {
+		this._initExecutionContext = null;
+	}
 
 	public init(executionContext: FExecutionContext): Promise<void> {
 		this.verifyNotDisposed();
@@ -84,10 +87,6 @@ export abstract class FInitableBase implements FInitable {
 			return this._disposingPromise;
 		}
 		return Promise.resolve();
-	}
-
-	protected constructor() {
-		this._initExecutionContext = null;
 	}
 
 	protected get initExecutionContext(): FExecutionContext {
