@@ -28,5 +28,6 @@ export * from "./primitive";
 export * from "./sql";
 
 export { FConfiguration } from "./FConfiguration";
+export { FEnsure, FEnsureException } from "./FEnsure";
 export { FLogger, FLoggerContainer } from "./FLogger";
 export { Fsleep } from "./Fsleep";
