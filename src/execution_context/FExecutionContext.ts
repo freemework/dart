@@ -168,9 +168,9 @@ class _FExecutionContextNone extends FExecutionContextBase {
 }
 export namespace FExecutionContext {
 	/**
-	 * Provide execution context with with:
-	 * * None logger
-	 * * None cancalletion token
+	 * Provide execution context with:
+	 * * None(Dummy) logger
+	 * * None(Dummy) cancelletion token
 	 */
 	export const None: FExecutionContext = new _FExecutionContextNone();
 }
