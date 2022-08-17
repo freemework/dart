@@ -27,6 +27,8 @@ export abstract class FInitableBase implements FInitable {
 	private _initializingPromise?: Promise<void>;
 	private _disposed?: boolean;
 	private _disposingPromise?: Promise<void>;
+	private _initExecutionContext: FExecutionContext | null;
+
 
 	public get initialized(): boolean { return this._initialized === true; }
 	public get initializing(): boolean { return this._initializingPromise !== undefined; }
@@ -43,9 +45,11 @@ export abstract class FInitableBase implements FInitable {
 						.finally(() => {
 							delete this._initializingPromise;
 							this._initialized = true;
+							this._initExecutionContext = executionContext;
 						});
 				} else {
 					this._initialized = true;
+					this._initExecutionContext = executionContext;
 					return Promise.resolve();
 				}
 			}
@@ -80,6 +84,15 @@ export abstract class FInitableBase implements FInitable {
 			return this._disposingPromise;
 		}
 		return Promise.resolve();
+	}
+
+	protected constructor() {
+		this._initExecutionContext = null;
+	}
+
+	protected get initExecutionContext(): FExecutionContext {
+		this.verifyInitialized();
+		return this._initExecutionContext!;
 	}
 
 	protected abstract onInit(executionContext: FExecutionContext): void | Promise<void>;
