@@ -8,7 +8,7 @@ export namespace FDisposable {
 		}
 	}
 
-	export async function  safeDispose(disposable: any): Promise<void> {
+	export async function safeDispose(disposable: any): Promise<void> {
 		if (typeof disposable !== "object" || disposable === null) { return Promise.resolve(); }
 		if (!("dispose" in disposable)) { return Promise.resolve(); }
 		if (typeof disposable.dispose !== "function") { return Promise.resolve(); }
@@ -38,18 +38,23 @@ export abstract class FDisposableBase extends FDisposable {
 	public dispose(): Promise<void> {
 		if (this._disposed !== true) {
 			if (this._disposingPromise === undefined) {
+				this._disposingPromise = Promise.resolve();
 				const onDisposeResult = this.onDispose();
 				if (onDisposeResult instanceof Promise) {
-					this._disposingPromise = onDisposeResult.finally(() => {
-						delete this._disposingPromise;
-						this._disposed = true;
-					});
+					this._disposingPromise = this._disposingPromise
+						.then(() => onDisposeResult)
+						.finally(() => {
+							delete this._disposingPromise;
+							this._disposed = true;
+						});
+					return this._disposingPromise;
 				} else {
 					this._disposed = true;
-					return Promise.resolve();
+					delete this._disposingPromise;
 				}
+			} else {
+				return this._disposingPromise;
 			}
-			return this._disposingPromise;
 		}
 		return Promise.resolve();
 	}

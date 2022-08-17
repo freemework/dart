@@ -43,19 +43,23 @@ export abstract class FInitableBase implements FInitable {
 		if (!this._initialized) {
 			if (this._initializingPromise === undefined) {
 				this._initExecutionContext = executionContext;
+				this._initializingPromise = Promise.resolve();
 				const onInitializeResult = this.onInit(executionContext);
 				if (onInitializeResult instanceof Promise) {
-					this._initializingPromise = onInitializeResult
+					this._initializingPromise = this._initializingPromise
+						.then(() => onInitializeResult)
 						.finally(() => {
 							delete this._initializingPromise;
 							this._initialized = true;
 						});
+					return this._initializingPromise;
 				} else {
 					this._initialized = true;
-					return Promise.resolve();
+					delete this._initializingPromise;
 				}
+			} else {
+				return this._initializingPromise;
 			}
-			return this._initializingPromise;
 		}
 		return Promise.resolve();
 	}
@@ -64,26 +68,33 @@ export abstract class FInitableBase implements FInitable {
 		if (this._disposed !== true) {
 			if (this._disposingPromise === undefined) {
 				if (this._initializingPromise !== undefined) {
-					this._disposingPromise = this._initializingPromise
+					this._disposingPromise = this._initializingPromise;
+					this._disposingPromise = this._disposingPromise
 						.then(async () => this.onDispose())
 						.finally(() => {
 							delete this._disposingPromise;
 							this._disposed = true;
 						});
+					return this._disposingPromise;
 				} else {
+					this._disposingPromise = Promise.resolve();
 					const onDisposeResult = this.onDispose();
 					if (onDisposeResult instanceof Promise) {
-						this._disposingPromise = onDisposeResult.finally(() => {
-							delete this._disposingPromise;
-							this._disposed = true;
-						});
+						this._disposingPromise = this._disposingPromise
+							.then(() => onDisposeResult)
+							.finally(() => {
+								delete this._disposingPromise;
+								this._disposed = true;
+							});
+						return this._disposingPromise;
 					} else {
 						this._disposed = true;
-						return Promise.resolve();
+						delete this._disposingPromise;
 					}
 				}
+			} else {
+				return this._disposingPromise;
 			}
-			return this._disposingPromise;
 		}
 		return Promise.resolve();
 	}
