@@ -28,5 +28,5 @@ export * from "./primitive";
 export * from "./sql";
 
 export { FConfiguration } from "./FConfiguration";
-export { FLogger } from "./FLogger";
+export { FLogger, FLoggerContainer } from "./FLogger";
 export { Fsleep } from "./Fsleep";
