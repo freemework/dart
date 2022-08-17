@@ -42,17 +42,16 @@ export abstract class FInitableBase implements FInitable {
 		this.verifyNotDisposed();
 		if (!this._initialized) {
 			if (this._initializingPromise === undefined) {
+				this._initExecutionContext = executionContext;
 				const onInitializeResult = this.onInit(executionContext);
 				if (onInitializeResult instanceof Promise) {
 					this._initializingPromise = onInitializeResult
 						.finally(() => {
 							delete this._initializingPromise;
 							this._initialized = true;
-							this._initExecutionContext = executionContext;
 						});
 				} else {
 					this._initialized = true;
-					this._initExecutionContext = executionContext;
 					return Promise.resolve();
 				}
 			}
@@ -90,7 +89,9 @@ export abstract class FInitableBase implements FInitable {
 	}
 
 	protected get initExecutionContext(): FExecutionContext {
-		this.verifyInitialized();
+		if (!(this.initialized || this.initializing)) {
+			throw new Error("Wrong operation. Cannot obtain initExecutionContext before call init().");
+		}
 		return this._initExecutionContext!;
 	}
 
