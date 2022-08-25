@@ -65,4 +65,8 @@ export class FExceptionNativeErrorWrapper extends FException {
 		super(nativeError.message);
 		this.nativeError = nativeError;
 	}
+
+	public get name(): string {
+		return this.nativeError.name;
+	}
 }
