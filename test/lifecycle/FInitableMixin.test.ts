@@ -17,7 +17,7 @@ namespace Deferred {
 		return deferred;
 	}
 }
-async function nextTick(): Promise<void> {
+async function nextThreeTicks(): Promise<void> {
 	await new Promise<void>(resolve => process.nextTick(resolve));
 	await new Promise<void>(resolve => process.nextTick(resolve));
 	await new Promise<void>(resolve => process.nextTick(resolve));
@@ -52,7 +52,7 @@ describe("FInitable tests", function () {
 			}
 		}
 	}
-	interface TestInitable extends FInitableMixin {}
+	interface TestInitable extends FInitableMixin { }
 	FInitableMixin.applyMixin(TestInitable);
 
 	it("Positive test onInit(): void and onDispose(): void", async function () {
@@ -77,7 +77,7 @@ describe("FInitable tests", function () {
 		disposable.throwIfNotInitialized(); // should not raise an error
 		disposable.throwIfNotInitializedOrDisposed(); // should not raise an error
 
-		await nextTick();
+		await nextThreeTicks();
 
 		disposable.throwIfDisposed(); // should not raise an error
 		disposable.throwIfNotInitialized(); // should not raise an error
@@ -133,7 +133,7 @@ describe("FInitable tests", function () {
 		disposable.throwIfNotInitialized(); // should not raise an error
 		disposable.throwIfNotInitializedOrDisposed(); // should not raise an error
 
-		await nextTick();
+		await nextThreeTicks();
 
 		disposable.throwIfDisposed(); // should not raise an error
 		disposable.throwIfNotInitialized(); // should not raise an error
@@ -156,7 +156,7 @@ describe("FInitable tests", function () {
 			assert.throw(() => disposable.throwIfNotInitializedOrDisposed());
 			assert.throw(() => disposable.throwIfDisposed());
 
-			await nextTick();
+			await nextThreeTicks();
 
 			assert.isFalse(disposablePromiseResolved);
 			assert.throw(() => disposable.throwIfNotInitializedOrDisposed());
@@ -172,7 +172,7 @@ describe("FInitable tests", function () {
 
 			assert.isFalse(secondDisposablePromiseResolved);
 
-			await nextTick();
+			await nextThreeTicks();
 
 			assert.isFalse(disposablePromiseResolved);
 			assert.isFalse(secondDisposablePromiseResolved);
@@ -190,7 +190,7 @@ describe("FInitable tests", function () {
 			assert.throw(() => disposable.throwIfNotInitializedOrDisposed());
 			assert.throw(() => disposable.throwIfDisposed());
 
-			await nextTick();
+			await nextThreeTicks();
 
 			assert.isTrue(disposablePromiseResolved);
 			assert.isTrue(secondDisposablePromiseResolved);
@@ -203,7 +203,7 @@ describe("FInitable tests", function () {
 			let thirdDisposablePromiseResolved = false;
 			disposable.dispose().then(() => { thirdDisposablePromiseResolved = true; });
 			assert.isFalse(thirdDisposablePromiseResolved);
-			await nextTick();
+			await nextThreeTicks();
 			assert.isTrue(thirdDisposablePromiseResolved);
 		} finally {
 			onDisposePromise = null;
@@ -240,7 +240,7 @@ describe("FInitable tests", function () {
 
 			const disposablePromise = disposable.dispose();
 
-			await nextTick();
+			await nextThreeTicks();
 
 			assert.isTrue(disposable.initialized);
 			assert.isFalse(disposable.initializing);
@@ -272,7 +272,7 @@ describe("FInitable tests", function () {
 			assert.isFalse(disposablePromiseResolved);
 			assert.throw(() => disposable.throwIfDisposed());
 
-			await nextTick();
+			await nextThreeTicks();
 
 			assert.isFalse(initablePromiseResolved);
 			assert.isFalse(disposablePromiseResolved);
@@ -288,7 +288,7 @@ describe("FInitable tests", function () {
 
 			assert.isFalse(secondDisposablePromiseResolved);
 
-			await nextTick();
+			await nextThreeTicks();
 
 			assert.isFalse(disposablePromiseResolved);
 			assert.isFalse(secondDisposablePromiseResolved);
@@ -303,7 +303,7 @@ describe("FInitable tests", function () {
 			assert.isFalse(secondDisposablePromiseResolved);
 			assert.throw(() => disposable.throwIfDisposed());
 
-			await nextTick();
+			await nextThreeTicks();
 
 			assert.isTrue(disposablePromiseResolved);
 			assert.isTrue(secondDisposablePromiseResolved);
@@ -315,7 +315,7 @@ describe("FInitable tests", function () {
 			let thirdDisposablePromiseResolved = false;
 			disposable.dispose().then(() => { thirdDisposablePromiseResolved = true; });
 			assert.isFalse(thirdDisposablePromiseResolved);
-			await nextTick();
+			await nextThreeTicks();
 			assert.isTrue(thirdDisposablePromiseResolved);
 		} finally {
 			onDisposePromise = null;
@@ -336,7 +336,7 @@ describe("FInitable tests", function () {
 
 		assert.throw(() => disposable.throwIfDisposed());
 
-		await nextTick();
+		await nextThreeTicks();
 
 		assert.throw(() => disposable.throwIfDisposed());
 
@@ -358,7 +358,7 @@ describe("FInitable tests", function () {
 
 		const initPromise1 = disposable.init(FExecutionContext.Empty);
 
-		await nextTick();
+		await nextThreeTicks();
 
 		disposable.throwIfDisposed(); // should not raise an error
 		disposable.throwIfNotInitialized(); // should not raise an error
@@ -382,7 +382,7 @@ describe("FInitable tests", function () {
 
 		let isSuccessed = false;
 		const initPromise2 = disposable.init(FExecutionContext.Empty).finally(() => { isSuccessed = true; });
-		await nextTick();
+		await nextThreeTicks();
 		assert.isTrue(isSuccessed);
 		await initPromise2;
 		await disposable.dispose();
@@ -393,7 +393,7 @@ describe("FInitable tests", function () {
 			protected onInit(): Promise<void> { return Promise.reject(new Error("test error")); }
 			protected onDispose(): Promise<void> { return Promise.resolve(); }
 		}
-		interface MyInitable extends FInitableMixin {}
+		interface MyInitable extends FInitableMixin { }
 		FInitableMixin.applyMixin(MyInitable);
 
 		const initable = new MyInitable();
@@ -415,7 +415,7 @@ describe("FInitable tests", function () {
 			protected onInit(): Promise<void> { return Promise.resolve(); }
 			protected onDispose(): Promise<void> { return Promise.reject(new Error("test error")); }
 		}
-		interface MyInitable extends FInitableMixin {}
+		interface MyInitable extends FInitableMixin { }
 		FInitableMixin.applyMixin(MyInitable);
 
 		const initable = new MyInitable();

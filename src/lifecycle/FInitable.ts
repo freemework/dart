@@ -44,7 +44,7 @@ export abstract class FInitableBase implements FInitable {
 			if (this._initializingPromise === undefined) {
 				this._initExecutionContext = executionContext;
 				this._initializingPromise = Promise.resolve();
-				const onInitializeResult = this.onInit(executionContext);
+				const onInitializeResult = this.onInit();
 				if (onInitializeResult instanceof Promise) {
 					this._initializingPromise = this._initializingPromise
 						.then(() => onInitializeResult)
@@ -106,9 +106,19 @@ export abstract class FInitableBase implements FInitable {
 		return this._initExecutionContext!;
 	}
 
-	protected abstract onInit(executionContext: FExecutionContext): void | Promise<void>;
-	protected abstract onDispose(): void | Promise<void>;
+	/**
+	 * Override this method to insert own logic at initialize phase
+	 * 
+	 * Note: this.initExecutionContext may be used here
+	 */
+	protected abstract onInit(): void | Promise<void>;
 
+	/**
+	 * Override this method to insert own logic at disposing phase
+	 * 
+	 * Note: this.initExecutionContext may be used here
+	 */
+	protected abstract onDispose(): void | Promise<void>;
 
 	protected verifyInitialized() {
 		if (!this.initialized) {
@@ -167,10 +177,20 @@ export class FInitableMixin extends FInitableBase {
 		});
 	}
 
-	protected onInit(executionContext: FExecutionContext): void | Promise<void> {
+	/**
+	 * Override this method to insert own logic at initialize phase
+	 * 
+	 * Note: this.initExecutionContext may be used here
+	 */
+	protected onInit(): void | Promise<void> {
 		// Do nothing here by design. Users will override this method.
 	}
 
+	/**
+	 * Override this method to insert own logic at disposing phase
+	 * 
+	 * Note: this.initExecutionContext may be used here
+	 */
 	protected onDispose(): void | Promise<void> {
 		// Do nothing here by design. Users will override this method.
 	}
