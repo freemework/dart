@@ -109,7 +109,10 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 				request.write(body);
 			}
 			request.end();
+
 			request.on("error", errorHandler);
+			request.on("close", () => request.removeListener("close", errorHandler)); // Prevent memory-leaks
+
 			request.setTimeout(this._requestTimeout, () => {
 				isConnectTimeout = true;
 				request.destroy();
@@ -124,7 +127,6 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 			});
 			if (cancellationToken !== undefined) {
 				const cb = () => {
-					cancellationToken.removeCancelListener(cb);
 					request.destroy();
 					if (!resolved) {
 						resolved = true;
@@ -138,6 +140,7 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 					}
 				};
 				cancellationToken.addCancelListener(cb);
+				request.on("close", () => cancellationToken.removeCancelListener(cb)); // Prevent memory-leaks
 			}
 		});
 	}
