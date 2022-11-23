@@ -2,9 +2,9 @@ export {
 	FExecutionContext,
 	FExecutionContextBase,
 	FExecutionContextCancellation,
-	FExecutionContextLogger,
+	FExecutionContextLoggerLegacy,
 	FExecutionElement,
 	FExecutionElementCancellation,
-	FExecutionElementLogger
+	FExecutionElementLoggerLegacy
 } from "./FExecutionContext";
 

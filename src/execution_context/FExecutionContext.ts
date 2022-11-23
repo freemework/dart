@@ -2,7 +2,7 @@ import { FCancellationToken } from "../cancellation/FCancellationToken";
 import { FCancellationTokenAggregated } from "../cancellation/FCancellationTokenAggregated";
 import { FExceptionArgument } from "../exception/FExceptionArgument";
 import { FExceptionInvalidOperation } from "../exception/FExceptionInvalidOperation";
-import { FLogger } from "../FLogger";
+import { FLoggerLegacy } from "../FLoggerLegacy";
 
 export abstract class FExecutionContext {
 	public abstract get prevContext(): FExecutionContext | null;
@@ -83,20 +83,20 @@ export class FExecutionElementCancellation<TFExecutionContextCancellation
 	public get cancellationToken(): FCancellationToken { return this.owner.cancellationToken; }
 }
 
-export class FExecutionContextLogger extends FExecutionContextBase {
-	private readonly _logger: FLogger;
+export class FExecutionContextLoggerLegacy extends FExecutionContextBase {
+	private readonly _logger: FLoggerLegacy;
 
-	public static of(context: FExecutionContext): FExecutionElementLogger {
-		const loggerCtx: FExecutionContextLogger
-			= FExecutionContext.getChainExecutionContext(context, FExecutionContextLogger);
+	public static of(context: FExecutionContext): FExecutionElementLoggerLegacy {
+		const loggerCtx: FExecutionContextLoggerLegacy
+			= FExecutionContext.getChainExecutionContext(context, FExecutionContextLoggerLegacy);
 
-		return new FExecutionElementLogger(loggerCtx);
+		return new FExecutionElementLoggerLegacy(loggerCtx);
 	}
 
-	public constructor(prevContext: FExecutionContext, logger: FLogger);
+	public constructor(prevContext: FExecutionContext, logger: FLoggerLegacy);
 	public constructor(prevContext: FExecutionContext, loggerName: string);
-	public constructor(prevContext: FExecutionContext, loggerName: string, loggerContext: FLogger.Context);
-	public constructor(prevContext: FExecutionContext, loggerContext: FLogger.Context);
+	public constructor(prevContext: FExecutionContext, loggerName: string, loggerContext: FLoggerLegacy.Context);
+	public constructor(prevContext: FExecutionContext, loggerContext: FLoggerLegacy.Context);
 	constructor(
 		prevContext: FExecutionContext,
 		...args: Array<any>
@@ -105,27 +105,27 @@ export class FExecutionContextLogger extends FExecutionContextBase {
 		const arg1 = args[0];
 		if ((args.length === 1 || args.length === 2) && typeof arg1 === "string") {
 			// public constructor(prevContext: FExecutionContext, loggerName: string);
-			// public constructor(prevContext: FExecutionContext, loggerName: string, loggerContext: FLogger.Context);
+			// public constructor(prevContext: FExecutionContext, loggerName: string, loggerContext: FLoggerLegacy.Context);
 			const loggerName: string = arg1;
-			const loggerContext: FLogger.Context | null = args.length >= 2 ? args[1] : null;
+			const loggerContext: FLoggerLegacy.Context | null = args.length >= 2 ? args[1] : null;
 
-			const loggerExCtx: FExecutionContextLogger = FExecutionContext
-				.getChainExecutionContext(prevContext, FExecutionContextLogger);
+			const loggerExCtx: FExecutionContextLoggerLegacy = FExecutionContext
+				.getChainExecutionContext(prevContext, FExecutionContextLoggerLegacy);
 
 			this._logger = loggerContext !== null
 				? loggerExCtx.logger.getLogger(loggerName, loggerContext)
 				: loggerExCtx.logger.getLogger(loggerName);
 		} else if (args.length === 1 && typeof arg1["getLogger"] === "function") {
-			// public constructor(prevContext: FExecutionContext, logger: FLogger);
-			const logger: FLogger = arg1;
+			// public constructor(prevContext: FExecutionContext, logger: FLoggerLegacy);
+			const logger: FLoggerLegacy = arg1;
 
 			this._logger = logger;
 		} else if (args.length === 1) {
-			// public constructor(prevContext: FExecutionContext, loggerContext: FLogger.Context);
-			const loggerContext: FLogger.Context = arg1;
+			// public constructor(prevContext: FExecutionContext, loggerContext: FLoggerLegacy.Context);
+			const loggerContext: FLoggerLegacy.Context = arg1;
 
-			const loggerExCtx: FExecutionContextLogger = FExecutionContext
-				.getChainExecutionContext(prevContext, FExecutionContextLogger);
+			const loggerExCtx: FExecutionContextLoggerLegacy = FExecutionContext
+				.getChainExecutionContext(prevContext, FExecutionContextLoggerLegacy);
 
 			this._logger = loggerExCtx.logger.getLogger(loggerContext);
 		} else {
@@ -133,12 +133,12 @@ export class FExecutionContextLogger extends FExecutionContextBase {
 		}
 	}
 
-	public get logger(): FLogger { return this._logger; }
+	public get logger(): FLoggerLegacy { return this._logger; }
 }
-export class FExecutionElementLogger<TFExecutionContextLogger
-	extends FExecutionContextLogger = FExecutionContextLogger>
-	extends FExecutionElement<TFExecutionContextLogger> {
-	public get logger(): FLogger { return this.owner.logger; }
+export class FExecutionElementLoggerLegacy<TFExecutionContextLoggerLegacy
+	extends FExecutionContextLoggerLegacy = FExecutionContextLoggerLegacy>
+	extends FExecutionElement<TFExecutionContextLoggerLegacy> {
+	public get logger(): FLoggerLegacy { return this.owner.logger; }
 }
 
 
@@ -157,9 +157,9 @@ class _FExecutionContextNone extends FExecutionContextBase {
 	public constructor() {
 		super(
 			new FExecutionContextCancellation(
-				new FExecutionContextLogger(
+				new FExecutionContextLoggerLegacy(
 					FExecutionContext.Empty,
-					FLogger.None
+					FLoggerLegacy.None
 				),
 				FCancellationToken.None
 			)

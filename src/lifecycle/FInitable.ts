@@ -99,6 +99,9 @@ export abstract class FInitableBase implements FInitable {
 		return Promise.resolve();
 	}
 
+	/**
+	 * @remark Defined as property to be able to use inside dispose()
+	 */
 	protected get initExecutionContext(): FExecutionContext {
 		if (!(this.initialized || this.initializing)) {
 			throw new Error("Wrong operation. Cannot obtain initExecutionContext before call init().");

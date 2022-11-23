@@ -1,4 +1,4 @@
-export function FAssertModuleVersion(packageInfo: { readonly name: string; readonly version: string; }) {
+export function FmoduleVersionGuard(packageInfo: { readonly name: string; readonly version: string; }) {
 	const { name: packageName, version: packageVersion } = packageInfo;
 	const G: any = global || window || {};
 	const PACKAGE_GUARD: symbol = Symbol.for(packageName);
@@ -15,7 +15,7 @@ export function FAssertModuleVersion(packageInfo: { readonly name: string; reado
 		G[PACKAGE_GUARD] = packageVersion;
 	}
 }
-FAssertModuleVersion(require("../package.json"));
+FmoduleVersionGuard(require("../package.json"));
 
 export * from "./cancellation";
 export * from "./channel";
@@ -27,7 +27,7 @@ export * from "./limit";
 export * from "./primitive";
 export * from "./sql";
 
-export { FConfiguration } from "./FConfiguration";
+export { FConfigurationLegacy } from "./FConfigurationLegacy";
 export { FEnsure, FEnsureException } from "./FEnsure";
-export { FLogger, FLoggerContainer } from "./FLogger";
+export { FLoggerLegacy, FLoggerLegacyContainer } from "./FLoggerLegacy";
 export { Fsleep } from "./Fsleep";

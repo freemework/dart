@@ -1,8 +1,8 @@
 import { FCancellationToken } from "../cancellation";
 import { FException, FExceptionCancelled, FExceptionInvalidOperation, FExceptionNativeErrorWrapper } from "../exception";
-import { FExecutionContext, FExecutionContextCancellation, FExecutionContextLogger } from "../execution_context";
+import { FExecutionContext, FExecutionContextCancellation, FExecutionContextLoggerLegacy } from "../execution_context";
 import { FInvokeChannel } from "../channel/FInvokeChannel";
-import { FLogger } from "../FLogger";
+import { FLoggerLegacy } from "../FLoggerLegacy";
 
 import * as http from "http";
 import * as https from "https";
@@ -21,14 +21,14 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 		executionContext: FExecutionContext,
 		{ url, method, headers, body }: FHttpClient.Request
 	): Promise<FHttpClient.Response> {
-		const originalLogger: FLogger = FExecutionContextLogger.of(executionContext).logger;
+		const originalLogger: FLoggerLegacy = FExecutionContextLoggerLegacy.of(executionContext).logger;
 
-		const invokeLoggerContext: FLogger.Context = {
+		const invokeLoggerContext: FLoggerLegacy.Context = {
 			httpInvokeUrl: url.toString(),
 			httpInvokeMethod: method
 		};
 
-		const invokeLogger: FLogger = originalLogger.getLogger(this.constructor.name, invokeLoggerContext);
+		const invokeLogger: FLoggerLegacy = originalLogger.getLogger(this.constructor.name, invokeLoggerContext);
 
 		if (invokeLogger.isTraceEnabled) { invokeLogger.trace("Begin invoke"); }
 		return new Promise<FHttpClient.Response>((resolve, reject) => {
@@ -148,7 +148,7 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 	private createClientRequest(
 		{ url, method, headers }: FHttpClient.Request,
 		callback: (res: http.IncomingMessage) => void,
-		log: FLogger
+		log: FLoggerLegacy
 	): http.ClientRequest {
 		const proxyOpts = this._proxyOpts;
 		if (proxyOpts && proxyOpts.type === "http") {
