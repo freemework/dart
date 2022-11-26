@@ -17,7 +17,7 @@ namespace Deferred {
 		return deferred;
 	}
 }
-async function nextThreeTicks(): Promise<void> {
+async function nextTick(): Promise<void> {
 	await new Promise<void>(resolve => process.nextTick(resolve));
 	await new Promise<void>(resolve => process.nextTick(resolve));
 	await new Promise<void>(resolve => process.nextTick(resolve));
@@ -30,10 +30,10 @@ describe("FInitable tests", function () {
 	let onDisposePromise: Promise<void> | null = null;
 
 	class TestInitable implements FInitable {
-		public throwIfDisposed() {
+		public verifyNotDisposed() {
 			this.verifyNotDisposed();
 		}
-		public throwIfNotInitializedOrDisposed() {
+		public verifyInitializedAndNotDisposed() {
 			this.verifyInitializedAndNotDisposed();
 		}
 		public throwIfNotInitialized() {
@@ -62,9 +62,9 @@ describe("FInitable tests", function () {
 		assert.isFalse(disposable.disposed);
 		assert.isFalse(disposable.disposing);
 
-		disposable.throwIfDisposed(); // should not raise an error
+		disposable.verifyNotDisposed(); // should not raise an error
 		assert.throw(() => disposable.throwIfNotInitialized()); // should raise an error
-		assert.throw(() => disposable.throwIfNotInitializedOrDisposed()); // should raise an error
+		assert.throw(() => disposable.verifyInitializedAndNotDisposed()); // should raise an error
 
 		const initPromise = disposable.init(FExecutionContext.Empty);
 
@@ -73,15 +73,15 @@ describe("FInitable tests", function () {
 		assert.isFalse(disposable.disposed);
 		assert.isFalse(disposable.disposing);
 
-		disposable.throwIfDisposed(); // should not raise an error
+		disposable.verifyNotDisposed(); // should not raise an error
 		disposable.throwIfNotInitialized(); // should not raise an error
-		disposable.throwIfNotInitializedOrDisposed(); // should not raise an error
+		disposable.verifyInitializedAndNotDisposed(); // should not raise an error
 
-		await nextThreeTicks();
+		await nextTick();
 
-		disposable.throwIfDisposed(); // should not raise an error
+		disposable.verifyNotDisposed(); // should not raise an error
 		disposable.throwIfNotInitialized(); // should not raise an error
-		disposable.throwIfNotInitializedOrDisposed(); // should not raise an error
+		disposable.verifyInitializedAndNotDisposed(); // should not raise an error
 
 		assert.isTrue(disposable.initialized);
 		assert.isFalse(disposable.initializing);
@@ -90,9 +90,9 @@ describe("FInitable tests", function () {
 
 		await initPromise;
 
-		disposable.throwIfDisposed(); // should not raise an error
+		disposable.verifyNotDisposed(); // should not raise an error
 		disposable.throwIfNotInitialized(); // should not raise an error
-		disposable.throwIfNotInitializedOrDisposed(); // should not raise an error
+		disposable.verifyInitializedAndNotDisposed(); // should not raise an error
 
 		assert.isTrue(disposable.initialized);
 		assert.isFalse(disposable.initializing);
@@ -102,8 +102,8 @@ describe("FInitable tests", function () {
 		const disposePromise = disposable.dispose();
 
 		disposable.throwIfNotInitialized(); // should not raise an error
-		assert.throw(() => disposable.throwIfDisposed());
-		assert.throw(() => disposable.throwIfNotInitializedOrDisposed());
+		assert.throw(() => disposable.verifyNotDisposed());
+		assert.throw(() => disposable.verifyInitializedAndNotDisposed());
 
 		assert.isTrue(disposable.initialized);
 		assert.isFalse(disposable.initializing);
@@ -118,9 +118,9 @@ describe("FInitable tests", function () {
 		assert.isFalse(disposable.disposed);
 		assert.isFalse(disposable.disposing);
 
-		disposable.throwIfDisposed(); // should not raise an error
+		disposable.verifyNotDisposed(); // should not raise an error
 		assert.throw(() => disposable.throwIfNotInitialized()); // should raise an error
-		assert.throw(() => disposable.throwIfNotInitializedOrDisposed()); // should raise an error
+		assert.throw(() => disposable.verifyInitializedAndNotDisposed()); // should raise an error
 
 		const initPromise = disposable.init(FExecutionContext.Empty);
 
@@ -129,15 +129,15 @@ describe("FInitable tests", function () {
 		assert.isFalse(disposable.disposed);
 		assert.isFalse(disposable.disposing);
 
-		disposable.throwIfDisposed(); // should not raise an error
+		disposable.verifyNotDisposed(); // should not raise an error
 		disposable.throwIfNotInitialized(); // should not raise an error
-		disposable.throwIfNotInitializedOrDisposed(); // should not raise an error
+		disposable.verifyInitializedAndNotDisposed(); // should not raise an error
 
-		await nextThreeTicks();
+		await nextTick();
 
-		disposable.throwIfDisposed(); // should not raise an error
+		disposable.verifyNotDisposed(); // should not raise an error
 		disposable.throwIfNotInitialized(); // should not raise an error
-		disposable.throwIfNotInitializedOrDisposed(); // should not raise an error
+		disposable.verifyInitializedAndNotDisposed(); // should not raise an error
 
 		assert.isTrue(disposable.initialized);
 		assert.isFalse(disposable.initializing);
@@ -150,17 +150,17 @@ describe("FInitable tests", function () {
 		onDisposePromise = defer.promise;
 		try {
 			let disposablePromiseResolved = false;
-			const disposablePromise = disposable.dispose().then(() => { disposablePromiseResolved = true; });
+			disposable.dispose().then(() => { disposablePromiseResolved = true; });
 
 			assert.isFalse(disposablePromiseResolved);
-			assert.throw(() => disposable.throwIfNotInitializedOrDisposed());
-			assert.throw(() => disposable.throwIfDisposed());
+			assert.throw(() => disposable.verifyInitializedAndNotDisposed());
+			assert.throw(() => disposable.verifyNotDisposed());
 
-			await nextThreeTicks();
+			await nextTick();
 
 			assert.isFalse(disposablePromiseResolved);
-			assert.throw(() => disposable.throwIfNotInitializedOrDisposed());
-			assert.throw(() => disposable.throwIfDisposed());
+			assert.throw(() => disposable.verifyInitializedAndNotDisposed());
+			assert.throw(() => disposable.verifyNotDisposed());
 
 			assert.isTrue(disposable.initialized);
 			assert.isFalse(disposable.initializing);
@@ -172,12 +172,12 @@ describe("FInitable tests", function () {
 
 			assert.isFalse(secondDisposablePromiseResolved);
 
-			await nextThreeTicks();
+			await nextTick();
 
 			assert.isFalse(disposablePromiseResolved);
 			assert.isFalse(secondDisposablePromiseResolved);
-			assert.throw(() => disposable.throwIfNotInitializedOrDisposed());
-			assert.throw(() => disposable.throwIfDisposed());
+			assert.throw(() => disposable.verifyInitializedAndNotDisposed());
+			assert.throw(() => disposable.verifyNotDisposed());
 			assert.isTrue(disposable.initialized);
 			assert.isFalse(disposable.initializing);
 			assert.isFalse(disposable.disposed);
@@ -187,15 +187,15 @@ describe("FInitable tests", function () {
 
 			assert.isFalse(disposablePromiseResolved);
 			assert.isFalse(secondDisposablePromiseResolved);
-			assert.throw(() => disposable.throwIfNotInitializedOrDisposed());
-			assert.throw(() => disposable.throwIfDisposed());
+			assert.throw(() => disposable.verifyInitializedAndNotDisposed());
+			assert.throw(() => disposable.verifyNotDisposed());
 
-			await nextThreeTicks();
+			await nextTick();
 
 			assert.isTrue(disposablePromiseResolved);
 			assert.isTrue(secondDisposablePromiseResolved);
-			assert.throw(() => disposable.throwIfNotInitializedOrDisposed());
-			assert.throw(() => disposable.throwIfDisposed());
+			assert.throw(() => disposable.verifyInitializedAndNotDisposed());
+			assert.throw(() => disposable.verifyNotDisposed());
 
 			assert.isTrue(disposable.disposed);
 			assert.isFalse(disposable.disposing);
@@ -203,7 +203,7 @@ describe("FInitable tests", function () {
 			let thirdDisposablePromiseResolved = false;
 			disposable.dispose().then(() => { thirdDisposablePromiseResolved = true; });
 			assert.isFalse(thirdDisposablePromiseResolved);
-			await nextThreeTicks();
+			await nextTick();
 			assert.isTrue(thirdDisposablePromiseResolved);
 		} finally {
 			onDisposePromise = null;
@@ -220,9 +220,9 @@ describe("FInitable tests", function () {
 			assert.isFalse(disposable.disposed);
 			assert.isFalse(disposable.disposing);
 
-			disposable.throwIfDisposed(); // should not raise an error
+			disposable.verifyNotDisposed(); // should not raise an error
 			assert.throw(() => disposable.throwIfNotInitialized()); // should raise an error
-			assert.throw(() => disposable.throwIfNotInitializedOrDisposed()); // should raise an error
+			assert.throw(() => disposable.verifyInitializedAndNotDisposed()); // should raise an error
 
 			const initPromise = disposable.init(FExecutionContext.Empty);
 
@@ -240,7 +240,7 @@ describe("FInitable tests", function () {
 
 			const disposablePromise = disposable.dispose();
 
-			await nextThreeTicks();
+			await nextTick();
 
 			assert.isTrue(disposable.initialized);
 			assert.isFalse(disposable.initializing);
@@ -256,7 +256,7 @@ describe("FInitable tests", function () {
 		assert.isFalse(disposable.disposed);
 		assert.isFalse(disposable.disposing);
 
-		disposable.throwIfDisposed(); // should not raise an error
+		disposable.verifyNotDisposed(); // should not raise an error
 
 		const initDefer = Deferred.create();
 		const disposeDefer = Deferred.create();
@@ -270,13 +270,13 @@ describe("FInitable tests", function () {
 
 			assert.isFalse(initablePromiseResolved);
 			assert.isFalse(disposablePromiseResolved);
-			assert.throw(() => disposable.throwIfDisposed());
+			assert.throw(() => disposable.verifyNotDisposed());
 
-			await nextThreeTicks();
+			await nextTick();
 
 			assert.isFalse(initablePromiseResolved);
 			assert.isFalse(disposablePromiseResolved);
-			assert.throw(() => disposable.throwIfDisposed());
+			assert.throw(() => disposable.verifyNotDisposed());
 
 			assert.isFalse(disposable.initialized);
 			assert.isFalse(disposable.disposed);
@@ -288,11 +288,11 @@ describe("FInitable tests", function () {
 
 			assert.isFalse(secondDisposablePromiseResolved);
 
-			await nextThreeTicks();
+			await nextTick();
 
 			assert.isFalse(disposablePromiseResolved);
 			assert.isFalse(secondDisposablePromiseResolved);
-			assert.throw(() => disposable.throwIfDisposed());
+			assert.throw(() => disposable.verifyNotDisposed());
 			assert.isFalse(disposable.disposed);
 			assert.isTrue(disposable.disposing);
 
@@ -301,13 +301,13 @@ describe("FInitable tests", function () {
 
 			assert.isFalse(disposablePromiseResolved);
 			assert.isFalse(secondDisposablePromiseResolved);
-			assert.throw(() => disposable.throwIfDisposed());
+			assert.throw(() => disposable.verifyNotDisposed());
 
-			await nextThreeTicks();
+			await nextTick();
 
 			assert.isTrue(disposablePromiseResolved);
 			assert.isTrue(secondDisposablePromiseResolved);
-			assert.throw(() => disposable.throwIfDisposed());
+			assert.throw(() => disposable.verifyNotDisposed());
 
 			assert.isTrue(disposable.disposed);
 			assert.isFalse(disposable.disposing);
@@ -315,7 +315,7 @@ describe("FInitable tests", function () {
 			let thirdDisposablePromiseResolved = false;
 			disposable.dispose().then(() => { thirdDisposablePromiseResolved = true; });
 			assert.isFalse(thirdDisposablePromiseResolved);
-			await nextThreeTicks();
+			await nextTick();
 			assert.isTrue(thirdDisposablePromiseResolved);
 		} finally {
 			onDisposePromise = null;
@@ -327,25 +327,25 @@ describe("FInitable tests", function () {
 		assert.isFalse(disposable.disposed);
 		assert.isFalse(disposable.disposing);
 
-		disposable.throwIfDisposed(); // should not raise an error
+		disposable.verifyNotDisposed(); // should not raise an error
 
 		const disposablePromise = disposable.dispose();
 
 		assert.isTrue(disposable.disposed);
 		assert.isFalse(disposable.disposing);
 
-		assert.throw(() => disposable.throwIfDisposed());
+		assert.throw(() => disposable.verifyNotDisposed());
 
-		await nextThreeTicks();
+		await nextTick();
 
-		assert.throw(() => disposable.throwIfDisposed());
+		assert.throw(() => disposable.verifyNotDisposed());
 
 		assert.isTrue(disposable.disposed);
 		assert.isFalse(disposable.disposing);
 
 		await disposablePromise;
 
-		assert.throw(() => disposable.throwIfDisposed());
+		assert.throw(() => disposable.verifyNotDisposed());
 
 		assert.isTrue(disposable.disposed);
 		assert.isFalse(disposable.disposing);
@@ -358,11 +358,11 @@ describe("FInitable tests", function () {
 
 		const initPromise1 = disposable.init(FExecutionContext.Empty);
 
-		await nextThreeTicks();
+		await nextTick();
 
-		disposable.throwIfDisposed(); // should not raise an error
+		disposable.verifyNotDisposed(); // should not raise an error
 		disposable.throwIfNotInitialized(); // should not raise an error
-		disposable.throwIfNotInitializedOrDisposed(); // should not raise an error
+		disposable.verifyInitializedAndNotDisposed(); // should not raise an error
 
 		assert.isTrue(disposable.initialized);
 		assert.isFalse(disposable.initializing);
@@ -371,9 +371,9 @@ describe("FInitable tests", function () {
 
 		await initPromise1;
 
-		disposable.throwIfDisposed(); // should not raise an error
+		disposable.verifyNotDisposed(); // should not raise an error
 		disposable.throwIfNotInitialized(); // should not raise an error
-		disposable.throwIfNotInitializedOrDisposed(); // should not raise an error
+		disposable.verifyInitializedAndNotDisposed(); // should not raise an error
 
 		assert.isTrue(disposable.initialized);
 		assert.isFalse(disposable.initializing);
@@ -382,7 +382,7 @@ describe("FInitable tests", function () {
 
 		let isSuccessed = false;
 		const initPromise2 = disposable.init(FExecutionContext.Empty).finally(() => { isSuccessed = true; });
-		await nextThreeTicks();
+		await nextTick();
 		assert.isTrue(isSuccessed);
 		await initPromise2;
 		await disposable.dispose();

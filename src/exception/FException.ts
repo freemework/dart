@@ -42,11 +42,46 @@ export class FException extends Error {
 	}
 
 	public toString(): string {
-		if (this.innerException !== null) {
-			return [super.toString(), this.innerException.toString()].join("\n");
+		let messageBuffer: string = '';
+		let stackTraceBuffer: string = '';
+
+		messageBuffer += this.constructor.name;
+		messageBuffer += ': ';
+		messageBuffer += this.message;
+
+		let innerException: FException | null = this.innerException;
+		while (innerException !== null) {
+			messageBuffer += ' ---> ';
+
+			messageBuffer += innerException.constructor.name;
+			messageBuffer += ': ';
+			messageBuffer += innerException.message;
+
+			const innerStack: string | undefined = innerException.stack;
+			if (innerStack !== undefined) {
+				stackTraceBuffer += innerStack;
+			} else {
+				stackTraceBuffer += 'No available stack trace';
+			}
+			stackTraceBuffer += '\n';
+			stackTraceBuffer += '--- End of inner exception stack trace ---\n';
+
+			innerException = innerException.innerException;
 		}
-		return super.toString();
+
+		const stackTrace: string | undefined = this.stack;
+		if (stackTrace !== undefined) {
+			stackTraceBuffer += stackTrace;
+		} else {
+			stackTraceBuffer += 'No available stack trace';
+		}
+
+		messageBuffer += '\n';
+		messageBuffer += stackTraceBuffer;
+
+		return messageBuffer.toString();
 	}
+
 }
 
 export class FExceptionNativeObjectWrapper extends FException {
