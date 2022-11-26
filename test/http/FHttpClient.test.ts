@@ -127,7 +127,6 @@ describe("FHttpClient tests", function () {
 				assert.instanceOf((expectedError as FHttpClient.CommunicationError).innerException, Error);
 				const code = (expectedError as FHttpClient.CommunicationError).code;
 				assert.isTrue(code === 'ENOTFOUND' || code ==='EAI_AGAIN', `Expected code '${code}' of CommunicationError should be 'ENOTFOUND' or 'EAI_AGAIN'`);
-				assert.include((expectedError as FHttpClient.CommunicationError).code, "ENOTFOUND");
 			});
 			it("Should handle Connection Timeout (before connect) as CommunicationError", async function () {
 				const httpClient = new FHttpClient({ timeout: 50 });
