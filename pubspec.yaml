@@ -1,16 +1,20 @@
 name: freemework
 description: Common library of the Freemework.
-version: 0.2.0
+version: 0.9.0
 homepage: https://freemework.org
 repository: https://github.com/freemework/dart
 issue_tracker: https://github.com/freemework/dart/issues
 documentation: https://freemework.org/#common?lang=dart
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: '>=2.15.0 <4.0.0'
 
 dev_dependencies:
-  build_runner: ^2.0.6
-  build_test: ^2.1.2
-  pedantic: ^1.11.1
-  test: ^1.17.10
+  build_runner: ^2.4.6
+  build_test: ^2.2.1
+  collection: ^1.18.0
+  lints: ^2.1.1
+  test: ^1.24.8
+
+dependencies:
+  meta: ^1.11.0

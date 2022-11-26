@@ -1,3 +1,7 @@
+## 0.9.0
+
+Sync implementation according to typescript version
+
 ## 0.1.1
 
 Bug fix after switch to null-safety
