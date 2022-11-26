@@ -1,26 +1,17 @@
 import { assert } from "chai";
 
-import { FDisposable, Fusing, FInitable, FDisposableBase, FInitableBase, FExecutionContext, FExceptionCancelled, FCancellationToken, FCancellationTokenSourceManual, FExecutionContextCancellation } from "../../src";
+import {
+	FCancellationToken,
+	FCancellationTokenSourceManual,
+	FDisposable,
+	FDisposableBase,
+	FExecutionContext,
+	FExceptionCancelled,
+	FExecutionContextCancellation,
+	FInitableBase,
+	Fusing,
+} from "../../src";
 import { Deferred, nextTick } from "./tools";
-
-// interface Deferred<T = any> {
-// 	resolve: (value?: T) => void;
-// 	reject: (err: any) => void;
-// 	promise: Promise<T>;
-// }
-// namespace Deferred {
-// 	export function create<T = void>(): Deferred<T> {
-// 		const deferred: any = {};
-// 		deferred.promise = new Promise<void>((r, j) => {
-// 			deferred.resolve = r;
-// 			deferred.reject = j;
-// 		});
-// 		return deferred;
-// 	}
-// }
-// function nextTick(): Promise<void> {
-// 	return new Promise<void>(resolve => process.nextTick(resolve));
-// }
 
 describe("Fusing tests", function () {
 	class TestDisposable extends FDisposableBase {
@@ -56,18 +47,7 @@ describe("Fusing tests", function () {
 		assert.isTrue(disposable.disposed);
 		assert.isFalse(disposable.disposing);
 	});
-	it("Should pass Task result to worker", async function () {
-		const disposable = new TestDisposable();
-		let executed = false;
-		await Fusing(FExecutionContext.Empty, Promise.resolve(disposable), (ct, instance) => {
-			executed = true;
-			assert.strictEqual(disposable, instance);
-		});
-		assert.isTrue(executed);
-		assert.isTrue(disposable.disposed);
-		assert.isFalse(disposable.disposing);
-	});
-	it("Should pass factory result to worker (result is instance of Disposable)", async function () {
+	it("Should pass factory result to worker (resource is instance of Disposable)", async function () {
 		let disposable: any;
 		let executed = false;
 		await Fusing(FExecutionContext.Empty, () => (disposable = new TestDisposable()), (ct, instance) => {
@@ -78,7 +58,7 @@ describe("Fusing tests", function () {
 		assert.isTrue(disposable.disposed);
 		assert.isFalse(disposable.disposing);
 	});
-	it("Should pass factory result to worker (result is Promise<Disposable>)", async function () {
+	it("Should pass factory result to worker (resource is instance Promise<Disposable>)", async function () {
 		let disposable: any;
 		let executed = false;
 		await Fusing(FExecutionContext.Empty, () => Promise.resolve(disposable = new TestDisposable()), (ct, instance) => {
@@ -89,18 +69,7 @@ describe("Fusing tests", function () {
 		assert.isTrue(disposable.disposed);
 		assert.isFalse(disposable.disposing);
 	});
-	it("Should pass factory result to worker (result is Task<Disposable>)", async function () {
-		let disposable: any;
-		let executed = false;
-		await Fusing(FExecutionContext.Empty, () => Promise.resolve(disposable = new TestDisposable()), (ct, instance) => {
-			executed = true;
-			assert.strictEqual(disposable, instance);
-		});
-		assert.isTrue(executed);
-		assert.isTrue(disposable.disposed);
-		assert.isFalse(disposable.disposing);
-	});
-	it("Should handle and execure worker's Task", async function () {
+	it("Should handle and execure worker's Promise", async function () {
 		let disposable: any;
 		let executed = false;
 		await Fusing(FExecutionContext.Empty, () => Promise.resolve(disposable = new TestDisposable()), (ct, instance) => {
@@ -127,28 +96,6 @@ describe("Fusing tests", function () {
 			assert.strictEqual(disposable, instance);
 			await new Promise(r => setTimeout(r, 25));
 			callSequence.push("worker");
-		});
-		assert.isTrue(executed);
-		assert.isTrue(disposable.disposed);
-		assert.isFalse(disposable.disposing);
-		assert.equal(callSequence.length, 2);
-		assert.equal(callSequence[0], "worker");
-		assert.equal(callSequence[1], "dispose");
-	});
-	it("Should wait for execute Task-worker before call dispose()", async function () {
-		let disposable: any;
-		let executed = false;
-
-		const callSequence: Array<string> = [];
-		function disposeCallback() { callSequence.push("dispose"); }
-
-		await Fusing(FExecutionContext.Empty, () => Promise.resolve(disposable = new TestDisposable(disposeCallback)), (ct, instance) => {
-			return Promise.resolve().then(async () => {
-				executed = true;
-				assert.strictEqual(disposable, instance);
-				await new Promise(r => setTimeout(r, 25));
-				callSequence.push("worker");
-			});
 		});
 		assert.isTrue(executed);
 		assert.isTrue(disposable.disposed);
@@ -186,34 +133,6 @@ describe("Fusing tests", function () {
 		} finally {
 			(global as any).console = originalConsole;
 		}
-	});
-	it("Should fail when wrong disposable", async function () {
-		let executed = false;
-		let expectedError: any;
-		try {
-			await Fusing(FExecutionContext.Empty, null as any, (ct, instance) => {
-				//
-			});
-		} catch (e) {
-			expectedError = e;
-		}
-		assert.isDefined(expectedError);
-		assert.instanceOf(expectedError, Error);
-		assert.include(expectedError.message, "Wrong argument");
-		assert.isFalse(executed);
-	});
-	it("Should fail when wrong worker", async function () {
-		let executed = false;
-		let expectedError: any;
-		try {
-			await Fusing(FExecutionContext.Empty, Promise.resolve(new TestDisposable()), null as any);
-		} catch (e) {
-			expectedError = e;
-		}
-		assert.isDefined(expectedError);
-		assert.instanceOf(expectedError, Error);
-		assert.include(expectedError.message, "Wrong argument");
-		assert.isFalse(executed);
 	});
 	it("Should fail with worker's error", async function () {
 		const disposable = new TestDisposable();
@@ -272,7 +191,6 @@ describe("Fusing tests", function () {
 	it("Should be able to use CancellationToken on init phase", async function () {
 		const cts = new FCancellationTokenSourceManual();
 		const token: FCancellationToken = cts.token;
-
 
 		cts.cancel();
 
