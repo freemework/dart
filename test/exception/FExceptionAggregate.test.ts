@@ -3,17 +3,6 @@ import { FException, FExceptionAggregate } from "../../src/index";
 import { assert } from "chai";
 
 describe("FExceptionAggregate test", function () {
-	it("should NOT be instantable without inner errors", function () {
-		let expectedErr: any;
-		try {
-			// tslint:disable-next-line: no-unused-expression
-			new (FExceptionAggregate as any)();
-		} catch (e) {
-			expectedErr = e;
-		}
-		assert.isDefined(expectedErr);
-	});
-
 	it("should be instantable without inner errors", function () {
 		const aggrError = new FExceptionAggregate([]);
 		assert.equal(aggrError.message, FExceptionAggregate.name);

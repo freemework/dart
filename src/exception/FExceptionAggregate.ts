@@ -22,7 +22,7 @@ export class FExceptionAggregate extends FException {
 			super(friendlyMessage);
 		}
 
-		this.innerExceptions = friendlyInnerExceptions;
+		this.innerExceptions = Object.freeze(friendlyInnerExceptions);
 	}
 
 	public toString(): string {
