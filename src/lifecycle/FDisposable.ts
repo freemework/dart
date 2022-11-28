@@ -1,31 +1,39 @@
+import { FException, FExceptionAggregate } from "../exception";
+
 export abstract class FDisposable {
 	abstract dispose(): Promise<void>;
 }
 export namespace FDisposable {
 	export async function disposeAll(...instances: ReadonlyArray<FDisposable>): Promise<void> {
+		const innerExceptions:Array<FException> = [];
 		for (const instance of instances) {
-			await FDisposableBase.safeDispose(instance);
-		}
-	}
-
-	export async function safeDispose(disposable: any): Promise<void> {
-		if (typeof disposable !== "object" || disposable === null) { return Promise.resolve(); }
-		if (!("dispose" in disposable)) { return Promise.resolve(); }
-		if (typeof disposable.dispose !== "function") { return Promise.resolve(); }
-
-		return Promise.resolve().then(async () => {
 			try {
-				const disposeResult = (disposable as FDisposable).dispose();
-				if (disposeResult instanceof Promise) {
-					await disposeResult;
-				}
-			} catch (e) {
-				console.error(
-					"Dispose method raised an error. This is unexpected behaviour due dispose() should be exception safe. The error was bypassed.",
-					e);
-			}
-		});
+			await instance.dispose();
+		  } catch (e) {
+			innerExceptions.push(FException.wrapIfNeeded(e));
+		  }
+		}
+		FExceptionAggregate.throwIfNeeded(innerExceptions);
 	}
+
+	// export async function safeDispose(disposable: any): Promise<void> {
+	// 	if (typeof disposable !== "object" || disposable === null) { return Promise.resolve(); }
+	// 	if (!("dispose" in disposable)) { return Promise.resolve(); }
+	// 	if (typeof disposable.dispose !== "function") { return Promise.resolve(); }
+
+	// 	return Promise.resolve().then(async () => {
+	// 		try {
+	// 			const disposeResult = (disposable as FDisposable).dispose();
+	// 			if (disposeResult instanceof Promise) {
+	// 				await disposeResult;
+	// 			}
+	// 		} catch (e) {
+	// 			console.error(
+	// 				"Dispose method raised an error. This is unexpected behaviour due dispose() should be exception safe. The error was bypassed.",
+	// 				e);
+	// 		}
+	// 	});
+	// }
 }
 
 export abstract class FDisposableBase extends FDisposable {

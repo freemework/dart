@@ -10,6 +10,7 @@ import {
 	FExecutionContextCancellation,
 	FInitableBase,
 	Fusing,
+	FException,
 } from "../../src";
 import { Deferred, nextTick } from "./tools";
 
@@ -39,7 +40,7 @@ describe("Fusing tests", function () {
 	it("Should pass Promise result to worker", async function () {
 		const disposable = new TestDisposable();
 		let executed = false;
-		await Fusing(FExecutionContext.Empty, Promise.resolve(disposable), (ct, instance) => {
+		await Fusing(FExecutionContext.Empty, () => Promise.resolve(disposable), (ct, instance) => {
 			executed = true;
 			assert.strictEqual(disposable, instance);
 		});
@@ -104,42 +105,31 @@ describe("Fusing tests", function () {
 		assert.equal(callSequence[0], "worker");
 		assert.equal(callSequence[1], "dispose");
 	});
-	it("Should NOT fail if dispose() raise an error", async function () {
-		const originalConsole = (global as any).console;
+	it("Should fail if dispose() raise an error", async function () {
+		let executed = false;
+
+		let expectedError: any;
+
 		try {
-			let executed = false;
-
-			let expectedErrorMessage: any;
-			let expectedErrorObj: any;
-
-			(global as any).console = {
-				error(msg: any, err: any) {
-					expectedErrorMessage = msg;
-					expectedErrorObj = err;
-				}
-			};
 			await Fusing(
 				FExecutionContext.Empty,
-				() => ({ dispose: () => Promise.resolve().then(() => { throw new Error("Expected abnormal error"); }) }),
-				(ct, instance) => {
-					executed = true;
-				});
-			assert.isTrue(executed);
-			assert.isString(expectedErrorMessage);
-			assert.equal(expectedErrorMessage,
-				"Dispose method raised an error. This is unexpected behaviour due dispose() should be exception safe. The error was bypassed.");
-			assert.instanceOf(expectedErrorObj, Error);
-			assert.equal(expectedErrorObj.message, "Expected abnormal error");
-		} finally {
-			(global as any).console = originalConsole;
+				() => ({ dispose: () => Promise.resolve().then(() => { throw new FException("Expected abnormal error"); }) }),
+				(ct, instance) => { executed = true; }
+			);
+		} catch (e) {
+			expectedError = e;
 		}
+
+		assert.isTrue(executed);
+		assert.instanceOf(expectedError, FException);
+		assert.equal((expectedError as FException).message, "Expected abnormal error");
 	});
 	it("Should fail with worker's error", async function () {
 		const disposable = new TestDisposable();
 		let executed = false;
 		let expectedError: any;
 		try {
-			await Fusing(FExecutionContext.Empty, Promise.resolve(disposable), (ct, instance) => {
+			await Fusing(FExecutionContext.Empty, () => Promise.resolve(disposable), (ct, instance) => {
 				executed = true;
 				throw new Error("Test ERROR");
 			});
@@ -158,7 +148,7 @@ describe("Fusing tests", function () {
 		let executed = false;
 		let expectedError: any;
 		try {
-			await Fusing(FExecutionContext.Empty, Promise.resolve(disposable), (ct, instance) => {
+			await Fusing(FExecutionContext.Empty, () => Promise.resolve(disposable), (ct, instance) => {
 				executed = true;
 				return Promise.reject(new Error("Test ERROR"));
 			});
@@ -249,10 +239,14 @@ describe("Fusing tests", function () {
 	it("Should call init() for Initable", async function () {
 		const initable = new TestInitable();
 		let executedAfterInit = false;
-		await Fusing(FExecutionContext.Empty, Promise.resolve(initable), (ct, instance) => {
-			executedAfterInit = initable.initialized;
-			assert.strictEqual(initable, instance);
-		});
+		await Fusing(
+			FExecutionContext.Empty,
+			() => Promise.resolve(initable),
+			(ct, instance) => {
+				executedAfterInit = initable.initialized;
+				assert.strictEqual(initable, instance);
+			}
+		);
 		assert.isTrue(executedAfterInit);
 		assert.isTrue(initable.initialized);
 		assert.isFalse(initable.initializing);

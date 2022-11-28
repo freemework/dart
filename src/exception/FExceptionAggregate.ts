@@ -1,6 +1,15 @@
 import { FException } from "./FException";
 
 export class FExceptionAggregate extends FException {
+	static throwIfNeeded(innerExceptions: ReadonlyArray<FException>): void {
+		if (innerExceptions.length > 0) {
+		  if (innerExceptions.length == 1) {
+			throw innerExceptions[0];
+		  }
+		  throw new FExceptionAggregate(innerExceptions);
+		}
+	  }
+
 	public readonly innerExceptions: ReadonlyArray<FException>;
 	public constructor(innerExceptions: ReadonlyArray<FException>) {
 		let friendlyInnerException: FException | null;

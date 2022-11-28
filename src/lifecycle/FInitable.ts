@@ -1,5 +1,6 @@
 import { FDisposable, FDisposableBase } from "./FDisposable";
 import { FExecutionContext } from "../execution_context/FExecutionContext";
+import { FException, FExceptionAggregate } from "../exception";
 
 export interface FInitable extends FDisposable {
 	init(executionContext: FExecutionContext): Promise<void>;
@@ -12,14 +13,24 @@ export namespace FInitable {
 				await instance.init(executionContext);
 				intializedInstances.push(instance);
 			}
-		} catch (e) {
+		} catch (initEx) {
+			const disposeExs: Array<FException> = [];
 			for (const intializedInstance of intializedInstances.reverse()) {
-				await FDisposableBase.safeDispose(intializedInstance);
+				try {
+					await intializedInstance.dispose();
+				} catch (disposeEx) {
+					disposeExs.push(FException.wrapIfNeeded(disposeEx));
+				}
+				if (disposeExs.length > 0) {
+					throw new FExceptionAggregate([
+						FException.wrapIfNeeded(initEx),
+						...disposeExs
+					]);
+				}
 			}
-			throw e;
+			throw initEx;
 		}
 	}
-
 }
 
 export abstract class FInitableBase implements FInitable {
