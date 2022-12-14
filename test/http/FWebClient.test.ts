@@ -31,7 +31,7 @@ describe("WebClient tests", function () {
 			try {
 				for (let index = 0; index < 10; index++) {
 					jobs.push(
-						apiClient.invoke(FExecutionContext.None, "a", "GET")
+						apiClient.invoke(FExecutionContext.Default, "a", "GET")
 							.then(() => { ++completeCount; })
 							.catch((reason: any) => { errors.push(reason); })
 					);
@@ -59,7 +59,7 @@ describe("WebClient tests", function () {
 			});
 			const cts = new FCancellationTokenSourceManual();
 			const cancellableExecutionContext: FExecutionContext = new FExecutionContextCancellation(
-				FExecutionContext.None,
+				FExecutionContext.Default,
 				cts.token
 			);
 			const jobs: Array<Promise<void>> = [];

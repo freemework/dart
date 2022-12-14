@@ -14,7 +14,7 @@ describe("FHttpClient tests", function () {
 	describe("Tests without proxy", function () {
 		it("FHttpClient should GET http:", async function () {
 			const httpClient = new FHttpClient({ timeout: 5000 });
-			await httpClient.invoke(FExecutionContext.None, {
+			await httpClient.invoke(FExecutionContext.Default, {
 				//				url: new URL("?a", "http://www.google.com"),
 				url: new URL("?a", "https://echo.zxteam.org"),
 				method: "GET",
@@ -24,7 +24,7 @@ describe("FHttpClient tests", function () {
 
 		it("FHttpClient should GET https:", async function () {
 			const httpClient = new FHttpClient({ timeout: 5000 });
-			await httpClient.invoke(FExecutionContext.None, {
+			await httpClient.invoke(FExecutionContext.Default, {
 				//url: new URL("?a", "https://www.google.com"),
 				url: new URL("?a", "https://echo.zxteam.org"),
 				method: "GET",
@@ -35,7 +35,7 @@ describe("FHttpClient tests", function () {
 		it("FHttpClient should cancel() invoke", async function () {
 			const cts = new FCancellationTokenSourceManual();
 			const cancellationExecutionContext: FExecutionContext = new FExecutionContextCancellation(
-				FExecutionContext.None,
+				FExecutionContext.Default,
 				cts.token
 			);
 
@@ -73,7 +73,7 @@ describe("FHttpClient tests", function () {
 			await listeningDefer.promise;
 			try {
 				const httpClient = new FHttpClient({ timeout: 500 });
-				const response = await httpClient.invoke(FExecutionContext.None, { url: new URL("http://127.0.0.1:65535"), method: "GET" });
+				const response = await httpClient.invoke(FExecutionContext.Default, { url: new URL("http://127.0.0.1:65535"), method: "GET" });
 
 				assert.isDefined(response);
 				assert.equal(response.statusCode, 301);
@@ -105,7 +105,7 @@ describe("FHttpClient tests", function () {
 				const httpClient = new FHttpClient();
 				let expectedError;
 				try {
-					await httpClient.invoke(FExecutionContext.None, { url: new URL("http://localhost:1"), method: "GET" });
+					await httpClient.invoke(FExecutionContext.Default, { url: new URL("http://localhost:1"), method: "GET" });
 				} catch (e) {
 					expectedError = e;
 				}
@@ -118,7 +118,7 @@ describe("FHttpClient tests", function () {
 				const httpClient = new FHttpClient();
 				let expectedError;
 				try {
-					await httpClient.invoke(FExecutionContext.None, { url: new URL("http://not.existing.domain.local"), method: "GET" });
+					await httpClient.invoke(FExecutionContext.Default, { url: new URL("http://not.existing.domain.local"), method: "GET" });
 				} catch (e) {
 					expectedError = e;
 				}
@@ -133,7 +133,7 @@ describe("FHttpClient tests", function () {
 				let expectedError;
 				try {
 					// Connecting to NON existng IP to emulate connect timeout
-					await httpClient.invoke(FExecutionContext.None, { url: new URL("http://192.168.255.255:65535"), method: "GET" });
+					await httpClient.invoke(FExecutionContext.Default, { url: new URL("http://192.168.255.255:65535"), method: "GET" });
 				} catch (e) {
 					expectedError = e;
 				}
@@ -159,7 +159,7 @@ describe("FHttpClient tests", function () {
 					const httpClient = new FHttpClient({ timeout: 50 });
 					let expectedError;
 					try {
-						await httpClient.invoke(FExecutionContext.None, { url: new URL("http://127.0.0.1:65535"), method: "GET" });
+						await httpClient.invoke(FExecutionContext.Default, { url: new URL("http://127.0.0.1:65535"), method: "GET" });
 					} catch (e) {
 						expectedError = e;
 					}
@@ -190,7 +190,7 @@ describe("FHttpClient tests", function () {
 					const httpClient = new FHttpClient({ timeout: 1000 });
 					let expectedError;
 					try {
-						await httpClient.invoke(FExecutionContext.None, { url: new URL("http://127.0.0.1:65535"), method: "GET" });
+						await httpClient.invoke(FExecutionContext.Default, { url: new URL("http://127.0.0.1:65535"), method: "GET" });
 					} catch (e) {
 						expectedError = e;
 					}
@@ -220,7 +220,7 @@ describe("FHttpClient tests", function () {
 					const httpClient = new FHttpClient({ timeout: 500 });
 					let expectedError;
 					try {
-						await httpClient.invoke(FExecutionContext.None, { url: new URL("http://127.0.0.1:65535"), method: "GET" });
+						await httpClient.invoke(FExecutionContext.Default, { url: new URL("http://127.0.0.1:65535"), method: "GET" });
 					} catch (e) {
 						expectedError = e;
 					}
@@ -250,7 +250,7 @@ describe("FHttpClient tests", function () {
 					const httpClient = new FHttpClient({ timeout: 500 });
 					let expectedError;
 					try {
-						await httpClient.invoke(FExecutionContext.None, {
+						await httpClient.invoke(FExecutionContext.Default, {
 							url: new URL("http://127.0.0.1:65535"),
 							headers: {
 								"Content-Type": "application/json"
@@ -288,7 +288,7 @@ describe("FHttpClient tests", function () {
 					const httpClient = new FHttpClient({ timeout: 500 });
 					let expectedError;
 					try {
-						await httpClient.invoke(FExecutionContext.None, {
+						await httpClient.invoke(FExecutionContext.Default, {
 							url: new URL("http://127.0.0.1:65535"),
 							headers: {
 								"Content-Type": "text/plain"
@@ -326,7 +326,7 @@ describe("FHttpClient tests", function () {
 		};
 		it("FHttpClient should GET http: with proxy", async function () {
 			const httpClient = new FHttpClient({ proxyOpts });
-			const res = await httpClient.invoke(FExecutionContext.None, {
+			const res = await httpClient.invoke(FExecutionContext.Default, {
 				method: "GET",
 				url: new URL("http://www.google.com?a"),
 				headers: { test: "test" }
@@ -335,7 +335,7 @@ describe("FHttpClient tests", function () {
 
 		it("FHttpClient should GET https: with proxy", async function () {
 			const httpClient = new FHttpClient({ proxyOpts });
-			const res = await httpClient.invoke(FExecutionContext.None, {
+			const res = await httpClient.invoke(FExecutionContext.Default, {
 				method: "GET",
 				url: new URL("http://www.google.com?a"),
 				headers: { test: "test" }
@@ -344,7 +344,7 @@ describe("FHttpClient tests", function () {
 
 		it("FHttpClient should GET data from Poloniex: with proxy", async function () {
 			const httpClient = new FHttpClient({ proxyOpts });
-			const res = await httpClient.invoke(FExecutionContext.None, {
+			const res = await httpClient.invoke(FExecutionContext.Default, {
 				method: "GET",
 				url: new URL("https://poloniex.com/public?command=returnTicker")
 			});

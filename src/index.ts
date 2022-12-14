@@ -24,10 +24,10 @@ export * from "./execution_context";
 export * from "./http";
 export * from "./lifecycle";
 export * from "./limit";
+export * from "./logging";
 export * from "./primitive";
 export * from "./sql";
 
 export { FConfigurationLegacy } from "./FConfigurationLegacy";
 export { FEnsure, FEnsureException } from "./FEnsure";
-export { FLoggerLegacy, FLoggerLegacyContainer } from "./FLoggerLegacy";
 export { Fsleep } from "./Fsleep";

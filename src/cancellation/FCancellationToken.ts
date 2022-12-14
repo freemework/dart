@@ -1,14 +1,18 @@
-export interface FCancellationToken {
-	readonly isCancellationRequested: boolean;
-	addCancelListener(cb: Function): void;
-	removeCancelListener(cb: Function): void;
-	throwIfCancellationRequested(): void;
-}
-export namespace FCancellationToken {
-	export const None: FCancellationToken = Object.freeze({
+import { FExceptionCancelled } from "../exception/FExceptionCancelled";
+
+export type FCancellationTokenCallback = (cancellationException: FExceptionCancelled) => void;
+
+export abstract class FCancellationToken {
+	public abstract get isCancellationRequested(): boolean;
+	public abstract addCancelListener(cb: FCancellationTokenCallback): void;
+	public abstract removeCancelListener(cb: FCancellationTokenCallback): void;
+	public abstract throwIfCancellationRequested(): void;
+
+	public static readonly Dummy: FCancellationToken = Object.freeze({
 		get isCancellationRequested(): boolean { return false; },
-		addCancelListener(cb: Function): void {/* Dummy */ },
-		removeCancelListener(cb: Function): void {/* Dummy */ },
+		addCancelListener(cb: FCancellationTokenCallback): void {/* Dummy */ },
+		removeCancelListener(cb: FCancellationTokenCallback): void {/* Dummy */ },
 		throwIfCancellationRequested(): void {/* Dummy */ }
 	});
+
 }

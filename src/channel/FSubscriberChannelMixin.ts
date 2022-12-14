@@ -3,8 +3,9 @@ import { FExecutionContext } from "../execution_context";
 import { FSubscriberChannel } from "./FSubscriberChannel";
 
 export class FSubscriberChannelMixin<
-	TData = Uint8Array,
-	TEvent extends FSubscriberChannel.Event<TData> = FSubscriberChannel.Event<TData>> implements FSubscriberChannel<TData, TEvent> {
+	TData,
+	TEvent extends FSubscriberChannel.Event<TData> = FSubscriberChannel.Event<TData>
+> implements FSubscriberChannel<TData, TEvent> {
 	private __callbacks?: Array<FSubscriberChannel.Callback<TData, TEvent>>;
 	private __broken?: boolean;
 

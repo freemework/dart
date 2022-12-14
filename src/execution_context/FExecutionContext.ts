@@ -1,13 +1,36 @@
 import { FCancellationToken } from "../cancellation/FCancellationToken";
-import { FCancellationTokenAggregated } from "../cancellation/FCancellationTokenAggregated";
-import { FExceptionArgument } from "../exception/FExceptionArgument";
+
 import { FExceptionInvalidOperation } from "../exception/FExceptionInvalidOperation";
-import { FLoggerLegacy } from "../FLoggerLegacy";
+
+let _EmptyExecutionContextInstance: FExecutionContext;
+let _DefaultExecutionContextInstance: FExecutionContext;
 
 export abstract class FExecutionContext {
 	public abstract get prevContext(): FExecutionContext | null;
 
-	protected static findChainExecutionContext<T extends FExecutionContext>(context: FExecutionContext, clz: Function & { prototype: T; }): T | null {
+	/**
+	 * Provide empty execution context. Usually used as root of execution context chain.
+	 */
+	public static get Empty(): FExecutionContext { return _EmptyExecutionContextInstance; }
+
+	/**
+	 * Provide default execution context.
+	 *
+	 * The execution context contains:
+	 * * `FExecutionContextCancellation` with `FCancellationToken.Dummy`
+	 * * `FExecutionContextLoggerProperties` with empty list of logger properties
+	 */
+	public static get Default(): FExecutionContext { return _DefaultExecutionContextInstance; }
+
+	/**
+	 * Obtain a closest instance of typed `FExecutionContext` that encloses
+	 * the given context.
+	 *
+	 * Returns `null` if requested type not found
+	 */
+	protected static findExecutionContext<T extends FExecutionContext>(
+		context: FExecutionContext, clz: Function & { prototype: T; }
+	): T | null {
 		let chainItem: FExecutionContext | null = context;
 		while (chainItem !== null) {
 			if (chainItem instanceof clz) {
@@ -17,8 +40,31 @@ export abstract class FExecutionContext {
 		}
 		return null;
 	}
-	protected static getChainExecutionContext<T extends FExecutionContext>(context: FExecutionContext, clz: Function & { prototype: T; }): T {
-		const chainItem: T | null = FExecutionContext.findChainExecutionContext(context, clz);
+
+	protected static findAllExecutionContexts<T extends FExecutionContext>(
+		context: FExecutionContext, clz: Function & { prototype: T; }
+	): ReadonlyArray<T> {
+		const result: Array<T> = [];
+
+		let chainItem: FExecutionContext | null = context;
+		while (chainItem != null) {
+			if (chainItem instanceof clz) {
+				result.push(chainItem as T);
+			}
+			chainItem = chainItem.prevContext;
+		}
+
+		return Object.freeze(result);
+	}
+
+	/**
+	 * Obtain a closest instance of typed `FExecutionContext` that encloses
+	 * the given context.
+	 *
+	 * Raise `FExceptionInvalidOperation` if requested type not found
+	 */
+	protected static getExecutionContext<T extends FExecutionContext>(context: FExecutionContext, clz: Function & { prototype: T; }): T {
+		const chainItem: T | null = FExecutionContext.findExecutionContext(context, clz);
 		if (chainItem !== null) {
 			return chainItem;
 		}
@@ -43,135 +89,33 @@ export abstract class FExecutionContextBase extends FExecutionContext {
 		this._prevContext = prevContext;
 	}
 
-	protected readonly _prevContext: FExecutionContext;
+	private readonly _prevContext: FExecutionContext;
 }
 
-export class FExecutionContextCancellation extends FExecutionContextBase {
-	private readonly _cancellationToken: FCancellationToken;
-
-	public static of(context: FExecutionContext): FExecutionElementCancellation {
-		const cancellationExecutionContext: FExecutionContextCancellation
-			= FExecutionContextBase.getChainExecutionContext(context, FExecutionContextCancellation);
-
-		return new FExecutionElementCancellation(cancellationExecutionContext);
-	}
-
-	public constructor(
-		prevContext: FExecutionContext,
-		cancellationToken: FCancellationToken,
-		isAggregateWithPrev: boolean = false
-	) {
-		super(prevContext);
-
-		if (isAggregateWithPrev) {
-			const prev: FExecutionContextCancellation | null = FExecutionContext
-				.findChainExecutionContext(prevContext, FExecutionContextCancellation);
-			if (prev !== null) {
-				this._cancellationToken = new FCancellationTokenAggregated(cancellationToken, prev.cancellationToken);
-				return;
-			}
-		}
-
-		this._cancellationToken = cancellationToken;
-	}
-
-	public get cancellationToken(): FCancellationToken { return this._cancellationToken; }
-}
-export class FExecutionElementCancellation<TFExecutionContextCancellation
-	extends FExecutionContextCancellation = FExecutionContextCancellation>
-	extends FExecutionElement<TFExecutionContextCancellation> {
-	public get cancellationToken(): FCancellationToken { return this.owner.cancellationToken; }
-}
-
-export class FExecutionContextLoggerLegacy extends FExecutionContextBase {
-	private readonly _logger: FLoggerLegacy;
-
-	public static of(context: FExecutionContext): FExecutionElementLoggerLegacy {
-		const loggerCtx: FExecutionContextLoggerLegacy
-			= FExecutionContext.getChainExecutionContext(context, FExecutionContextLoggerLegacy);
-
-		return new FExecutionElementLoggerLegacy(loggerCtx);
-	}
-
-	public constructor(prevContext: FExecutionContext, logger: FLoggerLegacy);
-	public constructor(prevContext: FExecutionContext, loggerName: string);
-	public constructor(prevContext: FExecutionContext, loggerName: string, loggerContext: FLoggerLegacy.Context);
-	public constructor(prevContext: FExecutionContext, loggerContext: FLoggerLegacy.Context);
-	constructor(
-		prevContext: FExecutionContext,
-		...args: Array<any>
-	) {
-		super(prevContext);
-		const arg1 = args[0];
-		if ((args.length === 1 || args.length === 2) && typeof arg1 === "string") {
-			// public constructor(prevContext: FExecutionContext, loggerName: string);
-			// public constructor(prevContext: FExecutionContext, loggerName: string, loggerContext: FLoggerLegacy.Context);
-			const loggerName: string = arg1;
-			const loggerContext: FLoggerLegacy.Context | null = args.length >= 2 ? args[1] : null;
-
-			const loggerExCtx: FExecutionContextLoggerLegacy = FExecutionContext
-				.getChainExecutionContext(prevContext, FExecutionContextLoggerLegacy);
-
-			this._logger = loggerContext !== null
-				? loggerExCtx.logger.getLogger(loggerName, loggerContext)
-				: loggerExCtx.logger.getLogger(loggerName);
-		} else if (args.length === 1 && typeof arg1["getLogger"] === "function") {
-			// public constructor(prevContext: FExecutionContext, logger: FLoggerLegacy);
-			const logger: FLoggerLegacy = arg1;
-
-			this._logger = logger;
-		} else if (args.length === 1) {
-			// public constructor(prevContext: FExecutionContext, loggerContext: FLoggerLegacy.Context);
-			const loggerContext: FLoggerLegacy.Context = arg1;
-
-			const loggerExCtx: FExecutionContextLoggerLegacy = FExecutionContext
-				.getChainExecutionContext(prevContext, FExecutionContextLoggerLegacy);
-
-			this._logger = loggerExCtx.logger.getLogger(loggerContext);
-		} else {
-			throw new FExceptionArgument();
-		}
-	}
-
-	public get logger(): FLoggerLegacy { return this._logger; }
-}
-export class FExecutionElementLoggerLegacy<TFExecutionContextLoggerLegacy
-	extends FExecutionContextLoggerLegacy = FExecutionContextLoggerLegacy>
-	extends FExecutionElement<TFExecutionContextLoggerLegacy> {
-	public get logger(): FLoggerLegacy { return this.owner.logger; }
-}
+// Here cyclic dependencies
+import { FExecutionContextCancellation } from "./FExecutionContextCancellation";
+import { FExecutionContextLoggerProperties } from "./FExecutionContextLoggerProperties";
 
 
-class _FExecutionContextRoot extends FExecutionContext {
-	public get prevContext(): FExecutionContext | null { return null; }
-}
-export namespace FExecutionContext {
-	/**
-	 * Provide empty execution context. Usually used as root of execution context chain.
-	 */
-	export const Empty: FExecutionContext = new _FExecutionContextRoot();
-}
+class _DefaultExecutionContext extends FExecutionContext {
+	private readonly _prevContext: FExecutionContext;
 
-
-class _FExecutionContextNone extends FExecutionContextBase {
 	public constructor() {
-		super(
-			new FExecutionContextCancellation(
-				new FExecutionContextLoggerLegacy(
-					FExecutionContext.Empty,
-					FLoggerLegacy.None
-				),
-				FCancellationToken.None
-			)
+		super();
+
+		this._prevContext = new FExecutionContextCancellation(
+			new FExecutionContextLoggerProperties(
+				_EmptyExecutionContextInstance // empty list of logger properties
+			),
+			FCancellationToken.Dummy,
 		);
 	}
-}
-export namespace FExecutionContext {
-	/**
-	 * Provide execution context with:
-	 * * None(Dummy) logger
-	 * * None(Dummy) cancelletion token
-	 */
-	export const None: FExecutionContext = new _FExecutionContextNone();
-}
 
+	public get prevContext(): FExecutionContext | null { return this._prevContext; }
+}
+_DefaultExecutionContextInstance = new _DefaultExecutionContext();
+
+class _EmptyExecutionContext extends FExecutionContext {
+	public get prevContext(): FExecutionContext | null { return null; }
+}
+_EmptyExecutionContextInstance = new _EmptyExecutionContext();

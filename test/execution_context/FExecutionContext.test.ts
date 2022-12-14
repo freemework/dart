@@ -1,8 +1,10 @@
 import {
 	FCancellationTokenAggregated, FCancellationTokenSource, FCancellationTokenSourceManual,
 	FExecutionContextCancellation, FExecutionElementCancellation, FCancellationToken,
-	FExecutionContext, FExecutionContextBase, FLoggerLegacy,
-	FExecutionContextLoggerLegacy, FExecutionElementLoggerLegacy
+	FExecutionContext, FExecutionContextBase,
+	FExecutionContextLoggerProperties,
+	FExecutionElementLoggerProperties,
+	FLoggerProperty
 } from "../../src/index";
 
 import { assert } from "chai";
@@ -15,21 +17,21 @@ describe("FExecutionContext test", function () {
 
 	it("Cancellation execution context should be resolved on head of chain", function () {
 		const emptyCtx: FExecutionContext = FExecutionContext.Empty;
-		const cancellationCtx: FExecutionContext = new FExecutionContextCancellation(emptyCtx, FCancellationToken.None);
+		const cancellationCtx: FExecutionContext = new FExecutionContextCancellation(emptyCtx, FCancellationToken.Dummy);
 
 		const element: FExecutionElementCancellation = FExecutionContextCancellation.of(cancellationCtx);
 		assert.strictEqual(element.owner, cancellationCtx);
-		assert.strictEqual(element.cancellationToken, FCancellationToken.None);
+		assert.strictEqual(element.cancellationToken, FCancellationToken.Dummy);
 	});
 
 	it("Cancellation execution context should be resolved on chain", function () {
 		const emptyCtx: FExecutionContext = FExecutionContext.Empty;
-		const cancellationCtx: FExecutionContext = new FExecutionContextCancellation(emptyCtx, FCancellationToken.None);
+		const cancellationCtx: FExecutionContext = new FExecutionContextCancellation(emptyCtx, FCancellationToken.Dummy);
 		const stubCtx = new StubExecutionContext(cancellationCtx);
 
 		const element: FExecutionElementCancellation = FExecutionContextCancellation.of(stubCtx);
 		assert.strictEqual(element.owner, cancellationCtx);
-		assert.strictEqual(element.cancellationToken, FCancellationToken.None);
+		assert.strictEqual(element.cancellationToken, FCancellationToken.Dummy);
 	});
 
 	it("Cancellation execution context should aggregate tokens", function () {
@@ -51,46 +53,23 @@ describe("FExecutionContext test", function () {
 
 	it("LoggerLegacy execution context should be resolved on head of chain", function () {
 		const emptyCtx: FExecutionContext = FExecutionContext.Empty;
-		const loggerCtx: FExecutionContext = new FExecutionContextLoggerLegacy(emptyCtx, FLoggerLegacy.None);
+		const loggerCtx: FExecutionContext = new FExecutionContextLoggerProperties(emptyCtx, { name: "test", value: "42" });
 
-		const element: FExecutionElementLoggerLegacy = FExecutionContextLoggerLegacy.of(loggerCtx);
+		const element: FExecutionElementLoggerProperties = FExecutionContextLoggerProperties.of(loggerCtx);
 		assert.strictEqual(element.owner, loggerCtx);
-		assert.strictEqual(element.logger, FLoggerLegacy.None);
+		assert.strictEqual(element.loggerProperties[0].name, "test");
+		assert.strictEqual(element.loggerProperties[0].value, "42");
 	});
 
 	it("LoggerLegacy execution context should be resolved on chain", function () {
 		const emptyCtx: FExecutionContext = FExecutionContext.Empty;
-		const loggerCtx: FExecutionContext = new FExecutionContextLoggerLegacy(emptyCtx, FLoggerLegacy.None);
+		const logProp: FLoggerProperty = { name: "test", value: "42" };
+		const loggerCtx: FExecutionContext = new FExecutionContextLoggerProperties(emptyCtx, logProp);
 		const stubCtx = new StubExecutionContext(loggerCtx);
 
-		const element: FExecutionElementLoggerLegacy = FExecutionContextLoggerLegacy.of(stubCtx);
+		const element: FExecutionElementLoggerProperties = FExecutionContextLoggerProperties.of(stubCtx);
 		assert.strictEqual(element.owner, loggerCtx);
-		assert.strictEqual(element.logger, FLoggerLegacy.None);
-	});
-
-	it("LoggerLegacy execution context should instantiate from logger context", function () {
-		const emptyCtx: FExecutionContext = FExecutionContext.Empty;
-		const loggerCtx: FExecutionContext = new FExecutionContextLoggerLegacy(emptyCtx, FLoggerLegacy.None);
-		const loggerWithPropertiesCtx: FExecutionContext = new FExecutionContextLoggerLegacy(loggerCtx, "TestLogger", { "data": "42" });
-		const stubCtx = new StubExecutionContext(loggerWithPropertiesCtx);
-
-		const element: FExecutionElementLoggerLegacy = FExecutionContextLoggerLegacy.of(stubCtx);
-		assert.strictEqual(element.owner, loggerWithPropertiesCtx);
-		assert.notStrictEqual(element.logger, FLoggerLegacy.None, "LoggerLegacy should be changed by instastiation second FExecutionContextLoggerLegacy");
-		assert.deepEqual(element.logger.context, { "data": "42" });
-	});
-
-	it("LoggerLegacy execution context should merge logger contexts", function () {
-		const emptyCtx: FExecutionContext = FExecutionContext.Empty;
-		const loggerCtx: FExecutionContext = new FExecutionContextLoggerLegacy(emptyCtx, FLoggerLegacy.None);
-		const loggerWithPropertiesCtx1: FExecutionContext = new FExecutionContextLoggerLegacy(loggerCtx, "TestLogger", { "data": "42" });
-		const loggerWithPropertiesCtx2: FExecutionContext = new FExecutionContextLoggerLegacy(loggerWithPropertiesCtx1, "TestLogger", { "data": "43", "data2": 42 });
-		const stubCtx = new StubExecutionContext(loggerWithPropertiesCtx2);
-
-		const element: FExecutionElementLoggerLegacy = FExecutionContextLoggerLegacy.of(stubCtx);
-		assert.strictEqual(element.owner, loggerWithPropertiesCtx2);
-		assert.notStrictEqual(element.logger, FLoggerLegacy.None, "LoggerLegacy should be changed by instastiation second FExecutionContextLoggerLegacy");
-		assert.deepEqual(element.logger.context, { "data": "43", "data2": 42 });
+		assert.strictEqual([...element.loggerProperties][0], logProp);
 	});
 });
 

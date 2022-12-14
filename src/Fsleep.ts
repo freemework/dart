@@ -7,7 +7,7 @@ import { FExecutionContext, FExecutionContextCancellation } from "./execution_co
  * @param cancellationToken The cancellation token to cancel "sleeping"
  * @param ms Timeout delay in milliseconds. If ommited, the "sleeping" `Promise` will sleep infinitely and wait for cancellation token activation
  * @example
- * await Fsleep(FCancellationToken.None, 25); // Suspend execution for 25 milliseconds
+ * await Fsleep(FCancellationToken.Dummy, 25); // Suspend execution for 25 milliseconds
  * @example
  * const cancellationTokenSource = new FCancellationTokenSourceManual();
  * ...

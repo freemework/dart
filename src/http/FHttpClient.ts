@@ -1,17 +1,23 @@
 import { FCancellationToken } from "../cancellation";
+
 import { FException, FExceptionCancelled, FExceptionInvalidOperation, FExceptionNativeErrorWrapper } from "../exception";
-import { FExecutionContext, FExecutionContextCancellation, FExecutionContextLoggerLegacy } from "../execution_context";
+
+import { FExecutionContext, FExecutionContextCancellation, FExecutionContextLoggerProperties } from "../execution_context";
+
 import { FInvokeChannel } from "../channel/FInvokeChannel";
-import { FLoggerLegacy } from "../FLoggerLegacy";
+
+import { FLogger } from "../logging/FLogger";
 
 import * as http from "http";
 import * as https from "https";
 
 export class FHttpClient implements FHttpClient.HttpInvokeChannel {
+	private readonly _log: FLogger;
 	private readonly _proxyOpts: FHttpClient.ProxyOpts | null;
 	private readonly _sslOpts: FHttpClient.SslOpts | null;
 	private readonly _requestTimeout: number;
 	public constructor(opts?: FHttpClient.Opts) {
+		this._log = opts && opts.log || FLogger.None;
 		this._proxyOpts = opts && opts.proxyOpts || null;
 		this._sslOpts = opts && opts.sslOpts || null;
 		this._requestTimeout = opts && opts.timeout || FHttpClient.DEFAULT_TIMEOUT;
@@ -21,16 +27,13 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 		executionContext: FExecutionContext,
 		{ url, method, headers, body }: FHttpClient.Request
 	): Promise<FHttpClient.Response> {
-		const originalLogger: FLoggerLegacy = FExecutionContextLoggerLegacy.of(executionContext).logger;
+		executionContext = new FExecutionContextLoggerProperties(
+			executionContext,
+			{ name: "httpInvokeUrl", value: url.toString() },
+			{ name: "httpInvokeMethod", value: method },
+		);
 
-		const invokeLoggerContext: FLoggerLegacy.Context = {
-			httpInvokeUrl: url.toString(),
-			httpInvokeMethod: method
-		};
-
-		const invokeLogger: FLoggerLegacy = originalLogger.getLogger(this.constructor.name, invokeLoggerContext);
-
-		if (invokeLogger.isTraceEnabled) { invokeLogger.trace("Begin invoke"); }
+		if (this._log.isTraceEnabled) { this._log.trace(executionContext, "Begin invoke"); }
 		return new Promise<FHttpClient.Response>((resolve, reject) => {
 			const cancellationToken: FCancellationToken = FExecutionContextCancellation.of(executionContext).cancellationToken;
 
@@ -43,7 +46,7 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 					resolved = true;
 					const msg = isConnectTimeout ? "Connect Timeout"
 						: `${method} ${url} failed with error: ${ex.message}. See innerException for details`;
-					invokeLogger.debug(msg, ex);
+						this._log.debug(executionContext,msg, ex);
 					return reject(new FHttpClient.CommunicationError(url, method,
 						headers !== undefined ? headers : {},
 						body !== undefined ? body : Buffer.alloc(0),
@@ -73,9 +76,9 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 						const respHeaders = response.headers;
 						const respBody: Buffer = Buffer.concat(responseDataChunks);
 
-						if (invokeLogger.isTraceEnabled) {
-							invokeLogger.trace(`Recv: ${JSON.stringify({ respStatus, respDescription, respHeaders })}`);
-							invokeLogger.trace(`Recv body: ${respBody.toString()}`);
+						if (this._log.isTraceEnabled) {
+							this._log.trace(executionContext,`Recv: ${JSON.stringify({ respStatus, respDescription, respHeaders })}`);
+							this._log.trace(executionContext,`Recv body: ${respBody.toString()}`);
 						}
 
 						if (respStatus < 400) {
@@ -103,9 +106,9 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 				return reject(e);
 			}
 
-			const request = this.createClientRequest({ url, method, headers }, responseHandler, invokeLogger);
+			const request: http.ClientRequest = this.createClientRequest(executionContext, { url, method, headers }, responseHandler, this._log);
 			if (body !== undefined) {
-				if (invokeLogger.isTraceEnabled) { invokeLogger.trace("Write body: " + body.toString()); }
+				if (this._log.isTraceEnabled) { this._log.trace(executionContext,"Write body: " + body.toString()); }
 				request.write(body);
 			}
 			request.end();
@@ -146,9 +149,10 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 	}
 
 	private createClientRequest(
+		executionContext: FExecutionContext,
 		{ url, method, headers }: FHttpClient.Request,
 		callback: (res: http.IncomingMessage) => void,
-		log: FLoggerLegacy
+		log: FLogger
 	): http.ClientRequest {
 		const proxyOpts = this._proxyOpts;
 		if (proxyOpts && proxyOpts.type === "http") {
@@ -161,7 +165,7 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 				headers: { Host: url.host, ...headers }
 			};
 			if (log.isTraceEnabled) {
-				log.trace("Call https.request: " + JSON.stringify(reqOpts));
+				log.trace(executionContext,"Call https.request: " + JSON.stringify(reqOpts));
 			}
 			return http.request(reqOpts, callback);
 		} else {
@@ -191,12 +195,12 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 					}
 				}
 				if (log.isTraceEnabled) {
-					log.trace("Call https.request: " + JSON.stringify(reqOpts));
+					log.trace(executionContext,"Call https.request: " + JSON.stringify(reqOpts));
 				}
 				return https.request(reqOpts, callback);
 			} else {
 				if (log.isTraceEnabled) {
-					log.trace("Call https.request: " + JSON.stringify(reqOpts));
+					log.trace(executionContext,"Call https.request: " + JSON.stringify(reqOpts));
 				}
 				return http.request(reqOpts, callback);
 			}
@@ -208,6 +212,7 @@ export namespace FHttpClient {
 	export const DEFAULT_TIMEOUT: number = 60000;
 
 	export interface Opts {
+		log?: FLogger;
 		timeout?: number;
 		proxyOpts?: ProxyOpts;
 		sslOpts?: SslOpts;
