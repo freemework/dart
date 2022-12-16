@@ -3,13 +3,13 @@ import { FException } from "../exception/FException";
 import { FLogger } from "./FLogger";
 import { FLoggerContainer } from "./FLoggerContainer";
 import { FLoggerLevel } from "./FLoggerLevel";
-import { FLoggerProperty } from "./FLoggerProperty";
+import { FLoggerProperties } from "./FLoggerProperties";
 
 export class FLoggerConsole extends FLoggerContainer {
 	public static readonly Default: FLoggerConsole = new FLoggerConsole();
 
-	protected createInnerLogger(innerLoggerName: string): FLogger {
-		return new FLoggerConsole(innerLoggerName, this);
+	protected createChildLogger(childLoggerName: string): FLogger {
+		return new FLoggerConsole(childLoggerName, this);
 	}
 
 	protected isLevelEnabled(level: FLoggerLevel): boolean {
@@ -18,13 +18,13 @@ export class FLoggerConsole extends FLoggerContainer {
 
 	protected log(
 		level: string,
-		loggerProperties: ReadonlyArray<FLoggerProperty>,
+		loggerProperties: FLoggerProperties,
 		message: string,
 		exception?: FException
 	): void {
-		let logMessageBuffer = `${new Date().toISOString()} ${this.loggerName} [$level]`;
-		for (const loggerProperty of loggerProperties) {
-			logMessageBuffer += `(${loggerProperty.name}:${loggerProperty.value})`;
+		let logMessageBuffer = `${new Date().toISOString()} ${this.name} [$level]`;
+		for (const [name, value] of Object.entries(loggerProperties)) {
+			logMessageBuffer += `(${name}:${value})`;
 		}
 
 		logMessageBuffer += (" ");
@@ -54,6 +54,6 @@ export class FLoggerConsole extends FLoggerContainer {
 	}
 
 	private constructor(loggerName?: string, parent?: FLogger) {
-		super({ loggerName, parent });
+		super(loggerName !== undefined ? loggerName : "Console", parent);
 	}
 }

@@ -4,7 +4,7 @@ import {
 	FExecutionContext, FExecutionContextBase,
 	FExecutionContextLoggerProperties,
 	FExecutionElementLoggerProperties,
-	FLoggerProperty
+	FLoggerProperties
 } from "../../src/index";
 
 import { assert } from "chai";
@@ -51,25 +51,25 @@ describe("FExecutionContext test", function () {
 		assert.instanceOf(element.cancellationToken, FCancellationTokenAggregated);
 	});
 
-	it("LoggerLegacy execution context should be resolved on head of chain", function () {
+	it("Logger execution context should be resolved on head of chain", function () {
 		const emptyCtx: FExecutionContext = FExecutionContext.Empty;
 		const loggerCtx: FExecutionContext = new FExecutionContextLoggerProperties(emptyCtx, { name: "test", value: "42" });
 
 		const element: FExecutionElementLoggerProperties = FExecutionContextLoggerProperties.of(loggerCtx);
 		assert.strictEqual(element.owner, loggerCtx);
-		assert.strictEqual(element.loggerProperties[0].name, "test");
-		assert.strictEqual(element.loggerProperties[0].value, "42");
+		assert.strictEqual(element.loggerProperties.name, "test");
+		assert.strictEqual(element.loggerProperties.value, "42");
 	});
 
-	it("LoggerLegacy execution context should be resolved on chain", function () {
+	it("Logger execution context should be resolved on chain", function () {
 		const emptyCtx: FExecutionContext = FExecutionContext.Empty;
-		const logProp: FLoggerProperty = { name: "test", value: "42" };
-		const loggerCtx: FExecutionContext = new FExecutionContextLoggerProperties(emptyCtx, logProp);
-		const stubCtx = new StubExecutionContext(loggerCtx);
+		const loggerCtx1: FExecutionContext = new FExecutionContextLoggerProperties(emptyCtx, { name: "test", value: "42" });
+		const loggerCtx2: FExecutionContext = new FExecutionContextLoggerProperties(loggerCtx1, { name: "test", value: "43" });
+		const stubCtx = new StubExecutionContext(loggerCtx2);
 
 		const element: FExecutionElementLoggerProperties = FExecutionContextLoggerProperties.of(stubCtx);
-		assert.strictEqual(element.owner, loggerCtx);
-		assert.strictEqual([...element.loggerProperties][0], logProp);
+		assert.strictEqual(element.owner, loggerCtx2);
+		assert.deepEqual({ ...element.loggerProperties }, { name: "test", value: "42" });
 	});
 });
 

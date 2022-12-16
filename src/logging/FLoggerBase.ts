@@ -5,7 +5,7 @@ import { FExecutionContextLoggerProperties } from "../execution_context/FExecuti
 
 import { FLogger } from "./FLogger";
 import { FLoggerLevel } from "./FLoggerLevel";
-import { FLoggerProperty } from "./FLoggerProperty";
+import { FLoggerProperties } from "./FLoggerProperties";
 
 export abstract class FLoggerBase extends FLogger {
 	public get isTraceEnabled(): boolean { return this.isLevelEnabled(FLoggerLevel.TRACE); }
@@ -16,7 +16,7 @@ export abstract class FLoggerBase extends FLogger {
 	public get isFatalEnabled(): boolean { return this.isLevelEnabled(FLoggerLevel.FATAL); }
 
 	public trace(
-		variant: FExecutionContext | ReadonlyArray<FLoggerProperty>,
+		variant: FExecutionContext | FLoggerProperties,
 		message: string,
 		ex?: FException,
 	): void {
@@ -24,13 +24,13 @@ export abstract class FLoggerBase extends FLogger {
 			return;
 		}
 
-		const loggerProperties: ReadonlyArray<FLoggerProperty> = this._getLoggerProperties(variant);
+		const loggerProperties: FLoggerProperties = this._getLoggerProperties(variant);
 
 		this.log(FLoggerLevel.TRACE, loggerProperties, message, ex);
 	}
 
 	public debug(
-		variant: FExecutionContext | ReadonlyArray<FLoggerProperty>,
+		variant: FExecutionContext | FLoggerProperties,
 		message: string,
 		ex?: FException,
 	): void {
@@ -38,59 +38,59 @@ export abstract class FLoggerBase extends FLogger {
 			return;
 		}
 
-		const loggerProperties: ReadonlyArray<FLoggerProperty> =
+		const loggerProperties: FLoggerProperties =
 			this._getLoggerProperties(variant);
 		this.log(FLoggerLevel.DEBUG, loggerProperties, message, ex);
 	}
 
 	public info(
-		variant: FExecutionContext | ReadonlyArray<FLoggerProperty>,
+		variant: FExecutionContext | FLoggerProperties,
 		message: string,
 	): void {
 		if (!this.isInfoEnabled) {
 			return;
 		}
 
-		const loggerProperties: ReadonlyArray<FLoggerProperty> =
+		const loggerProperties: FLoggerProperties =
 			this._getLoggerProperties(variant);
 		this.log(FLoggerLevel.INFO, loggerProperties, message);
 	}
 
 	public warn(
-		variant: FExecutionContext | ReadonlyArray<FLoggerProperty>,
+		variant: FExecutionContext | FLoggerProperties,
 		message: string,
 	): void {
 		if (!this.isWarnEnabled) {
 			return;
 		}
 
-		const loggerProperties: ReadonlyArray<FLoggerProperty> =
+		const loggerProperties: FLoggerProperties =
 			this._getLoggerProperties(variant);
 		this.log(FLoggerLevel.WARN, loggerProperties, message);
 	}
 
 	public error(
-		variant: FExecutionContext | ReadonlyArray<FLoggerProperty>,
+		variant: FExecutionContext | FLoggerProperties,
 		message: string,
 	): void {
 		if (!this.isErrorEnabled) {
 			return;
 		}
 
-		const loggerProperties: ReadonlyArray<FLoggerProperty> =
+		const loggerProperties: FLoggerProperties =
 			this._getLoggerProperties(variant);
 		this.log(FLoggerLevel.ERROR, loggerProperties, message);
 	}
 
 	public fatal(
-		variant: FExecutionContext | ReadonlyArray<FLoggerProperty>,
+		variant: FExecutionContext | FLoggerProperties,
 		message: string,
 	): void {
 		if (!this.isFatalEnabled) {
 			return;
 		}
 
-		const loggerProperties: ReadonlyArray<FLoggerProperty> =
+		const loggerProperties: FLoggerProperties =
 			this._getLoggerProperties(variant);
 		this.log(FLoggerLevel.FATAL, loggerProperties, message);
 	}
@@ -102,20 +102,20 @@ export abstract class FLoggerBase extends FLogger {
 	///
 	protected abstract log(
 		level: FLoggerLevel,
-		loggerProperties: ReadonlyArray<FLoggerProperty>,
+		loggerProperties: FLoggerProperties,
 		message: string,
 		exception?: FException,
 	): void;
 
 	private _getLoggerProperties(
-		variant: FExecutionContext | ReadonlyArray<FLoggerProperty>,
-	): ReadonlyArray<FLoggerProperty> {
-		const loggerProperties: ReadonlyArray<FLoggerProperty> = variant instanceof FExecutionContext
-			? Object.freeze([
+		variant: FExecutionContext | FLoggerProperties,
+	): FLoggerProperties {
+		const loggerProperties: FLoggerProperties = variant instanceof FExecutionContext
+			? Object.freeze({
 				...FExecutionContextLoggerProperties
 					.of(variant)
 					.loggerProperties
-			])
+			})
 			: variant;
 
 		return loggerProperties;

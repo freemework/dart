@@ -1,9 +1,9 @@
-import { FLoggerProperty } from "../logging/FLoggerProperty";
+import { FLoggerProperties } from "../logging/FLoggerProperties";
 import { FExecutionContext, FExecutionContextBase, FExecutionElement } from "./FExecutionContext";
 
 
 export class FExecutionContextLoggerProperties extends FExecutionContextBase {
-	private readonly _loggerProperties: ReadonlyArray<FLoggerProperty>;
+	private readonly _loggerProperties: FLoggerProperties;
 
 	public static of(
 		executionContext: FExecutionContext
@@ -28,13 +28,13 @@ export class FExecutionContextLoggerProperties extends FExecutionContextBase {
 		return new FExecutionElementLoggerProperties(loggerCtx, chain);
 	}
 
-	public get loggerProperties(): ReadonlyArray<FLoggerProperty> { return this._loggerProperties; }
+	public get loggerProperties(): FLoggerProperties { return this._loggerProperties; }
 
 	public constructor(
-		prevContext: FExecutionContext, ...loggerProperties: Array<FLoggerProperty>
+		prevContext: FExecutionContext, loggerProperties?: FLoggerProperties
 	) {
 		super(prevContext);
-		this._loggerProperties = Object.freeze([...loggerProperties]);
+		this._loggerProperties = Object.freeze({ ...loggerProperties });
 	}
 }
 export class FExecutionElementLoggerProperties<
@@ -50,15 +50,16 @@ export class FExecutionElementLoggerProperties<
 		this.chain = chain;
 	}
 
-	public get loggerProperties(): ReadonlyArray<FLoggerProperty> {
-		const dict = this.chain.reduce((p, c) => {
-			c.loggerProperties.forEach(lp => {
-				if (!p.has(lp.name)) {
-					p.set(lp.name, lp);
+	public get loggerProperties(): FLoggerProperties {
+		// using reduceRight to take priority for first property in chain.
+		const dict = this.chain.reduceRight((p, c) => {
+			Object.entries(c.loggerProperties).forEach(([name, value]) => {
+				if (!p.has(name)) {
+					p.set(name, value);
 				}
 			});
 			return p;
-		}, new Map<string, FLoggerProperty>);
-		return Object.freeze([...dict.values()]);
+		}, new Map<string, string>);
+		return Object.freeze(Object.fromEntries(dict));
 	}
 }

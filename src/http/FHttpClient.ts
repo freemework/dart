@@ -29,8 +29,10 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 	): Promise<FHttpClient.Response> {
 		executionContext = new FExecutionContextLoggerProperties(
 			executionContext,
-			{ name: "httpInvokeUrl", value: url.toString() },
-			{ name: "httpInvokeMethod", value: method },
+			{
+				httpInvokeUrl: url.toString(),
+				httpInvokeMethod: method
+			},
 		);
 
 		if (this._log.isTraceEnabled) { this._log.trace(executionContext, "Begin invoke"); }
@@ -46,7 +48,7 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 					resolved = true;
 					const msg = isConnectTimeout ? "Connect Timeout"
 						: `${method} ${url} failed with error: ${ex.message}. See innerException for details`;
-						this._log.debug(executionContext,msg, ex);
+					this._log.debug(executionContext, msg, ex);
 					return reject(new FHttpClient.CommunicationError(url, method,
 						headers !== undefined ? headers : {},
 						body !== undefined ? body : Buffer.alloc(0),
@@ -77,8 +79,8 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 						const respBody: Buffer = Buffer.concat(responseDataChunks);
 
 						if (this._log.isTraceEnabled) {
-							this._log.trace(executionContext,`Recv: ${JSON.stringify({ respStatus, respDescription, respHeaders })}`);
-							this._log.trace(executionContext,`Recv body: ${respBody.toString()}`);
+							this._log.trace(executionContext, `Recv: ${JSON.stringify({ respStatus, respDescription, respHeaders })}`);
+							this._log.trace(executionContext, `Recv body: ${respBody.toString()}`);
 						}
 
 						if (respStatus < 400) {
@@ -108,7 +110,7 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 
 			const request: http.ClientRequest = this.createClientRequest(executionContext, { url, method, headers }, responseHandler, this._log);
 			if (body !== undefined) {
-				if (this._log.isTraceEnabled) { this._log.trace(executionContext,"Write body: " + body.toString()); }
+				if (this._log.isTraceEnabled) { this._log.trace(executionContext, "Write body: " + body.toString()); }
 				request.write(body);
 			}
 			request.end();
@@ -165,7 +167,7 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 				headers: { Host: url.host, ...headers }
 			};
 			if (log.isTraceEnabled) {
-				log.trace(executionContext,"Call https.request: " + JSON.stringify(reqOpts));
+				log.trace(executionContext, "Call https.request: " + JSON.stringify(reqOpts));
 			}
 			return http.request(reqOpts, callback);
 		} else {
@@ -195,12 +197,12 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 					}
 				}
 				if (log.isTraceEnabled) {
-					log.trace(executionContext,"Call https.request: " + JSON.stringify(reqOpts));
+					log.trace(executionContext, "Call https.request: " + JSON.stringify(reqOpts));
 				}
 				return https.request(reqOpts, callback);
 			} else {
 				if (log.isTraceEnabled) {
-					log.trace(executionContext,"Call https.request: " + JSON.stringify(reqOpts));
+					log.trace(executionContext, "Call https.request: " + JSON.stringify(reqOpts));
 				}
 				return http.request(reqOpts, callback);
 			}
