@@ -1,4 +1,4 @@
-import { FUnreadonly } from "../util";
+import { FUtilUnreadonly } from "../util";
 
 import { FConfiguration } from "./FConfiguration";
 import { FConfigurationException } from "./FConfigurationException";
@@ -51,7 +51,7 @@ export class FConfigurationDictionary extends FConfiguration {
 	}
 
 	public getNamespace(configurationNamespace: string): FConfiguration {
-		const innerDict: FUnreadonly<FConfigurationDictionary.Data> = {};
+		const innerDict: FUtilUnreadonly<FConfigurationDictionary.Data> = {};
 		const criteria = configurationNamespace + ".";
 		const criteriaLen = criteria.length;
 		Object.keys(this._dict).forEach((key) => {

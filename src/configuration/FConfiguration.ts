@@ -1,5 +1,5 @@
 import { FExceptionArgument } from "../exception";
-import { FUnreadonly } from "../util";
+import { FUtilUnreadonly } from "../util";
 
 import { FConfigurationValue } from "./FConfigurationValue";
 
@@ -84,7 +84,7 @@ export abstract class FConfiguration {
 		const jsonDict: { [key: string]: boolean | number | string; } = {};
 		expandJson(jsonObject, jsonDict);
 
-		const dict: FUnreadonly<FConfigurationDictionary.Data> = {};
+		const dict: FUtilUnreadonly<FConfigurationDictionary.Data> = {};
 		for (const [name, value] of Object.entries(jsonDict)) {
 			if (typeof value === "string") {
 				dict[name] = value === "" ? null : value;

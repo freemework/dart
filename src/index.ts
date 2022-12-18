@@ -28,5 +28,6 @@ export * from "./limit";
 export * from "./logging";
 export * from "./primitive";
 export * from "./sql";
+export * from "./util";
 
 export { FEnsure, FEnsureException } from "./FEnsure";
