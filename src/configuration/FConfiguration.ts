@@ -34,7 +34,7 @@ export abstract class FConfiguration {
 	 * assert.equal(array[2].get("c").asInteger, 42);
 	 * ```
 	 */
-	public static factoryJson(jsonObject: any, indexFieldName: string = "index"): FConfiguration {
+	public static factoryJson(jsonObject: any, indexFieldName: string = FConfiguration.DEFAULT_INDEX_KEY): FConfiguration {
 
 		/**
 		 * Expand json to key-value dict
@@ -105,8 +105,8 @@ export abstract class FConfiguration {
 	}
 
 
-	protected static readonly DEFAULT_INDEXES_KEY = "indexes";
-
+	protected static readonly DEFAULT_INDEXES_KEY: string = "indexes";
+	protected static readonly DEFAULT_INDEX_KEY: string = "index";
 
 	/**
 	 * Gets configuration source URI.
