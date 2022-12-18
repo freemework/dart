@@ -67,6 +67,15 @@ export abstract class FConfigurationValue {
 	public abstract get asNumber(): number;
 	public abstract get asNumberNullable(): number | null;
 
+	/**
+	 * Gets value representations as TCP port
+	 */
+	public abstract get asPortNumber(): number;
+	/**
+	 * Gets value representations as TCP port or `null` if value empty
+	 */
+	public abstract get asPortNumberNullable(): number | null;
+
 	public abstract get asString(): string;
 	public abstract get asStringNullable(): string | null;
 
@@ -154,6 +163,14 @@ class _FConfigurationValue extends FConfigurationValue {
 	public get asNumberNullable(): number | null {
 		if (this._value === null) { return null; }
 		return this.fromNumber(this._value);
+	}
+	public get asPortNumber(): number {
+		this.assertNotNullValue(this._value, "asPortNumber");
+		return this.fromPortNumber(this._value);
+	}
+	public get asPortNumberNullable(): number | null {
+		if (this._value === null) { return null; }
+		return this.fromPortNumber(this._value);
 	}
 	public get asString(): string {
 		this.assertNotNullValue(this._value, "asString");
@@ -295,10 +312,10 @@ class _FConfigurationValue extends FConfigurationValue {
 
 	private fromIntegerPositive(value: string): number {
 		const friendlyValue = this.fromInteger(value);
-		if (friendlyValue < 0) { return friendlyValue; }
+		if (friendlyValue > 0) { return friendlyValue; }
 		throw new FConfigurationValueException(
 			this,
-			`Cannot convert the value '${value}' to integer negative type.`,
+			`Cannot convert the value '${value}' to integer positive type.`,
 			this.key,
 		);
 	}
@@ -311,6 +328,25 @@ class _FConfigurationValue extends FConfigurationValue {
 			`Cannot convert the value '${value}' to float type.`,
 			this.key
 		);
+	}
+
+	private fromPortNumber(value: string): number {
+		const friendlyValue = Number.parseInt(value);
+		if (friendlyValue.toString() !== value) {
+			throw new FConfigurationValueException(
+				this,
+				`Cannot convert the value '${value}' to TCP port number.`,
+				this.key
+			);
+		}
+		if (friendlyValue < 0 || friendlyValue > 65535) {
+			throw new FConfigurationValueException(
+				this,
+				`Cannot convert the value '${value}' to TCP port number. Value out of range 0 - 65535.`,
+				this.key
+			);
+		}
+		return friendlyValue;
 	}
 
 	private fromString(value: string): string {
@@ -356,6 +392,8 @@ class _FConfigurationValueUndefined extends FConfigurationValue {
 	public get asIntegerPositiveNullable(): number | null { return this.throwHelper(); }
 	public get asNumber(): number { return this.throwHelper(); }
 	public get asNumberNullable(): number | null { return this.throwHelper(); }
+	public get asPortNumber(): number { return this.throwHelper(); }
+	public get asPortNumberNullable(): number | null { return this.throwHelper(); }
 	public get asString(): string { return this.throwHelper(); }
 	public get asStringNullable(): string | null { return this.throwHelper(); }
 	public get asUrl(): URL { return this.throwHelper(); }

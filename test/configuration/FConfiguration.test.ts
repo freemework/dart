@@ -154,4 +154,24 @@ describe("FConfiguration tests", function () {
 		assert.equal(aValueDefault.asString, emptyString);
 		assert.equal(aValueDefault.asStringNullable, emptyString);
 	});
+
+	it("Should read positive integer", function () {
+		const data = {
+			"a": "42"
+		};
+
+		const config = FConfiguration.factoryJson(data);
+
+		assert.equal(config.get("a").asIntegerPositive, 42);
+	});
+
+	it("Should read negative integer", function () {
+		const data = {
+			"a": "-42"
+		};
+
+		const config = FConfiguration.factoryJson(data);
+
+		assert.equal(config.get("a").asIntegerNegative, -42);
+	});
 });

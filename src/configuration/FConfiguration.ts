@@ -113,6 +113,8 @@ export abstract class FConfiguration {
 	 *
 	 * @remarks This value mostly need to debug purposes to understand source of a value.
 	 *
+	 * @see https://docs.freemework.org/configuration/FConfiguration#sourceURI?lang=typescript
+	 *
 	 * Each configuration source should represents an URI.
 	 * For example:
 	 * - configuration+file+properies:///path/to/file.properies
@@ -122,11 +124,13 @@ export abstract class FConfiguration {
 	 * - configuration+file+yaml:///path/to/file.yml
 	 * - configuration+consul://my.consul.host:????
 	 * - configuration+redis://my.redis.host:6379/1
+	 * - configuration+directory+keyperfile:///run/secrets
 	 * - configuration:json?data=%7B%22a%22%3A42%7D
+	 * - configuration:properies?data=...
+	 * - configuration:toml?data=...
 	 * - configuration:chain?sources=configuration:env,configuration%3Ajson%3Fdata%3D...,...
 	 * - configuration:env
-	 * - configuration:default
-	 * - etc
+	 * - etc.
 	 */
 	public abstract get sourceURI(): URL;
 
