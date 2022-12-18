@@ -209,7 +209,7 @@ export abstract class FConfiguration {
 	 * console.log(serverCfgs[1].get("listenPort").asInteger); // 8083
 	 * ```
 	 */
-	public abstract getArray(key: string, indexesName?: string): ReadonlyArray<FConfiguration>;
+	public abstract getArray(key: string, indexesName?: string): Array<FConfiguration>;
 
 	/**
 	 * Get inner configuration for specific namespace.
@@ -387,7 +387,7 @@ class _FConfiguration extends FConfiguration {
 		}
 	}
 
-	public getArray(key: string, indexesName: string = FConfiguration.DEFAULT_INDEXES_KEY): ReadonlyArray<FConfiguration> {
+	public getArray(key: string, indexesName: string = FConfiguration.DEFAULT_INDEXES_KEY): Array<FConfiguration> {
 		const arrayIndexesKey = `${key}.${indexesName}`;
 		const arrayIndexes: Array<string> = this.get(arrayIndexesKey).asString
 			.split(" ")
@@ -398,7 +398,7 @@ class _FConfiguration extends FConfiguration {
 			return this.getNamespace(arrayItemNamespaceKey);
 		});
 
-		return Object.freeze(arrayNamespaces);
+		return arrayNamespaces;
 	}
 
 	public hasNamespace(configurationNamespace: string): boolean {

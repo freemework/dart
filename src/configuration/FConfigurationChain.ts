@@ -36,7 +36,7 @@ export class FConfigurationChain extends FConfiguration {
 		this._configurations = Object.freeze(configurations);
 	}
 
-	public getArray(key: string, indexesName: string = FConfiguration.DEFAULT_INDEXES_KEY): ReadonlyArray<FConfiguration> {
+	public getArray(key: string, indexesName: string = FConfiguration.DEFAULT_INDEXES_KEY): Array<FConfiguration> {
 		const arrayIndexesKey = `${key}.${indexesName}`;
 		const arrayIndexes: Array<string> = this.get(arrayIndexesKey).asString
 			.split(" ")
@@ -47,7 +47,7 @@ export class FConfigurationChain extends FConfiguration {
 			return this.getNamespace(arrayItemNamespaceKey);
 		});
 
-		return Object.freeze(arrayNamespaces);
+		return arrayNamespaces;
 	}
 
 	public getNamespace(configurationNamespace: string): FConfiguration {
