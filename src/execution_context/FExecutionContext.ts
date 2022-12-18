@@ -81,9 +81,8 @@ export class FExecutionElement<TExecutionContext extends FExecutionContext> {
 	public get owner(): TExecutionContext { return this._owner; }
 }
 
-// Here cyclic dependencies
+// Import here due to cyclic dependencies
 import { FCancellationExecutionContext } from "../cancellation/FCancellationExecutionContext";
-
 
 class _DefaultExecutionContext extends FExecutionContext {
 	private static _instance: _DefaultExecutionContext | null = null;
