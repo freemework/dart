@@ -2,25 +2,25 @@ import { FCancellationToken } from "../cancellation/FCancellationToken";
 
 import { FExceptionInvalidOperation } from "../exception/FExceptionInvalidOperation";
 
-let _EmptyExecutionContextInstance: FExecutionContext;
-let _DefaultExecutionContextInstance: FExecutionContext;
-
 export abstract class FExecutionContext {
 	public abstract get prevContext(): FExecutionContext | null;
 
 	/**
 	 * Provide empty execution context. Usually used as root of execution context chain.
 	 */
-	public static get Empty(): FExecutionContext { return _EmptyExecutionContextInstance; }
+	public static get Empty(): FExecutionContext {
+		return _EmptyExecutionContext.instance;
+	}
 
 	/**
 	 * Provide default execution context.
 	 *
 	 * The execution context contains:
-	 * * `FExecutionContextCancellation` with `FCancellationToken.Dummy`
-	 * * `FExecutionContextLoggerProperties` with empty list of logger properties
+	 * * `FCancellationExecutionContext` with `FCancellationToken.Dummy`
 	 */
-	public static get Default(): FExecutionContext { return _DefaultExecutionContextInstance; }
+	public static get Default(): FExecutionContext {
+		return _DefaultExecutionContext.instance;
+	}
 
 	/**
 	 * Obtain a closest instance of typed `FExecutionContext` that encloses
@@ -81,41 +81,41 @@ export class FExecutionElement<TExecutionContext extends FExecutionContext> {
 	public get owner(): TExecutionContext { return this._owner; }
 }
 
-export abstract class FExecutionContextBase extends FExecutionContext {
-	public get prevContext(): FExecutionContext | null { return this._prevContext; }
-
-	public constructor(prevContext: FExecutionContext) {
-		super();
-		this._prevContext = prevContext;
-	}
-
-	private readonly _prevContext: FExecutionContext;
-}
-
 // Here cyclic dependencies
-import { FExecutionContextCancellation } from "./FExecutionContextCancellation";
-import { FExecutionContextLoggerProperties } from "./FExecutionContextLoggerProperties";
+import { FCancellationExecutionContext } from "../cancellation/FCancellationExecutionContext";
 
 
 class _DefaultExecutionContext extends FExecutionContext {
+	private static _instance: _DefaultExecutionContext | null = null;
+	public static get instance(): _DefaultExecutionContext {
+		if (_DefaultExecutionContext._instance === null) {
+			_DefaultExecutionContext._instance = new _DefaultExecutionContext();
+		}
+		return _DefaultExecutionContext._instance;
+	}
+
 	private readonly _prevContext: FExecutionContext;
 
 	public constructor() {
 		super();
 
-		this._prevContext = new FExecutionContextCancellation(
-			new FExecutionContextLoggerProperties(
-				_EmptyExecutionContextInstance // empty list of logger properties
-			),
+		this._prevContext = new FCancellationExecutionContext(
+			_EmptyExecutionContext.instance,
 			FCancellationToken.Dummy,
 		);
 	}
 
 	public get prevContext(): FExecutionContext | null { return this._prevContext; }
 }
-_DefaultExecutionContextInstance = new _DefaultExecutionContext();
 
 class _EmptyExecutionContext extends FExecutionContext {
+	private static _instance: _EmptyExecutionContext | null = null;
+	public static get instance(): _EmptyExecutionContext {
+		if (_EmptyExecutionContext._instance === null) {
+			_EmptyExecutionContext._instance = new _EmptyExecutionContext();
+		}
+		return _EmptyExecutionContext._instance;
+	}
+
 	public get prevContext(): FExecutionContext | null { return null; }
 }
-_EmptyExecutionContextInstance = new _EmptyExecutionContext();

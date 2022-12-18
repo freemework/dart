@@ -5,7 +5,7 @@ import {
 	FCancellationTokenAggregated,
 	FCancellationTokenSource,
 	FCancellationTokenSourceManual,
-	FExceptionCancelled,
+	FCancellationException,
 } from "../../src/index";
 
 describe("FCancellationTokenSourceManual tests", function () {
@@ -128,6 +128,6 @@ describe("FCancellationTokenSourceManual tests", function () {
 		}
 
 		assert.isDefined(expectedError);
-		assert.instanceOf(expectedError, FExceptionCancelled);
+		assert.instanceOf(expectedError, FCancellationException);
 	});
 });

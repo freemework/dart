@@ -1,17 +1,19 @@
-import { FException, FExceptionAggregate, FExceptionCancelled, FExceptionInvalidOperation } from "../exception";
+import { FCancellationException } from "../cancellation";
+import { FException, FExceptionAggregate, FExceptionInvalidOperation } from "../exception";
 import { FExecutionContext } from "../execution_context";
-import { FSubscriberChannel } from "./FSubscriberChannel";
 
-export class FSubscriberChannelMixin<
+import { FChannelSubscriber } from "./FChannelSubscriber";
+
+export class FChannelSubscriberMixin<
 	TData,
-	TEvent extends FSubscriberChannel.Event<TData> = FSubscriberChannel.Event<TData>
-> implements FSubscriberChannel<TData, TEvent> {
-	private __callbacks?: Array<FSubscriberChannel.Callback<TData, TEvent>>;
+	TEvent extends FChannelSubscriber.Event<TData> = FChannelSubscriber.Event<TData>
+> implements FChannelSubscriber<TData, TEvent> {
+	private __callbacks?: Array<FChannelSubscriber.Callback<TData, TEvent>>;
 	private __broken?: boolean;
 
 	public static applyMixin(targetClass: any): void {
-		Object.getOwnPropertyNames(FSubscriberChannelMixin.prototype).forEach(name => {
-			const propertyDescr = Object.getOwnPropertyDescriptor(FSubscriberChannelMixin.prototype, name);
+		Object.getOwnPropertyNames(FChannelSubscriberMixin.prototype).forEach(name => {
+			const propertyDescr = Object.getOwnPropertyDescriptor(FChannelSubscriberMixin.prototype, name);
 
 			if (name === "constructor") {
 				// Skip constructor
@@ -34,7 +36,7 @@ export class FSubscriberChannelMixin<
 		});
 	}
 
-	public addHandler(cb: FSubscriberChannel.Callback<TData, TEvent>): void {
+	public addHandler(cb: FChannelSubscriber.Callback<TData, TEvent>): void {
 		this.verifyBrokenChannel();
 		if (this.__callbacks === undefined) { this.__callbacks = []; }
 
@@ -44,7 +46,7 @@ export class FSubscriberChannelMixin<
 		}
 	}
 
-	public removeHandler(cb: FSubscriberChannel.Callback<TData, TEvent>): void {
+	public removeHandler(cb: FChannelSubscriber.Callback<TData, TEvent>): void {
 		if (this.__callbacks === undefined) { return; }
 		const index = this.__callbacks.indexOf(cb);
 		if (index !== -1) {
@@ -102,22 +104,22 @@ export class FSubscriberChannelMixin<
 				.then(function () {
 					if (errors.length > 0) {
 						for (const error of errors) {
-							if (!(error instanceof FExceptionCancelled)) {
+							if (!(error instanceof FCancellationException)) {
 								throw new FExceptionAggregate(errors);
 							}
 						}
-						// So, all errors are FExceptionCancelled instances, throw first
+						// So, all errors are FCancellationException instances, throw first
 						throw errors[0];
 					}
 				});
 		} else {
 			if (errors.length > 0) {
 				for (const error of errors) {
-					if (!(error instanceof FExceptionCancelled)) {
+					if (!(error instanceof FCancellationException)) {
 						throw new FExceptionAggregate(errors);
 					}
 				}
-				// So, all errors are FExceptionCancelled instances, throw first
+				// So, all errors are FCancellationException instances, throw first
 				throw errors[0];
 			}
 		}

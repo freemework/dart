@@ -1,15 +1,17 @@
-import { FException, FExceptionAggregate, FExceptionCancelled } from "../exception";
+import { FCancellationException } from "../cancellation";
+import { FException, FExceptionAggregate } from "../exception";
 import { FExecutionContext } from "../execution_context";
-import { FEventChannel } from "./FEventChannel";
 
-export class FEventChannelMixin<
+import { FChannelEvent } from "./FChannelEvent";
+
+export class FChannelEventMixin<
 	TData = Uint8Array,
-	TEvent extends FEventChannel.Event<TData> = FEventChannel.Event<TData>> implements FEventChannel<TData, TEvent> {
-	private __callbacks?: Array<FEventChannel.Callback<TData, TEvent>>;
+	TEvent extends FChannelEvent.Event<TData> = FChannelEvent.Event<TData>> implements FChannelEvent<TData, TEvent> {
+	private __callbacks?: Array<FChannelEvent.Callback<TData, TEvent>>;
 
 	public static applyMixin(targetClass: any): void {
-		Object.getOwnPropertyNames(FEventChannelMixin.prototype).forEach(name => {
-			const propertyDescr = Object.getOwnPropertyDescriptor(FEventChannelMixin.prototype, name);
+		Object.getOwnPropertyNames(FChannelEventMixin.prototype).forEach(name => {
+			const propertyDescr = Object.getOwnPropertyDescriptor(FChannelEventMixin.prototype, name);
 
 			if (name === "constructor") {
 				// Skip constructor
@@ -32,7 +34,7 @@ export class FEventChannelMixin<
 		});
 	}
 
-	public addHandler(cb: FEventChannel.Callback<TData, TEvent>): void {
+	public addHandler(cb: FChannelEvent.Callback<TData, TEvent>): void {
 		if (this.__callbacks === undefined) { this.__callbacks = []; }
 
 		this.__callbacks.push(cb);
@@ -41,7 +43,7 @@ export class FEventChannelMixin<
 		}
 	}
 
-	public removeHandler(cb: FEventChannel.Callback<TData, TEvent>): void {
+	public removeHandler(cb: FChannelEvent.Callback<TData, TEvent>): void {
 		if (this.__callbacks === undefined) { return; }
 		const index = this.__callbacks.indexOf(cb);
 		if (index !== -1) {
@@ -87,22 +89,22 @@ export class FEventChannelMixin<
 				.then(function () {
 					if (errors.length > 0) {
 						for (const error of errors) {
-							if (!(error instanceof FExceptionCancelled)) {
+							if (!(error instanceof FCancellationException)) {
 								throw new FExceptionAggregate(errors);
 							}
 						}
-						// So, all errors are FExceptionCancelled instances, throw first
+						// So, all errors are FCancellationException instances, throw first
 						throw errors[0];
 					}
 				});
 		} else {
 			if (errors.length > 0) {
 				for (const error of errors) {
-					if (!(error instanceof FExceptionCancelled)) {
+					if (!(error instanceof FCancellationException)) {
 						throw new FExceptionAggregate(errors);
 					}
 				}
-				// So, all errors are FExceptionCancelled instances, throw first
+				// So, all errors are FCancellationException instances, throw first
 				throw errors[0];
 			} else {
 				return Promise.resolve();

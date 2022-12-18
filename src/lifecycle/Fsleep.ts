@@ -1,6 +1,5 @@
-import { FCancellationToken } from "./cancellation";
-import { FExceptionCancelled } from "./exception";
-import { FExecutionContext, FExecutionContextCancellation } from "./execution_context";
+import { FCancellationExecutionContext, FCancellationException, FCancellationToken } from "../cancellation";
+import { FExecutionContext } from "../execution_context";
 
 /**
  * Provide a "sleeping" `Promise` that completes via timeout or cancellationToken
@@ -25,12 +24,12 @@ export function Fsleep(cancellationToken: FCancellationToken, ms?: number): Prom
 export function Fsleep(executionContext: FExecutionContext, ms?: number): Promise<void>;
 export function Fsleep(data: FExecutionContext | FCancellationToken, ms?: number): Promise<void> {
 	const cancellationToken: FCancellationToken = data instanceof FExecutionContext
-		? FExecutionContextCancellation.of(data).cancellationToken
+		? FCancellationExecutionContext.of(data).cancellationToken
 		: data;
 
 	return new Promise<void>((resolve, reject) => {
 		if (cancellationToken.isCancellationRequested) {
-			return reject(new FExceptionCancelled());
+			return reject(new FCancellationException());
 		}
 
 		let timeout: NodeJS.Timeout | null = null;
@@ -48,7 +47,7 @@ export function Fsleep(data: FExecutionContext | FCancellationToken, ms?: number
 			if (timeout !== null) {
 				clearTimeout(timeout);
 			}
-			return reject(new FExceptionCancelled());
+			return reject(new FCancellationException());
 		}
 
 		cancellationToken.addCancelListener(cancelCallback);

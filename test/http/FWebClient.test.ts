@@ -3,7 +3,7 @@ import { URL } from "url";
 import { assert } from "chai";
 
 import { FWebClient } from "../../src/http/FWebClient";
-import { FCancellationTokenSourceManual, FExceptionCancelled, FExecutionContext, FExecutionContextCancellation } from "../../src";
+import { FCancellationTokenSourceManual, FCancellationException, FExecutionContext, FCancellationExecutionContext } from "../../src";
 
 describe("WebClient tests", function () {
 	describe("Tests with limits", function () {
@@ -58,7 +58,7 @@ describe("WebClient tests", function () {
 				}
 			});
 			const cts = new FCancellationTokenSourceManual();
-			const cancellableExecutionContext: FExecutionContext = new FExecutionContextCancellation(
+			const cancellableExecutionContext: FExecutionContext = new FCancellationExecutionContext(
 				FExecutionContext.Default,
 				cts.token
 			);
@@ -79,7 +79,7 @@ describe("WebClient tests", function () {
 				await new Promise((r) => setTimeout(r, 25));
 				assert.equal(completeCount + errors.length, 10);
 				assert.isTrue(errors.length >= 6);
-				errors.slice(errors.length - 6).forEach(e => assert.instanceOf(e, FExceptionCancelled));
+				errors.slice(errors.length - 6).forEach(e => assert.instanceOf(e, FCancellationException));
 			} finally {
 				await apiClient.dispose();
 			}

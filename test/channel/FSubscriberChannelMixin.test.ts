@@ -1,9 +1,9 @@
 import { assert } from "chai";
 
-import { FException, FExecutionContext, FSubscriberChannel, FSubscriberChannelMixin } from "../../src";
+import { FException, FExecutionContext, FChannelSubscriber, FChannelSubscriberMixin } from "../../src";
 
-describe("FSubscriberChannelMixin tests", function () {
-	class MyNotifier implements FSubscriberChannel<string> {
+describe("FChannelSubscriberMixin tests", function () {
+	class MyNotifier implements FChannelSubscriber<string> {
 		public crash(ex: FException) {
 			return this.notify(FExecutionContext.Empty, ex);
 		}
@@ -11,8 +11,8 @@ describe("FSubscriberChannelMixin tests", function () {
 			return this.notify(FExecutionContext.Empty, { data });
 		}
 	}
-	interface MyNotifier extends FSubscriberChannelMixin<string> { }
-	FSubscriberChannelMixin.applyMixin(MyNotifier);
+	interface MyNotifier extends FChannelSubscriberMixin<string> { }
+	FChannelSubscriberMixin.applyMixin(MyNotifier);
 
 
 	it("Positive test", async function () {
@@ -21,7 +21,7 @@ describe("FSubscriberChannelMixin tests", function () {
 		let callCount = 0;
 		let eventData: Array<string> = [];
 
-		function handler(executionContext: FExecutionContext, event: FSubscriberChannel.Event<string> | FException) {
+		function handler(executionContext: FExecutionContext, event: FChannelSubscriber.Event<string> | FException) {
 			++callCount;
 
 			if (event instanceof Error) { return Promise.resolve(); }
@@ -55,7 +55,7 @@ describe("FSubscriberChannelMixin tests", function () {
 
 		let errors: Array<Error> = [];
 
-		function handler(executionContext: FExecutionContext, event: FSubscriberChannel.Event<string> | FException) {
+		function handler(executionContext: FExecutionContext, event: FChannelSubscriber.Event<string> | FException) {
 			++callCount;
 
 			if (event instanceof Error) {

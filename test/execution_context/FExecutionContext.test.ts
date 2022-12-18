@@ -1,10 +1,10 @@
 import {
 	FCancellationTokenAggregated, FCancellationTokenSource, FCancellationTokenSourceManual,
-	FExecutionContextCancellation, FExecutionElementCancellation, FCancellationToken,
+	FCancellationExecutionContext, FCancellationExecutionElement, FCancellationToken,
 	FExecutionContext, FExecutionContextBase,
-	FExecutionContextLoggerProperties,
-	FExecutionElementLoggerProperties,
-	FLoggerProperties
+	FLoggerLabelsExecutionContext,
+	FLoggerPropertiesExecutionElement,
+	FLoggerLabels
 } from "../../src/index";
 
 import { assert } from "chai";
@@ -17,19 +17,19 @@ describe("FExecutionContext test", function () {
 
 	it("Cancellation execution context should be resolved on head of chain", function () {
 		const emptyCtx: FExecutionContext = FExecutionContext.Empty;
-		const cancellationCtx: FExecutionContext = new FExecutionContextCancellation(emptyCtx, FCancellationToken.Dummy);
+		const cancellationCtx: FExecutionContext = new FCancellationExecutionContext(emptyCtx, FCancellationToken.Dummy);
 
-		const element: FExecutionElementCancellation = FExecutionContextCancellation.of(cancellationCtx);
+		const element: FCancellationExecutionElement = FCancellationExecutionContext.of(cancellationCtx);
 		assert.strictEqual(element.owner, cancellationCtx);
 		assert.strictEqual(element.cancellationToken, FCancellationToken.Dummy);
 	});
 
 	it("Cancellation execution context should be resolved on chain", function () {
 		const emptyCtx: FExecutionContext = FExecutionContext.Empty;
-		const cancellationCtx: FExecutionContext = new FExecutionContextCancellation(emptyCtx, FCancellationToken.Dummy);
+		const cancellationCtx: FExecutionContext = new FCancellationExecutionContext(emptyCtx, FCancellationToken.Dummy);
 		const stubCtx = new StubExecutionContext(cancellationCtx);
 
-		const element: FExecutionElementCancellation = FExecutionContextCancellation.of(stubCtx);
+		const element: FCancellationExecutionElement = FCancellationExecutionContext.of(stubCtx);
 		assert.strictEqual(element.owner, cancellationCtx);
 		assert.strictEqual(element.cancellationToken, FCancellationToken.Dummy);
 	});
@@ -40,11 +40,11 @@ describe("FExecutionContext test", function () {
 		const cts1: FCancellationTokenSource = new FCancellationTokenSourceManual();
 		const cts2: FCancellationTokenSource = new FCancellationTokenSourceManual();
 
-		const cancellationCtx1: FExecutionContext = new FExecutionContextCancellation(emptyCtx, cts1.token);
-		const cancellationCtx2: FExecutionContext = new FExecutionContextCancellation(cancellationCtx1, cts2.token, true);
+		const cancellationCtx1: FExecutionContext = new FCancellationExecutionContext(emptyCtx, cts1.token);
+		const cancellationCtx2: FExecutionContext = new FCancellationExecutionContext(cancellationCtx1, cts2.token, true);
 		const stubCtx = new StubExecutionContext(cancellationCtx2);
 
-		const element: FExecutionElementCancellation = FExecutionContextCancellation.of(stubCtx);
+		const element: FCancellationExecutionElement = FCancellationExecutionContext.of(stubCtx);
 		assert.strictEqual(element.owner, cancellationCtx2);
 		assert.notStrictEqual(element.cancellationToken, cts1.token);
 		assert.notStrictEqual(element.cancellationToken, cts2.token);
@@ -53,9 +53,10 @@ describe("FExecutionContext test", function () {
 
 	it("Logger execution context should be resolved on head of chain", function () {
 		const emptyCtx: FExecutionContext = FExecutionContext.Empty;
-		const loggerCtx: FExecutionContext = new FExecutionContextLoggerProperties(emptyCtx, { name: "test", value: "42" });
+		const loggerCtx: FExecutionContext = new FLoggerLabelsExecutionContext(emptyCtx, { name: "test", value: "42" });
 
-		const element: FExecutionElementLoggerProperties = FExecutionContextLoggerProperties.of(loggerCtx);
+		const element: FLoggerPropertiesExecutionElement = FLoggerLabelsExecutionContext.of(loggerCtx)!;
+		assert.isNotNull(element);
 		assert.strictEqual(element.owner, loggerCtx);
 		assert.strictEqual(element.loggerProperties.name, "test");
 		assert.strictEqual(element.loggerProperties.value, "42");
@@ -63,11 +64,12 @@ describe("FExecutionContext test", function () {
 
 	it("Logger execution context should be resolved on chain", function () {
 		const emptyCtx: FExecutionContext = FExecutionContext.Empty;
-		const loggerCtx1: FExecutionContext = new FExecutionContextLoggerProperties(emptyCtx, { name: "test", value: "42" });
-		const loggerCtx2: FExecutionContext = new FExecutionContextLoggerProperties(loggerCtx1, { name: "test", value: "43" });
+		const loggerCtx1: FExecutionContext = new FLoggerLabelsExecutionContext(emptyCtx, { name: "test", value: "42" });
+		const loggerCtx2: FExecutionContext = new FLoggerLabelsExecutionContext(loggerCtx1, { name: "test", value: "43" });
 		const stubCtx = new StubExecutionContext(loggerCtx2);
 
-		const element: FExecutionElementLoggerProperties = FExecutionContextLoggerProperties.of(stubCtx);
+		const element: FLoggerPropertiesExecutionElement = FLoggerLabelsExecutionContext.of(stubCtx)!;
+		assert.isNotNull(element);
 		assert.strictEqual(element.owner, loggerCtx2);
 		assert.deepEqual({ ...element.loggerProperties }, { name: "test", value: "42" });
 	});

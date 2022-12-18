@@ -1,6 +1,6 @@
 import { assert } from "chai";
 
-import { Fsleep, FCancellationTokenSourceManual, FCancellationTokenSourceTimeout, FExceptionCancelled } from "../src/index";
+import { Fsleep, FCancellationTokenSourceManual, FCancellationTokenSourceTimeout, FCancellationException } from "../src/index";
 
 describe("Fsleep tests", function () {
 	it("Should cancel Fsleep() before started", async () => {
@@ -12,7 +12,7 @@ describe("Fsleep tests", function () {
 		await new Promise(wakeup => setTimeout(wakeup, 25));
 
 		assert.isDefined(expectedError);
-		assert.instanceOf(expectedError, FExceptionCancelled);
+		assert.instanceOf(expectedError, FCancellationException);
 	});
 	it("Should cancel Fsleep() after start", async () => {
 		let expectedError;
@@ -26,7 +26,7 @@ describe("Fsleep tests", function () {
 		await sleepTask;
 
 		assert.isDefined(expectedError);
-		assert.instanceOf(expectedError, FExceptionCancelled);
+		assert.instanceOf(expectedError, FCancellationException);
 	});
 	it("Should cancel Fsleep() via cancellationToken", async () => {
 		let expectedError;
@@ -45,7 +45,7 @@ describe("Fsleep tests", function () {
 		await new Promise(wakeup => setTimeout(wakeup, 10));
 
 		assert.isDefined(expectedError);
-		assert.instanceOf(expectedError, FExceptionCancelled);
+		assert.instanceOf(expectedError, FCancellationException);
 	});
 	it("Should cancel Fsleep() via Timeout", async () => {
 		let expectedError;
@@ -60,7 +60,7 @@ describe("Fsleep tests", function () {
 
 
 		assert.isDefined(expectedError);
-		assert.instanceOf(expectedError, FExceptionCancelled);
+		assert.instanceOf(expectedError, FCancellationException);
 	});
 	it("Should cancel Fsleep() via Timeout before start", async () => {
 		let expectedError;
@@ -75,7 +75,7 @@ describe("Fsleep tests", function () {
 
 
 		assert.isDefined(expectedError);
-		assert.instanceOf(expectedError, FExceptionCancelled);
+		assert.instanceOf(expectedError, FCancellationException);
 	});
 	it("Should cancel Fsleep() via Timeout + call cancel()", async () => {
 		let expectedError;
@@ -93,6 +93,6 @@ describe("Fsleep tests", function () {
 		await sleepTask;
 
 		assert.isDefined(expectedError);
-		assert.instanceOf(expectedError, FExceptionCancelled);
+		assert.instanceOf(expectedError, FCancellationException);
 	});
 });

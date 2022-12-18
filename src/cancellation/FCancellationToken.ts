@@ -1,6 +1,6 @@
-import { FExceptionCancelled } from "../exception/FExceptionCancelled";
+import { FCancellationException } from "./FCancellationException";
 
-export type FCancellationTokenCallback = (cancellationException: FExceptionCancelled) => void;
+export type FCancellationTokenCallback = (cancellationException: FCancellationException) => void;
 
 export abstract class FCancellationToken {
 	public abstract get isCancellationRequested(): boolean;

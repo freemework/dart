@@ -1,11 +1,11 @@
 import { FException } from "../exception/FException";
 
 import { FExecutionContext } from "../execution_context/FExecutionContext";
-import { FExecutionContextLoggerProperties } from "../execution_context/FExecutionContextLoggerProperties";
 
 import { FLogger } from "./FLogger";
 import { FLoggerLevel } from "./FLoggerLevel";
-import { FLoggerProperties } from "./FLoggerProperties";
+import { FLoggerLabels } from "./FLoggerLabels";
+import { FLoggerLabelsExecutionContext } from "./FLoggerLabelsExecutionContext";
 
 export abstract class FLoggerBase extends FLogger {
 	public get isTraceEnabled(): boolean { return this.isLevelEnabled(FLoggerLevel.TRACE); }
@@ -16,7 +16,7 @@ export abstract class FLoggerBase extends FLogger {
 	public get isFatalEnabled(): boolean { return this.isLevelEnabled(FLoggerLevel.FATAL); }
 
 	public trace(
-		variant: FExecutionContext | FLoggerProperties,
+		variant: FExecutionContext | FLoggerLabels,
 		message: string,
 		ex?: FException,
 	): void {
@@ -24,13 +24,13 @@ export abstract class FLoggerBase extends FLogger {
 			return;
 		}
 
-		const loggerProperties: FLoggerProperties = this._getLoggerProperties(variant);
+		const loggerProperties: FLoggerLabels = this._resolveLoggerProperties(variant);
 
 		this.log(FLoggerLevel.TRACE, loggerProperties, message, ex);
 	}
 
 	public debug(
-		variant: FExecutionContext | FLoggerProperties,
+		variant: FExecutionContext | FLoggerLabels,
 		message: string,
 		ex?: FException,
 	): void {
@@ -38,60 +38,60 @@ export abstract class FLoggerBase extends FLogger {
 			return;
 		}
 
-		const loggerProperties: FLoggerProperties =
-			this._getLoggerProperties(variant);
+		const loggerProperties: FLoggerLabels =
+			this._resolveLoggerProperties(variant);
 		this.log(FLoggerLevel.DEBUG, loggerProperties, message, ex);
 	}
 
 	public info(
-		variant: FExecutionContext | FLoggerProperties,
+		variant: FExecutionContext | FLoggerLabels,
 		message: string,
 	): void {
 		if (!this.isInfoEnabled) {
 			return;
 		}
 
-		const loggerProperties: FLoggerProperties =
-			this._getLoggerProperties(variant);
+		const loggerProperties: FLoggerLabels =
+			this._resolveLoggerProperties(variant);
 		this.log(FLoggerLevel.INFO, loggerProperties, message);
 	}
 
 	public warn(
-		variant: FExecutionContext | FLoggerProperties,
+		variant: FExecutionContext | FLoggerLabels,
 		message: string,
 	): void {
 		if (!this.isWarnEnabled) {
 			return;
 		}
 
-		const loggerProperties: FLoggerProperties =
-			this._getLoggerProperties(variant);
+		const loggerProperties: FLoggerLabels =
+			this._resolveLoggerProperties(variant);
 		this.log(FLoggerLevel.WARN, loggerProperties, message);
 	}
 
 	public error(
-		variant: FExecutionContext | FLoggerProperties,
+		variant: FExecutionContext | FLoggerLabels,
 		message: string,
 	): void {
 		if (!this.isErrorEnabled) {
 			return;
 		}
 
-		const loggerProperties: FLoggerProperties =
-			this._getLoggerProperties(variant);
+		const loggerProperties: FLoggerLabels =
+			this._resolveLoggerProperties(variant);
 		this.log(FLoggerLevel.ERROR, loggerProperties, message);
 	}
 
 	public fatal(
-		variant: FExecutionContext | FLoggerProperties,
+		variant: FExecutionContext | FLoggerLabels,
 		message: string,
 	): void {
 		if (!this.isFatalEnabled) {
 			return;
 		}
 
-		const loggerProperties: FLoggerProperties =
-			this._getLoggerProperties(variant);
+		const loggerProperties: FLoggerLabels =
+			this._resolveLoggerProperties(variant);
 		this.log(FLoggerLevel.FATAL, loggerProperties, message);
 	}
 
@@ -102,21 +102,27 @@ export abstract class FLoggerBase extends FLogger {
 	///
 	protected abstract log(
 		level: FLoggerLevel,
-		loggerProperties: FLoggerProperties,
+		loggerProperties: FLoggerLabels,
 		message: string,
 		exception?: FException,
 	): void;
 
-	private _getLoggerProperties(
-		variant: FExecutionContext | FLoggerProperties,
-	): FLoggerProperties {
-		const loggerProperties: FLoggerProperties = variant instanceof FExecutionContext
-			? Object.freeze({
-				...FExecutionContextLoggerProperties
-					.of(variant)
-					.loggerProperties
-			})
-			: variant;
+	private _resolveLoggerProperties(
+		variant: FExecutionContext | FLoggerLabels,
+	): FLoggerLabels {
+		let loggerProperties: FLoggerLabels;
+
+		if (variant instanceof FExecutionContext) {
+			const executionElement = FLoggerLabelsExecutionContext
+				.of(variant);
+			if (executionElement !== null) {
+				loggerProperties = Object.freeze({ ...executionElement.loggerProperties });
+			} else {
+				loggerProperties = Object.freeze({}); // No any logger properties on excecution context chain
+			}
+		} else {
+			loggerProperties = variant;
+		}
 
 		return loggerProperties;
 	}

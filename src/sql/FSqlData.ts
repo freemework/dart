@@ -2,26 +2,26 @@ import { FDecimal } from "../primitive/FDecimal";
 
 export interface FSqlData {
 	readonly asBoolean: boolean;
-	readonly asNullableBoolean: boolean | null;
+	readonly asBooleanNullable: boolean | null;
 
 	readonly asString: string;
-	readonly asNullableString: string | null;
+	readonly asStringNullable: string | null;
 
 	readonly asInteger: number;
-	readonly asNullableInteger: number | null;
+	readonly asIntegerNullable: number | null;
 
 	readonly asNumber: number;
-	readonly asNullableNumber: number | null;
+	readonly asNumberNullable: number | null;
 
 	readonly asDecimal: FDecimal;
-	readonly asNullableDecimal: FDecimal | null;
+	readonly asDecimalNullable: FDecimal | null;
 
 	readonly asDate: Date;
-	readonly asNullableDate: Date | null;
+	readonly asDateNullable: Date | null;
 
 	readonly asBinary: Uint8Array;
-	readonly asNullableBinary: Uint8Array | null;
+	readonly asBinaryNullable: Uint8Array | null;
 
 	readonly asObject: any;
-	readonly asNullableObject: any | null;
+	readonly asObjectNullable: any | null;
 }

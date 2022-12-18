@@ -1,15 +1,15 @@
 import { assert } from "chai";
 
-import { FEventChannel, FEventChannelMixin, FException, FExceptionAggregate, FExecutionContext } from "../../src";
+import { FChannelEvent, FChannelEventMixin, FException, FExceptionAggregate, FExecutionContext } from "../../src";
 
-describe("FEventChannelMixin tests", function () {
-	class MyNotifier implements FEventChannel<string> {
+describe("FChannelEventMixin tests", function () {
+	class MyNotifier implements FChannelEvent<string> {
 		public test(data: string) {
 			return this.notify(FExecutionContext.Empty, { data });
 		}
 	}
-	interface MyNotifier extends FEventChannelMixin<string> { }
-	FEventChannelMixin.applyMixin(MyNotifier);
+	interface MyNotifier extends FChannelEventMixin<string> { }
+	FChannelEventMixin.applyMixin(MyNotifier);
 
 
 	it("Positive test", async function () {
@@ -18,7 +18,7 @@ describe("FEventChannelMixin tests", function () {
 		let callCount = 0;
 		let eventData: Array<string> = [];
 
-		async function handler(executionContext: FExecutionContext, event: FEventChannel.Event<string>) {
+		async function handler(executionContext: FExecutionContext, event: FChannelEvent.Event<string>) {
 			await new Promise(wakeup => setTimeout(wakeup, 50));
 			++callCount;
 			eventData.push(event.data);
@@ -48,7 +48,7 @@ describe("FEventChannelMixin tests", function () {
 
 		class MyTestError extends FException { }
 
-		async function handler(executionContext: FExecutionContext, event: FEventChannel.Event<string>) {
+		async function handler(executionContext: FExecutionContext, event: FChannelEvent.Event<string>) {
 			await new Promise(wakeup => setTimeout(wakeup, 50));
 			++callCount;
 			throw new MyTestError(event.data);

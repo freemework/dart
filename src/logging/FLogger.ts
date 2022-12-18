@@ -1,20 +1,20 @@
 import { FExceptionInvalidOperation } from "../exception";
 import { FException } from "../exception/FException";
 import { FExecutionContext } from "../execution_context/FExecutionContext";
-import { FLoggerProperties } from "./FLoggerProperties";
+import { FLoggerLabels } from "./FLoggerLabels";
 
 export interface LoggerFactory {
 	(loggerName?: string): FLogger;
 }
 
 let _consoleLogger: FLogger;
-let _noneLogger: FLogger;
+let _dummyLogger: FLogger;
 
 export abstract class FLogger {
 	private static _loggerFactory: LoggerFactory | null = null;
 
 	public static get Console(): FLogger { return _consoleLogger; }
-	public static get None(): FLogger { return _noneLogger; }
+	public static get Dummy(): FLogger { return _dummyLogger; }
 
 	/**
 	 * Factory constructor
@@ -52,7 +52,7 @@ export abstract class FLogger {
 		ex?: FException,
 	): void;
 	public abstract trace(
-		loggerProperties: FLoggerProperties,
+		loggerProperties: FLoggerLabels,
 		message: string,
 		ex?: FException,
 	): void;
@@ -63,7 +63,7 @@ export abstract class FLogger {
 		ex?: FException,
 	): void;
 	public abstract debug(
-		loggerProperties: FLoggerProperties,
+		loggerProperties: FLoggerLabels,
 		message: string,
 		ex?: FException,
 	): void;
@@ -73,7 +73,7 @@ export abstract class FLogger {
 		message: string,
 	): void;
 	public abstract info(
-		loggerProperties: FLoggerProperties,
+		loggerProperties: FLoggerLabels,
 		message: string,
 	): void;
 
@@ -82,7 +82,7 @@ export abstract class FLogger {
 		message: string,
 	): void;
 	public abstract warn(
-		loggerProperties: FLoggerProperties,
+		loggerProperties: FLoggerLabels,
 		message: string,
 	): void;
 
@@ -91,7 +91,7 @@ export abstract class FLogger {
 		message: string,
 	): void;
 	public abstract error(
-		loggerProperties: FLoggerProperties,
+		loggerProperties: FLoggerLabels,
 		message: string,
 	): void;
 
@@ -100,7 +100,7 @@ export abstract class FLogger {
 		message: string,
 	): void;
 	public abstract fatal(
-		loggerProperties: FLoggerProperties,
+		loggerProperties: FLoggerLabels,
 		message: string,
 	): void;
 	/**
@@ -109,7 +109,7 @@ export abstract class FLogger {
 	public abstract getLogger(loggerName: string): FLogger;
 }
 
-class _NoneLogger implements FLogger {
+class _DummyLogger implements FLogger {
 	public get isTraceEnabled(): boolean { return false; }
 	public get isDebugEnabled(): boolean { return false; }
 	public get isInfoEnabled(): boolean { return false; }
@@ -117,15 +117,15 @@ class _NoneLogger implements FLogger {
 	public get isErrorEnabled(): boolean { return false; }
 	public get isFatalEnabled(): boolean { return false; }
 	public get name(): string { return "None"; }
-	public trace(variant: FExecutionContext | FLoggerProperties, message: string, ex?: FException | undefined): void { }
-	public debug(executionContext: FExecutionContext | FLoggerProperties, message: string, ex?: FException | undefined): void { }
-	public info(executionContext: FExecutionContext | FLoggerProperties, message: string): void { }
-	public warn(executionContext: FExecutionContext | FLoggerProperties, message: string): void { }
-	public error(executionContext: FExecutionContext | FLoggerProperties, message: string): void { }
-	public fatal(executionContext: FExecutionContext | FLoggerProperties, message: string): void { }
+	public trace(variant: FExecutionContext | FLoggerLabels, message: string, ex?: FException | undefined): void { }
+	public debug(executionContext: FExecutionContext | FLoggerLabels, message: string, ex?: FException | undefined): void { }
+	public info(executionContext: FExecutionContext | FLoggerLabels, message: string): void { }
+	public warn(executionContext: FExecutionContext | FLoggerLabels, message: string): void { }
+	public error(executionContext: FExecutionContext | FLoggerLabels, message: string): void { }
+	public fatal(executionContext: FExecutionContext | FLoggerLabels, message: string): void { }
 	public getLogger(loggerName: string): FLogger { return this; }
 }
-_noneLogger = new _NoneLogger();
+_dummyLogger = new _DummyLogger();
 
 import { FLoggerConsole } from './FLoggerConsole'; // Yes, here cyclic dependencies
 _consoleLogger = FLoggerConsole.Default;

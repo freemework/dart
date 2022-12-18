@@ -3,7 +3,7 @@ import { FException } from "../exception/FException";
 import { FLogger } from "./FLogger";
 import { FLoggerContainer } from "./FLoggerContainer";
 import { FLoggerLevel } from "./FLoggerLevel";
-import { FLoggerProperties } from "./FLoggerProperties";
+import { FLoggerLabels } from "./FLoggerLabels";
 
 export class FLoggerConsole extends FLoggerContainer {
 	public static readonly Default: FLoggerConsole = new FLoggerConsole();
@@ -18,7 +18,7 @@ export class FLoggerConsole extends FLoggerContainer {
 
 	protected log(
 		level: string,
-		loggerProperties: FLoggerProperties,
+		loggerProperties: FLoggerLabels,
 		message: string,
 		exception?: FException
 	): void {

@@ -6,8 +6,8 @@ import {
 	FDisposable,
 	FDisposableBase,
 	FExecutionContext,
-	FExceptionCancelled,
-	FExecutionContextCancellation,
+	FCancellationException,
+	FCancellationExecutionContext,
 	FInitableBase,
 	Fusing,
 	FException,
@@ -188,9 +188,9 @@ describe("Fusing tests", function () {
 		let err;
 		try {
 			await Fusing(
-				new FExecutionContextCancellation(FExecutionContext.Empty, token),
+				new FCancellationExecutionContext(FExecutionContext.Empty, token),
 				(executionContext) => {
-					FExecutionContextCancellation.of(executionContext).cancellationToken.throwIfCancellationRequested();
+					FCancellationExecutionContext.of(executionContext).cancellationToken.throwIfCancellationRequested();
 					return disposable;
 				},
 				(ct, instance) => {
@@ -202,7 +202,7 @@ describe("Fusing tests", function () {
 		}
 
 		assert.isDefined(err);
-		assert.instanceOf(err, FExceptionCancelled);
+		assert.instanceOf(err, FCancellationException);
 	});
 	it("Should be able to use CancellationToken on worker phase", async function () {
 		const cts = new FCancellationTokenSourceManual();
@@ -218,13 +218,13 @@ describe("Fusing tests", function () {
 		let err;
 		try {
 			await Fusing(
-				new FExecutionContextCancellation(FExecutionContext.Empty, token),
+				new FCancellationExecutionContext(FExecutionContext.Empty, token),
 				(executionContext) => {
 					cts.cancel();
 					return disposable;
 				},
 				(executionContext, instance) => {
-					FExecutionContextCancellation.of(executionContext).cancellationToken.throwIfCancellationRequested();
+					FCancellationExecutionContext.of(executionContext).cancellationToken.throwIfCancellationRequested();
 					// Do nothing
 				}
 			);
@@ -233,7 +233,7 @@ describe("Fusing tests", function () {
 		}
 
 		assert.isDefined(err);
-		assert.instanceOf(err, FExceptionCancelled);
+		assert.instanceOf(err, FCancellationException);
 		assert.isTrue(onDisposeCalled);
 	});
 	it("Should call init() for Initable", async function () {

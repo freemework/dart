@@ -1,15 +1,11 @@
-import { FCancellationToken } from "../cancellation";
-
-import { FException, FExceptionCancelled, FExceptionInvalidOperation, FExceptionNativeErrorWrapper } from "../exception";
-
-import { FExecutionContext, FExecutionContextCancellation, FExecutionContextLoggerProperties } from "../execution_context";
-
-import { FInvokeChannel } from "../channel/FInvokeChannel";
-
-import { FLogger } from "../logging/FLogger";
-
 import * as http from "http";
 import * as https from "https";
+
+import { FCancellationExecutionContext, FCancellationException, FCancellationToken } from "../cancellation";
+import { FChannelInvoke } from "../channel";
+import { FException, FExceptionInvalidOperation, FExceptionNativeErrorWrapper } from "../exception";
+import { FExecutionContext } from "../execution_context";
+import { FLogger, FLoggerLabelsExecutionContext } from "../logging";
 
 export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 	private readonly _log: FLogger;
@@ -17,7 +13,7 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 	private readonly _sslOpts: FHttpClient.SslOpts | null;
 	private readonly _requestTimeout: number;
 	public constructor(opts?: FHttpClient.Opts) {
-		this._log = opts && opts.log || FLogger.None;
+		this._log = opts && opts.log || FLogger.Dummy;
 		this._proxyOpts = opts && opts.proxyOpts || null;
 		this._sslOpts = opts && opts.sslOpts || null;
 		this._requestTimeout = opts && opts.timeout || FHttpClient.DEFAULT_TIMEOUT;
@@ -27,7 +23,7 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 		executionContext: FExecutionContext,
 		{ url, method, headers, body }: FHttpClient.Request
 	): Promise<FHttpClient.Response> {
-		executionContext = new FExecutionContextLoggerProperties(
+		executionContext = new FLoggerLabelsExecutionContext(
 			executionContext,
 			{
 				httpInvokeUrl: url.toString(),
@@ -37,7 +33,7 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 
 		if (this._log.isTraceEnabled) { this._log.trace(executionContext, "Begin invoke"); }
 		return new Promise<FHttpClient.Response>((resolve, reject) => {
-			const cancellationToken: FCancellationToken = FExecutionContextCancellation.of(executionContext).cancellationToken;
+			const cancellationToken: FCancellationToken = FCancellationExecutionContext.of(executionContext).cancellationToken;
 
 			let isConnectTimeout: boolean = false;
 			let resolved: boolean = false;
@@ -138,7 +134,7 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 						try {
 							cancellationToken.throwIfCancellationRequested(); // Should raise error
 							// Guard for broken implementation of cancellationToken
-							reject(new FExceptionCancelled("Cancelled by user"));
+							reject(new FCancellationException("Cancelled by user"));
 						} catch (e) {
 							reject(e);
 						}
@@ -274,7 +270,7 @@ export namespace FHttpClient {
 		readonly body: Buffer;
 	}
 
-	export type HttpInvokeChannel = FInvokeChannel<Request, Response>;
+	export type HttpInvokeChannel = FChannelInvoke<Request, Response>;
 
 	/** Base error type for WebClient */
 	export abstract class HttpClientError extends FException {

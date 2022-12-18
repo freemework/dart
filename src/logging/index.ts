@@ -2,4 +2,5 @@ export * from "./FLogger";
 export * from "./FLoggerBase";
 export * from "./FLoggerConsole";
 export * from "./FLoggerContainer";
-export * from "./FLoggerProperties";
+export * from "./FLoggerLabels";
+export * from "./FLoggerLabelsExecutionContext";

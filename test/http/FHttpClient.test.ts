@@ -1,4 +1,4 @@
-import { FCancellationTokenSourceManual, FExceptionCancelled, FExceptionInvalidOperation, FExecutionContext, FExecutionContextCancellation, FHttpClient } from "../../src";
+import { FCancellationTokenSourceManual, FCancellationException, FExceptionInvalidOperation, FExecutionContext, FCancellationExecutionContext, FHttpClient } from "../../src";
 
 import { assert } from "chai";
 import { URL } from "url";
@@ -34,7 +34,7 @@ describe("FHttpClient tests", function () {
 
 		it("FHttpClient should cancel() invoke", async function () {
 			const cts = new FCancellationTokenSourceManual();
-			const cancellationExecutionContext: FExecutionContext = new FExecutionContextCancellation(
+			const cancellationExecutionContext: FExecutionContext = new FCancellationExecutionContext(
 				FExecutionContext.Default,
 				cts.token
 			);
@@ -57,7 +57,7 @@ describe("FHttpClient tests", function () {
 
 			assert.isFalse(thenCalled);
 			assert.isDefined(expectedError);
-			assert.instanceOf(expectedError, FExceptionCancelled);
+			assert.instanceOf(expectedError, FCancellationException);
 		});
 
 		it("Should handle HTTP 301 as normal response", async function () {

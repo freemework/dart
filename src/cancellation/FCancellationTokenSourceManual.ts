@@ -1,5 +1,6 @@
-import { FException, FExceptionAggregate, FExceptionCancelled } from "../exception";
+import { FException, FExceptionAggregate } from "../exception";
 
+import { FCancellationException } from "./FCancellationException";
 import { FCancellationToken } from "./FCancellationToken";
 import { FCancellationTokenSource } from "./FCancellationTokenSource";
 
@@ -58,7 +59,7 @@ export class FCancellationTokenSourceManual implements FCancellationTokenSource 
 
 	private throwIfCancellationRequested(): void {
 		if (this.isCancellationRequested) {
-			throw new FExceptionCancelled();
+			throw new FCancellationException();
 		}
 	}
 }

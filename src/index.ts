@@ -18,6 +18,7 @@ export function FmoduleVersionGuard(packageInfo: { readonly name: string; readon
 FmoduleVersionGuard(require("../package.json"));
 
 export * from "./cancellation";
+export * from "./configuration";
 export * from "./channel";
 export * from "./exception";
 export * from "./execution_context";
@@ -28,6 +29,4 @@ export * from "./logging";
 export * from "./primitive";
 export * from "./sql";
 
-export { FConfigurationLegacy } from "./FConfigurationLegacy";
 export { FEnsure, FEnsureException } from "./FEnsure";
-export { Fsleep } from "./Fsleep";

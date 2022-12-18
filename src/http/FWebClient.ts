@@ -1,8 +1,8 @@
 import { FDisposableBase } from "../lifecycle";
-import { FExecutionContext, FExecutionContextCancellation } from "../execution_context";
+import { FExecutionContext } from "../execution_context";
 import { FHttpClient } from "./FHttpClient";
 import { FLimit } from "../limit/FLimit";
-import { FCancellationToken } from "../cancellation";
+import { FCancellationExecutionContext, FCancellationToken } from "../cancellation";
 import { FLimitInMemory } from "../limit/FLimitInMemory";
 
 import * as http from "http";
@@ -132,7 +132,7 @@ export class FWebClient extends FDisposableBase {
 		}): Promise<FWebClient.Response> {
 		super.verifyNotDisposed();
 
-		const cancellationToken: FCancellationToken = FExecutionContextCancellation.of(executionContext).cancellationToken;
+		const cancellationToken: FCancellationToken = FCancellationExecutionContext.of(executionContext).cancellationToken;
 
 		let friendlyBody: Buffer | null = null;
 		let friendlyHeaders: http.OutgoingHttpHeaders = {};

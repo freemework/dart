@@ -1,6 +1,6 @@
-export { FEventChannel } from "./FEventChannel";
-export { FEventChannelMixin } from "./FEventChannelMixin";
-export { FInvokeChannel } from "./FInvokeChannel";
-export { FPublisherChannel } from "./FPublisherChannel";
-export { FSubscriberChannel } from "./FSubscriberChannel";
-export { FSubscriberChannelMixin } from "./FSubscriberChannelMixin";
+export { FChannelEvent } from "./FChannelEvent";
+export { FChannelEventMixin } from "./FChannelEventMixin";
+export { FChannelInvoke } from "./FChannelInvoke";
+export { FChannelPublisher } from "./FChannelPublisher";
+export { FChannelSubscriber } from "./FChannelSubscriber";
+export { FChannelSubscriberMixin } from "./FChannelSubscriberMixin";
