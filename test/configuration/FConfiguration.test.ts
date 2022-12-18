@@ -174,4 +174,188 @@ describe("FConfiguration tests", function () {
 
 		assert.equal(config.get("a").asIntegerNegative, -42);
 	});
+
+
+});
+
+describe("FConfigurationProperties Negative test", function () {
+	let config: FConfiguration;
+
+	beforeEach(async () => {
+		config = FConfiguration.factoryJson({
+			"boolean": "123",
+			"int": "fake",
+			"float": "fake",
+			"enable": "fake",
+			"base64": "wrong_base64",
+			"a.b.c.url": "wrong_url",
+		});
+	});
+
+	it("Should be execution error Wrong argument on getConfiguration #2", function () {
+		let ex;
+		try {
+			config.getNamespace("a.b").getNamespace("o.l.o.l.o");
+		} catch (err) {
+			ex = err;
+		}
+
+		assert.isDefined(ex);
+		assert.instanceOf(ex, FConfigurationException);
+		assert.equal((<FConfigurationException>ex).key,"a.b.o.l.o.l.o");
+	});
+	it("Should be execution error Wrong argument on getConfiguration #3", function () {
+		assert.isTrue(config.getNamespace("a.b").hasNamespace("c"), "Should exist: a.b.c");
+		assert.isFalse(config.getNamespace("a.b").hasNamespace("o.l.o.l.o"), "Should not exist: a.b.o.l.o.l.o");
+	});
+	it("Should be execution error not found key on getString", function () {
+		let ex;
+		try {
+			const fake = "fake";
+			config.get(fake).asString;
+		} catch (err) {
+			ex = err;
+		}
+
+		assert.isDefined(ex);
+		assert.instanceOf(ex, FConfigurationException);
+		assert.equal((<FConfigurationException>ex).key,"fake");
+
+	});
+	it("Should be execution error not found key on getBoolean", function () {
+		let ex;
+		try {
+			const fake = "fake";
+			config.get(fake).asBoolean;
+		} catch (err) {
+			ex = err;
+		}
+
+		assert.isDefined(ex);
+		assert.instanceOf(ex, FConfigurationException);
+		assert.equal((<FConfigurationException>ex).key,"fake");
+
+	});
+	it("Should be execution error not found key on getEnabled", function () {
+		let ex;
+		try {
+			const fake = "fake";
+			config.get(fake).asBoolean;
+		} catch (err) {
+			ex = err;
+		}
+
+		assert.isDefined(ex);
+		assert.instanceOf(ex, FConfigurationException);
+		assert.equal((<FConfigurationException>ex).key,"fake");
+
+	});
+	it("Should be execution error not found key on getFloat", function () {
+		let ex;
+		try {
+			const fake = "fake";
+			config.get(fake).asNumber;
+		} catch (err) {
+			ex = err;
+		}
+
+		assert.isDefined(ex);
+		assert.instanceOf(ex, FConfigurationException);
+		assert.equal((<FConfigurationException>ex).key,"fake");
+
+	});
+	it("Should be execution error not found key on getInteger", function () {
+		let ex;
+		try {
+			const fake = "fake";
+			config.get(fake).asInteger;
+		} catch (err) {
+			ex = err;
+		}
+
+		assert.isDefined(ex);
+		assert.instanceOf(ex, FConfigurationException);
+		assert.equal((<FConfigurationException>ex).key,"fake");
+
+	});
+	it("Should be execution error Bad type of key on getBoolean", function () {
+		let ex;
+		try {
+			config.get("boolean").asBoolean;
+		} catch (err) {
+			ex = err;
+		}
+
+		assert.isDefined(ex);
+		assert.instanceOf(ex, FConfigurationException);
+		assert.equal((<FConfigurationException>ex).key,"boolean");
+
+	});
+	it("Should be execution error Bad type of key on getInteger", function () {
+		let ex;
+		try {
+			config.get("int").asInteger;
+		} catch (err) {
+			ex = err;
+		}
+
+		assert.isDefined(ex);
+		assert.instanceOf(ex, FConfigurationException);
+		assert.equal((<FConfigurationException>ex).key,"int");
+
+	});
+	it("Should be execution error Bad type of key on getFloat", function () {
+		let ex;
+		try {
+			config.get("float").asNumber;
+		} catch (err) {
+			ex = err;
+		}
+
+		assert.isDefined(ex);
+		assert.instanceOf(ex, FConfigurationException);
+		assert.equal((<FConfigurationException>ex).key,"float");
+
+	});
+	it("Should be execution error Bad type of key on getEnabled", function () {
+		let ex;
+		try {
+			config.get("enable").asBoolean;
+		} catch (err) {
+			ex = err;
+		}
+
+		assert.isDefined(ex);
+		assert.instanceOf(ex, FConfigurationException);
+		assert.equal((<FConfigurationException>ex).key,"enable");
+
+	});
+	it("Should be execution error Bad type of key on getBase64", function () {
+		let ex;
+		try {
+			config.get("base64").asBase64;
+		} catch (err) {
+			ex = err;
+		}
+
+		assert.isDefined(ex);
+		assert.instanceOf(ex, FConfigurationException);
+		assert.equal((<FConfigurationException>ex).key,"base64");
+	});
+	it("Should raise exception for key on get().asUrl", function () {
+		let ex;
+		try {
+			config
+				.getNamespace("a")
+				.getNamespace("b")
+				.getNamespace("c")
+				.get("url").asUrl;
+		} catch (err) {
+			ex = err;
+		}
+
+		assert.isDefined(ex);
+		assert.instanceOf(ex, FConfigurationException);
+		assert.equal((<FConfigurationException>ex).key,"url");
+	});
 });
