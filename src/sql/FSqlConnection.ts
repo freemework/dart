@@ -3,7 +3,7 @@ import { FDisposable } from "../lifecycle/FDisposable";
 import { FSqlStatement } from "./FSqlStatement";
 import { FSqlTemporaryTable } from "./FSqlTemporaryTable";
 
-export interface FSqlProvider extends FDisposable {
+export interface FSqlConnection extends FDisposable {
 	statement(sql: string): FSqlStatement;
 	createTempTable(
 		executionContext: FExecutionContext, tableName: string, columnsDefinitions: string

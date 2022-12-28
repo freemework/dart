@@ -1,7 +1,8 @@
 import { FExecutionContext } from "../execution_context";
-import { FSqlProviderFactory } from "./FSqlProviderFactory";
 
-export interface FSqlProviderEmbeddedFactory extends FSqlProviderFactory {
+import { FSqlConnectionFactory } from "./FSqlConnectionFactory";
+
+export interface FSqlConnectionFactoryEmbedded extends FSqlConnectionFactory {
 	/**
 	 * Check if a Database exists
 	 * @param cancellationToken Cancellation Token allows your to cancel execution process
