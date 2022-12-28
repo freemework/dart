@@ -29,7 +29,7 @@ export class FLoggerConsole extends FLoggerBase {
 		if(name === null) {
 			name = "Unnamed";
 		}
-		let logMessageBuffer = `${new Date().toISOString()} ${name} [$level]`;
+		let logMessageBuffer = `${new Date().toISOString()} ${name} [${level}]`;
 		for (const [labelName, labelValue] of Object.entries(labels)) {
 			logMessageBuffer += `(${labelName}:${labelValue})`;
 		}
