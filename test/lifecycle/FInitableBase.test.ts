@@ -1,6 +1,6 @@
 import { assert } from "chai";
 
-import { FExecutionContext, FInitable, FInitableBase } from "../../src";
+import { FExecutionContext, FInitableBase } from "../../src";
 
 interface Deferred<T = any> {
 	resolve: (value?: T) => void;

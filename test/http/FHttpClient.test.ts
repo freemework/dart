@@ -1,4 +1,11 @@
-import { FCancellationTokenSourceManual, FCancellationException, FExceptionInvalidOperation, FExecutionContext, FCancellationExecutionContext, FHttpClient } from "../../src";
+import {
+	FCancellationTokenSourceManual,
+	FCancellationException,
+	FCancellationExecutionContext,
+	FExceptionInvalidOperation,
+	FExecutionContext,
+	FHttpClient
+} from "../../src";
 
 import { assert } from "chai";
 import { URL } from "url";
@@ -15,7 +22,7 @@ describe("FHttpClient tests", function () {
 		it("FHttpClient should GET http:", async function () {
 			const httpClient = new FHttpClient({ timeout: 5000 });
 			await httpClient.invoke(FExecutionContext.Default, {
-				//				url: new URL("?a", "http://www.google.com"),
+				//url: new URL("?a", "http://www.google.com"),
 				url: new URL("?a", "https://echo.zxteam.org"),
 				method: "GET",
 				headers: { test: "test" }
@@ -97,9 +104,7 @@ describe("FHttpClient tests", function () {
 						- Connection closed by server
 						- etc
 					WebError wraps HTTP errors
-
 			 */
-
 
 			it("Should handle Socket Refused as CommunicationError", async function () {
 				const httpClient = new FHttpClient();
@@ -126,7 +131,7 @@ describe("FHttpClient tests", function () {
 				assert.instanceOf(expectedError, FHttpClient.CommunicationError);
 				assert.instanceOf((expectedError as FHttpClient.CommunicationError).innerException, Error);
 				const code = (expectedError as FHttpClient.CommunicationError).code;
-				assert.isTrue(code === 'ENOTFOUND' || code ==='EAI_AGAIN', `Expected code '${code}' of CommunicationError should be 'ENOTFOUND' or 'EAI_AGAIN'`);
+				assert.isTrue(code === 'ENOTFOUND' || code === 'EAI_AGAIN', `Expected code '${code}' of CommunicationError should be 'ENOTFOUND' or 'EAI_AGAIN'`);
 			});
 			it("Should handle Connection Timeout (before connect) as CommunicationError", async function () {
 				const httpClient = new FHttpClient({ timeout: 50 });

@@ -13,10 +13,10 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 	private readonly _sslOpts: FHttpClient.SslOpts | null;
 	private readonly _requestTimeout: number;
 	public constructor(opts?: FHttpClient.Opts) {
-		this._log = opts && opts.log || FLogger.Dummy;
-		this._proxyOpts = opts && opts.proxyOpts || null;
-		this._sslOpts = opts && opts.sslOpts || null;
-		this._requestTimeout = opts && opts.timeout || FHttpClient.DEFAULT_TIMEOUT;
+		this._log = opts !== undefined && opts.log !== undefined ? opts.log : FLogger.create(this.constructor.name);
+		this._proxyOpts = opts !== undefined && opts.proxyOpts !== undefined ? opts.proxyOpts : null;
+		this._sslOpts = opts !== undefined && opts.sslOpts !== undefined ? opts.sslOpts : null;
+		this._requestTimeout = opts !== undefined && opts.timeout !== undefined ? opts.timeout : FHttpClient.DEFAULT_TIMEOUT;
 	}
 
 	public async invoke(

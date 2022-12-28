@@ -1,3 +1,3 @@
 export interface FLoggerLabels {
-	readonly [name: string]: string;
+	readonly [labelName: string]: string;
 }

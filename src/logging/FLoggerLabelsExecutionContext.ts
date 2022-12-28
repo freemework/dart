@@ -22,7 +22,7 @@ export class FLoggerLabelsExecutionContext extends FExecutionContextBase {
 		if (prevExecutionContext != null) {
 			chain.push(
 				...FExecutionContext
-					.findAllExecutionContexts(
+					.listExecutionContexts(
 						prevExecutionContext,
 						FLoggerLabelsExecutionContext,
 					)

@@ -41,7 +41,21 @@ export abstract class FExecutionContext {
 		return null;
 	}
 
-	protected static findAllExecutionContexts<T extends FExecutionContext>(
+	/**
+	 * Obtain a closest instance of typed `FExecutionContext` that encloses
+	 * the given context.
+	 *
+	 * Raise `FExceptionInvalidOperation` if requested type not found
+	 */
+	protected static getExecutionContext<T extends FExecutionContext>(context: FExecutionContext, clz: Function & { prototype: T; }): T {
+		const chainItem: T | null = FExecutionContext.findExecutionContext(context, clz);
+		if (chainItem !== null) {
+			return chainItem;
+		}
+		throw new FExceptionInvalidOperation(`Execution context '${clz.name}' is not presented on the chain.`);
+	}
+
+	protected static listExecutionContexts<T extends FExecutionContext>(
 		context: FExecutionContext, clz: Function & { prototype: T; }
 	): ReadonlyArray<T> {
 		const result: Array<T> = [];
@@ -55,20 +69,6 @@ export abstract class FExecutionContext {
 		}
 
 		return Object.freeze(result);
-	}
-
-	/**
-	 * Obtain a closest instance of typed `FExecutionContext` that encloses
-	 * the given context.
-	 *
-	 * Raise `FExceptionInvalidOperation` if requested type not found
-	 */
-	protected static getExecutionContext<T extends FExecutionContext>(context: FExecutionContext, clz: Function & { prototype: T; }): T {
-		const chainItem: T | null = FExecutionContext.findExecutionContext(context, clz);
-		if (chainItem !== null) {
-			return chainItem;
-		}
-		throw new FExceptionInvalidOperation(`Execution context '${clz.name}' is not presented on the chain.`);
 	}
 }
 export class FExecutionElement<TExecutionContext extends FExecutionContext> {

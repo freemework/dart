@@ -15,6 +15,8 @@ export abstract class FLoggerBase extends FLogger {
 	public get isErrorEnabled(): boolean { return this.isLevelEnabled(FLoggerLevel.ERROR); }
 	public get isFatalEnabled(): boolean { return this.isLevelEnabled(FLoggerLevel.FATAL); }
 
+	public get name(): string | null { return this._name; }
+
 	public trace(
 		variant: FExecutionContext | FLoggerLabels,
 		message: string,
@@ -95,6 +97,12 @@ export abstract class FLoggerBase extends FLogger {
 		this.log(FLoggerLevel.FATAL, loggerProperties, message);
 	}
 
+	protected constructor(loggerName?: string) {
+		super();
+
+		this._name = loggerName !== undefined ? loggerName : null;
+	}
+
 	protected abstract isLevelEnabled(level: FLoggerLevel): boolean;
 
 	///
@@ -102,10 +110,12 @@ export abstract class FLoggerBase extends FLogger {
 	///
 	protected abstract log(
 		level: FLoggerLevel,
-		loggerProperties: FLoggerLabels,
+		labels: FLoggerLabels,
 		message: string,
 		exception?: FException,
 	): void;
+
+	private readonly _name: string | null;
 
 	private _resolveLoggerProperties(
 		variant: FExecutionContext | FLoggerLabels,
