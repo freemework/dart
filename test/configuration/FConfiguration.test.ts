@@ -178,7 +178,7 @@ describe("FConfiguration tests", function () {
 
 });
 
-describe("FConfigurationProperties Negative test", function () {
+describe("FConfiguration Negative test", function () {
 	let config: FConfiguration;
 
 	beforeEach(async () => {
@@ -208,67 +208,11 @@ describe("FConfigurationProperties Negative test", function () {
 		assert.isTrue(config.getNamespace("a.b").hasNamespace("c"), "Should exist: a.b.c");
 		assert.isFalse(config.getNamespace("a.b").hasNamespace("o.l.o.l.o"), "Should not exist: a.b.o.l.o.l.o");
 	});
-	it("Should be execution error not found key on getString", function () {
+	it("Should be execution error not found key", function () {
 		let ex;
 		try {
 			const fake = "fake";
-			config.get(fake).asString;
-		} catch (err) {
-			ex = err;
-		}
-
-		assert.isDefined(ex);
-		assert.instanceOf(ex, FConfigurationException);
-		assert.equal((<FConfigurationException>ex).key,"fake");
-
-	});
-	it("Should be execution error not found key on getBoolean", function () {
-		let ex;
-		try {
-			const fake = "fake";
-			config.get(fake).asBoolean;
-		} catch (err) {
-			ex = err;
-		}
-
-		assert.isDefined(ex);
-		assert.instanceOf(ex, FConfigurationException);
-		assert.equal((<FConfigurationException>ex).key,"fake");
-
-	});
-	it("Should be execution error not found key on getEnabled", function () {
-		let ex;
-		try {
-			const fake = "fake";
-			config.get(fake).asBoolean;
-		} catch (err) {
-			ex = err;
-		}
-
-		assert.isDefined(ex);
-		assert.instanceOf(ex, FConfigurationException);
-		assert.equal((<FConfigurationException>ex).key,"fake");
-
-	});
-	it("Should be execution error not found key on getFloat", function () {
-		let ex;
-		try {
-			const fake = "fake";
-			config.get(fake).asNumber;
-		} catch (err) {
-			ex = err;
-		}
-
-		assert.isDefined(ex);
-		assert.instanceOf(ex, FConfigurationException);
-		assert.equal((<FConfigurationException>ex).key,"fake");
-
-	});
-	it("Should be execution error not found key on getInteger", function () {
-		let ex;
-		try {
-			const fake = "fake";
-			config.get(fake).asInteger;
+			config.get(fake);
 		} catch (err) {
 			ex = err;
 		}

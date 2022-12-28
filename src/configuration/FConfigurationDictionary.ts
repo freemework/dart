@@ -91,10 +91,7 @@ export class FConfigurationDictionary extends FConfiguration {
 			);
 			return value;
 		} else {
-			const value: FConfigurationValue = FConfigurationValue.factoryUndefined(
-				key
-			);
-			return value;
+			throw new FConfigurationException("Current configuration does not have such key. Check your configuration.", key);
 		}
 	}
 

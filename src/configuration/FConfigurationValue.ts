@@ -12,13 +12,6 @@ export abstract class FConfigurationValue {
 	}
 
 	/**
-	 * Factory constructor
-	 */
-	public static factoryUndefined(key: string): FConfigurationValue {
-		return new _FConfigurationValueUndefined(key);
-	}
-
-	/**
 	 * Configuration source URI.
 	 *
 	 * See `sourceURI` in `FConfiguration` for details.
@@ -367,37 +360,4 @@ class _FConfigurationValue extends FConfigurationValue {
 			);
 		}
 	}
-}
-
-class _FConfigurationValueUndefined extends FConfigurationValue {
-	public get sourceURI(): URL { return this.throwHelper(); }
-	public get overriden(): null { return null; }
-	public get key(): string { return this.key; }
-	public get isNull(): boolean { return false; }
-	public get asBase64(): Uint8Array { return this.throwHelper(); }
-	public get asBase64Nullable(): Uint8Array | null { return this.throwHelper(); }
-	public get asBoolean(): boolean { return this.throwHelper(); }
-	public get asBooleanNullable(): boolean | null { return this.throwHelper(); }
-	public get asDateIso8601(): Date { return this.throwHelper(); }
-	public get asDateIso8601Nullable(): Date | null { return this.throwHelper(); }
-	public get asDateTimestamp(): Date { return this.throwHelper(); }
-	public get asDateTimestampNullable(): Date | null { return this.throwHelper(); }
-	public get asDecimal(): FDecimal { return this.throwHelper(); }
-	public get asDecimalNullable(): FDecimal | null { return this.throwHelper(); }
-	public get asInteger(): number { return this.throwHelper(); }
-	public get asIntegerNullable(): number | null { return this.throwHelper(); }
-	public get asIntegerNegative(): number { return this.throwHelper(); }
-	public get asIntegerNegativeNullable(): number | null { return this.throwHelper(); }
-	public get asIntegerPositive(): number { return this.throwHelper(); }
-	public get asIntegerPositiveNullable(): number | null { return this.throwHelper(); }
-	public get asNumber(): number { return this.throwHelper(); }
-	public get asNumberNullable(): number | null { return this.throwHelper(); }
-	public get asPortNumber(): number { return this.throwHelper(); }
-	public get asPortNumberNullable(): number | null { return this.throwHelper(); }
-	public get asString(): string { return this.throwHelper(); }
-	public get asStringNullable(): string | null { return this.throwHelper(); }
-	public get asUrl(): URL { return this.throwHelper(); }
-	public get asUrlNullable(): URL | null { return this.throwHelper(); }
-	public constructor(private readonly _key: string) { super(); }
-	private throwHelper(): never { throw new FConfigurationException("Current configuration does not have such key. Check your configuration.", this._key); }
 }

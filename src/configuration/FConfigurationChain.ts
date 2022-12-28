@@ -83,10 +83,7 @@ export class FConfigurationChain extends FConfiguration {
 			);
 			return value;
 		} else {
-			const value: FConfigurationValue = FConfigurationValue.factoryUndefined(
-				fullKey
-			);
-			return value;
+			throw new FConfigurationException("Current configuration does not have such key. Check your configuration.", fullKey);
 		}
 	}
 

@@ -244,6 +244,9 @@ export abstract class FConfiguration {
 	 */
 	public abstract getNamespace(configurationNamespace: string): FConfiguration;
 
+	/**
+	 * @throws `FConfigurationException` if the `key` not found and no `defaultData` provided
+	 */
 	public abstract get(key: string, defaultData?: string | null): FConfigurationValue;
 
 	/**
