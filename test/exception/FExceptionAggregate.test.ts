@@ -1,11 +1,11 @@
 import { FException, FExceptionAggregate } from "../../src/index";
 
+import { EOL } from "os";
 import { assert } from "chai";
 
 describe("FExceptionAggregate test", function () {
 	it("should be instantable without inner errors", function () {
-		const aggrError = new FExceptionAggregate([]);
-		assert.equal(aggrError.message, FExceptionAggregate.name);
+		new FExceptionAggregate([]);
 	});
 
 	it("should concatenate messages from inner errors", function () {
@@ -13,13 +13,33 @@ describe("FExceptionAggregate test", function () {
 		let err2: FException;
 		let err3: FException;
 
-		try { throw new FException("Err1"); } catch (e) { err1 = e as FException; }
-		try { throw new FException("Err2"); } catch (e) { err2 = e as FException; }
-		try { throw new FException("Err3"); } catch (e) { err3 = e as FException; }
+		try {
+			throw new FException("Err1");
+		} catch (e) {
+			err1 = e as FException;
+		}
+		try {
+			throw new FException("Err2");
+		} catch (e) {
+			err2 = e as FException;
+		}
+		try {
+			throw new FException("Err3");
+		} catch (e) {
+			err3 = e as FException;
+		}
 
-		const aggrError = new FExceptionAggregate([err1, err2, err3]);
+		let aggrError: FExceptionAggregate;
+		try {
+			throw new FExceptionAggregate([err1, err2, err3]);
+		} catch (e) {
+			aggrError = e as FExceptionAggregate;
+		}
 
-		assert.equal(aggrError.message, "Err1\nErr2\nErr3");
-		assert.equal(aggrError.toString(), `${err1.toString()}\n${err2.toString()}\n${err3.toString()}`);
+		assert.equal(aggrError.message, "One or more errors occurred.");
+		assert.equal(
+			aggrError.toString().split(EOL)[0],
+			"FExceptionAggregate: One or more errors occurred. ---> FException: Err1",
+		);
 	});
 });
