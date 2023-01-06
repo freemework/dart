@@ -26,9 +26,9 @@ export abstract class FLoggerBase extends FLogger {
 			return;
 		}
 
-		const loggerProperties: FLoggerLabels = this._resolveLoggerProperties(variant);
+		const loggerLabels: FLoggerLabels = this._resolveLoggerProperties(variant);
 
-		this.log(FLoggerLevel.TRACE, loggerProperties, message, ex);
+		this.log(FLoggerLevel.TRACE, loggerLabels, message, ex);
 	}
 
 	public debug(
@@ -40,9 +40,9 @@ export abstract class FLoggerBase extends FLogger {
 			return;
 		}
 
-		const loggerProperties: FLoggerLabels =
+		const loggerLabels: FLoggerLabels =
 			this._resolveLoggerProperties(variant);
-		this.log(FLoggerLevel.DEBUG, loggerProperties, message, ex);
+		this.log(FLoggerLevel.DEBUG, loggerLabels, message, ex);
 	}
 
 	public info(
@@ -53,9 +53,9 @@ export abstract class FLoggerBase extends FLogger {
 			return;
 		}
 
-		const loggerProperties: FLoggerLabels =
+		const loggerLabels: FLoggerLabels =
 			this._resolveLoggerProperties(variant);
-		this.log(FLoggerLevel.INFO, loggerProperties, message);
+		this.log(FLoggerLevel.INFO, loggerLabels, message);
 	}
 
 	public warn(
@@ -66,9 +66,9 @@ export abstract class FLoggerBase extends FLogger {
 			return;
 		}
 
-		const loggerProperties: FLoggerLabels =
+		const loggerLabels: FLoggerLabels =
 			this._resolveLoggerProperties(variant);
-		this.log(FLoggerLevel.WARN, loggerProperties, message);
+		this.log(FLoggerLevel.WARN, loggerLabels, message);
 	}
 
 	public error(
@@ -79,9 +79,9 @@ export abstract class FLoggerBase extends FLogger {
 			return;
 		}
 
-		const loggerProperties: FLoggerLabels =
+		const loggerLabels: FLoggerLabels =
 			this._resolveLoggerProperties(variant);
-		this.log(FLoggerLevel.ERROR, loggerProperties, message);
+		this.log(FLoggerLevel.ERROR, loggerLabels, message);
 	}
 
 	public fatal(
@@ -92,9 +92,9 @@ export abstract class FLoggerBase extends FLogger {
 			return;
 		}
 
-		const loggerProperties: FLoggerLabels =
+		const loggerLabels: FLoggerLabels =
 			this._resolveLoggerProperties(variant);
-		this.log(FLoggerLevel.FATAL, loggerProperties, message);
+		this.log(FLoggerLevel.FATAL, loggerLabels, message);
 	}
 
 	protected constructor(loggerName?: string) {
@@ -120,20 +120,20 @@ export abstract class FLoggerBase extends FLogger {
 	private _resolveLoggerProperties(
 		variant: FExecutionContext | FLoggerLabels,
 	): FLoggerLabels {
-		let loggerProperties: FLoggerLabels;
+		let loggerLabels: FLoggerLabels;
 
 		if (variant instanceof FExecutionContext) {
 			const executionElement = FLoggerLabelsExecutionContext
 				.of(variant);
 			if (executionElement !== null) {
-				loggerProperties = Object.freeze({ ...executionElement.loggerProperties });
+				loggerLabels = Object.freeze({ ...executionElement.loggerLabels });
 			} else {
-				loggerProperties = Object.freeze({}); // No any logger properties on excecution context chain
+				loggerLabels = Object.freeze({}); // No any logger properties on excecution context chain
 			}
 		} else {
-			loggerProperties = variant;
+			loggerLabels = variant;
 		}
 
-		return loggerProperties;
+		return loggerLabels;
 	}
 }

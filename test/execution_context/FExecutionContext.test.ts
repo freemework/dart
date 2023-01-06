@@ -58,8 +58,8 @@ describe("FExecutionContext test", function () {
 		const element: FLoggerPropertiesExecutionElement = FLoggerLabelsExecutionContext.of(loggerCtx)!;
 		assert.isNotNull(element);
 		assert.strictEqual(element.owner, loggerCtx);
-		assert.strictEqual(element.loggerProperties.name, "test");
-		assert.strictEqual(element.loggerProperties.value, "42");
+		assert.strictEqual(element.loggerLabels.name, "test");
+		assert.strictEqual(element.loggerLabels.value, "42");
 	});
 
 	it("Logger execution context should be resolved on chain", function () {
@@ -71,7 +71,7 @@ describe("FExecutionContext test", function () {
 		const element: FLoggerPropertiesExecutionElement = FLoggerLabelsExecutionContext.of(stubCtx)!;
 		assert.isNotNull(element);
 		assert.strictEqual(element.owner, loggerCtx2);
-		assert.deepEqual({ ...element.loggerProperties }, { name: "test", value: "42" });
+		assert.deepEqual({ ...element.loggerLabels }, { name: "test", value: "42" });
 	});
 });
 

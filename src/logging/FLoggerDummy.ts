@@ -23,7 +23,7 @@ export class FLoggerDummy extends FLoggerBase {
 	}
 
 	protected isLevelEnabled(level: FLoggerLevel): boolean { return false; }
-	protected log(level: FLoggerLevel, loggerProperties: FLoggerLabels, message: string, exception?: FException | undefined): void { }
+	protected log(level: FLoggerLevel, loggerLabels: FLoggerLabels, message: string, exception?: FException): void { }
 
 	private constructor() { super(); }
 }

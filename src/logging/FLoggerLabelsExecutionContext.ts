@@ -5,7 +5,7 @@ import { FLoggerLabels } from "../logging/FLoggerLabels";
 
 
 export class FLoggerLabelsExecutionContext extends FExecutionContextBase {
-	private readonly _loggerProperties: FLoggerLabels;
+	private readonly _loggerLabels: FLoggerLabels;
 
 	public static of(
 		executionContext: FExecutionContext
@@ -32,13 +32,13 @@ export class FLoggerLabelsExecutionContext extends FExecutionContextBase {
 		return new FLoggerPropertiesExecutionElement(loggerCtx, chain);
 	}
 
-	public get loggerProperties(): FLoggerLabels { return this._loggerProperties; }
+	public get loggerLabels(): FLoggerLabels { return this._loggerLabels; }
 
 	public constructor(
-		prevContext: FExecutionContext, loggerProperties?: FLoggerLabels
+		prevContext: FExecutionContext, loggerLabels?: FLoggerLabels
 	) {
 		super(prevContext);
-		this._loggerProperties = Object.freeze({ ...loggerProperties });
+		this._loggerLabels = Object.freeze({ ...loggerLabels });
 	}
 }
 export class FLoggerPropertiesExecutionElement<
@@ -54,10 +54,10 @@ export class FLoggerPropertiesExecutionElement<
 		this.chain = chain;
 	}
 
-	public get loggerProperties(): FLoggerLabels {
+	public get loggerLabels(): FLoggerLabels {
 		// using reduceRight to take priority for first property in chain.
 		const dict = this.chain.reduceRight((p, c) => {
-			Object.entries(c.loggerProperties).forEach(([name, value]) => {
+			Object.entries(c.loggerLabels).forEach(([name, value]) => {
 				if (!p.has(name)) {
 					p.set(name, value);
 				}
