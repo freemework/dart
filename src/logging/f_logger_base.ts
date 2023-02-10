@@ -15,7 +15,7 @@ export abstract class FLoggerBase extends FLogger {
 	public get isErrorEnabled(): boolean { return this.isLevelEnabled(FLoggerLevel.ERROR); }
 	public get isFatalEnabled(): boolean { return this.isLevelEnabled(FLoggerLevel.FATAL); }
 
-	public get name(): string | null { return this._name; }
+	public get name(): string { return this._name; }
 
 	public trace(
 		variant: FExecutionContext | FLoggerLabels,
@@ -103,10 +103,10 @@ export abstract class FLoggerBase extends FLogger {
 		this.log(FLoggerLevel.FATAL, loggerLabels, message);
 	}
 
-	protected constructor(loggerName?: string) {
+	protected constructor(loggerName: string) {
 		super();
 
-		this._name = loggerName !== undefined ? loggerName : null;
+		this._name = loggerName;
 	}
 
 	protected abstract isLevelEnabled(level: FLoggerLevel): boolean;
@@ -121,7 +121,7 @@ export abstract class FLoggerBase extends FLogger {
 		exception?: FException,
 	): void;
 
-	private readonly _name: string | null;
+	private readonly _name: string;
 
 	private static _resolveLoggerProperties(
 		variant: FExecutionContext | FLoggerLabels,
@@ -140,11 +140,19 @@ export abstract class FLoggerBase extends FLogger {
 	}
 
 	private static _resolveMessage(messageOrMessageFactory: string | FLoggerMessageFactory): string {
-		if (typeof messageOrMessageFactory === "string") {
-			return messageOrMessageFactory;
-		} else {
-			return messageOrMessageFactory();
+		if (typeof messageOrMessageFactory === "function") {
+			try {
+			messageOrMessageFactory = messageOrMessageFactory();
+			} catch(e) {
+				messageOrMessageFactory = "FLoggerMessageFactory contract violation detected: Exception was raised."
+			}
 		}
+
+		if (typeof messageOrMessageFactory !== "string") {
+			messageOrMessageFactory = `${messageOrMessageFactory}`;
+		}
+
+		return messageOrMessageFactory;
 	}
 
 	private static readonly _emptyLabels: FLoggerLabels = Object.freeze({});

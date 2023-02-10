@@ -15,7 +15,7 @@ export class FLoggerDummy extends FLoggerBase {
 		// Lazy singleton
 
 		if (FLoggerDummy._instance === null) {
-			FLoggerDummy._instance = new FLoggerDummy();
+			FLoggerDummy._instance = new FLoggerDummy(loggerName !== undefined ? loggerName : "Dummy");
 		}
 
 		return FLoggerDummy._instance;
@@ -24,5 +24,5 @@ export class FLoggerDummy extends FLoggerBase {
 	protected isLevelEnabled(level: FLoggerLevel): boolean { return false; }
 	protected log(level: FLoggerLevel, loggerLabels: FLoggerLabels, message: string, exception?: FException): void { }
 
-	private constructor() { super(); }
+	private constructor(loggerName: string) { super(loggerName); }
 }

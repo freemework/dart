@@ -4,9 +4,8 @@ import { FExceptionInvalidOperation } from "../exception/f_exception_invalid_ope
 import { FLoggerLevel } from "./f_logger_level";
 
 import { FExecutionContext } from "../execution_context/f_execution_context";
-// import { FLoggerLabels } from "./FLoggerLabels";
 
-export interface LoggerFactory { (loggerName?: string): FLogger; }
+export interface LoggerFactory { (loggerName: string): FLogger; }
 
 export interface FLoggerMessageFactory { (): string; }
 
@@ -18,7 +17,7 @@ export abstract class FLogger {
 			console.error(
 				"Logging subsystem used before call FLogger.setLoggerFactory(). Use FLoggerConsole as default logger. Please, consider to call FLogger.setLoggerFactory() at bootstrap phase."
 			);
-			this._loggerFactory = (loggerName?: string) => FLoggerConsole.create(loggerName, FLoggerLevel.TRACE);
+			this._loggerFactory = (loggerName: string) => FLoggerConsole.create(loggerName, FLoggerLevel.TRACE);
 		}
 		return this._loggerFactory;
 	}
@@ -35,7 +34,7 @@ export abstract class FLogger {
 	/**
 	 * Factory constructor
 	 */
-	public static create(loggerName?: string): FLogger {
+	public static create(loggerName: string): FLogger {
 		return FLogger.loggerFactory(loggerName);
 	}
 

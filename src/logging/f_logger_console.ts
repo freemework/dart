@@ -10,7 +10,7 @@ export class FLoggerConsole extends FLoggerBase {
 	/**
 	 * Factory constructor
 	 */
-	public static create(loggerName?: string, level?: FLoggerLevel): FLogger {
+	public static create(loggerName: string, level?: FLoggerLevel): FLogger {
 		const levels: Map<FLoggerLevel, boolean> = new Map();
 		levels.set(FLoggerLevel.FATAL, level != null && level >= FLoggerLevel.FATAL);
 		levels.set(FLoggerLevel.ERROR, level != null && level >= FLoggerLevel.ERROR);
@@ -71,7 +71,7 @@ export class FLoggerConsole extends FLoggerBase {
 	}
 
 	private readonly _levels: Map<FLoggerLevel, boolean>;
-	private constructor(loggerName: string | undefined, levels: Map<FLoggerLevel, boolean>) {
+	private constructor(loggerName: string, levels: Map<FLoggerLevel, boolean>) {
 		super(loggerName);
 		this._levels = levels;
 	}
