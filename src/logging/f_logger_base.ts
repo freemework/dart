@@ -26,7 +26,7 @@ export abstract class FLoggerBase extends FLogger {
 			return;
 		}
 
-		const loggerLabels: FLoggerLabels = FLoggerBase._resolveLoggerProperties(variant);
+		const loggerLabels: FLoggerLabels = FLoggerBase._resolveLoggerLabels(variant);
 		const message: string = FLoggerBase._resolveMessage(messageOrMessageFactory);
 
 		this.log(FLoggerLevel.TRACE, loggerLabels, message, ex);
@@ -42,7 +42,7 @@ export abstract class FLoggerBase extends FLogger {
 		}
 
 		const loggerLabels: FLoggerLabels =
-			FLoggerBase._resolveLoggerProperties(variant);
+			FLoggerBase._resolveLoggerLabels(variant);
 		const message: string = FLoggerBase._resolveMessage(messageOrMessageFactory);
 		this.log(FLoggerLevel.DEBUG, loggerLabels, message, ex);
 	}
@@ -56,7 +56,7 @@ export abstract class FLoggerBase extends FLogger {
 		}
 
 		const loggerLabels: FLoggerLabels =
-			FLoggerBase._resolveLoggerProperties(variant);
+			FLoggerBase._resolveLoggerLabels(variant);
 		const message: string = FLoggerBase._resolveMessage(messageOrMessageFactory);
 		this.log(FLoggerLevel.INFO, loggerLabels, message);
 	}
@@ -70,7 +70,7 @@ export abstract class FLoggerBase extends FLogger {
 		}
 
 		const loggerLabels: FLoggerLabels =
-			FLoggerBase._resolveLoggerProperties(variant);
+			FLoggerBase._resolveLoggerLabels(variant);
 		const message: string = FLoggerBase._resolveMessage(messageOrMessageFactory);
 		this.log(FLoggerLevel.WARN, loggerLabels, message);
 	}
@@ -84,7 +84,7 @@ export abstract class FLoggerBase extends FLogger {
 		}
 
 		const loggerLabels: FLoggerLabels =
-			FLoggerBase._resolveLoggerProperties(variant);
+			FLoggerBase._resolveLoggerLabels(variant);
 		const message: string = FLoggerBase._resolveMessage(messageOrMessageFactory);
 		this.log(FLoggerLevel.ERROR, loggerLabels, message);
 	}
@@ -98,7 +98,7 @@ export abstract class FLoggerBase extends FLogger {
 		}
 
 		const loggerLabels: FLoggerLabels =
-			FLoggerBase._resolveLoggerProperties(variant);
+			FLoggerBase._resolveLoggerLabels(variant);
 		const message: string = FLoggerBase._resolveMessage(messageOrMessageFactory);
 		this.log(FLoggerLevel.FATAL, loggerLabels, message);
 	}
@@ -123,10 +123,14 @@ export abstract class FLoggerBase extends FLogger {
 
 	private readonly _name: string;
 
-	private static _resolveLoggerProperties(
+	private static _resolveLoggerLabels(
 		variant: FExecutionContext | FLoggerLabels,
 	): FLoggerLabels {
-		if (variant instanceof FExecutionContext) {
+		if (variant === null || variant === undefined) {
+			// Sometime users pass undefined/null value.
+			// It is contract violation, but not a reason to crash in logger
+			return FLoggerBase._emptyLabels; 
+		} else if (variant instanceof FExecutionContext) {
 			const executionElement = FLoggerLabelsExecutionContext
 				.of(variant);
 			if (executionElement !== null) {
