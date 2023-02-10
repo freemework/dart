@@ -1,1 +1,1 @@
-export { FDecimal, FDecimalBase, FDecimalBackendNumber } from "./FDecimal";
+export { FDecimal, FDecimalBase, FDecimalBackendNumber } from "./f_decimal";

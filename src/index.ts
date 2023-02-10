@@ -30,4 +30,4 @@ export * from "./primitive";
 export * from "./sql";
 export * from "./util";
 
-export { FEnsure, FEnsureException } from "./FEnsure";
+export { FEnsure, FEnsureException } from "./f_ensure";
