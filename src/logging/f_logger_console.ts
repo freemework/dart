@@ -56,6 +56,9 @@ export class FLoggerConsole extends FLoggerBase {
 			case FLoggerLevel.DEBUG:
 				console.debug(logMessageBuffer);
 				break;
+			case FLoggerLevel.INFO:
+				console.log(logMessageBuffer);
+				break;
 			case FLoggerLevel.WARN:
 			case FLoggerLevel.ERROR:
 			case FLoggerLevel.FATAL:
@@ -63,7 +66,7 @@ export class FLoggerConsole extends FLoggerBase {
 				break;
 			default:
 				throw new FExceptionInvalidOperation(`Unsupported log level '${level}'.`);
-			}
+		}
 
 	}
 
