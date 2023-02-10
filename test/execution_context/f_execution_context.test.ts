@@ -3,7 +3,7 @@ import {
 	FCancellationExecutionContext, FCancellationExecutionElement, FCancellationToken,
 	FExecutionContext, FExecutionContextBase,
 	FLoggerLabelsExecutionContext,
-	FLoggerPropertiesExecutionElement,
+	FLoggerLabelsExecutionElement,
 	FLoggerLabels
 } from "../../src";
 
@@ -55,7 +55,7 @@ describe("FExecutionContext test", function () {
 		const emptyCtx: FExecutionContext = FExecutionContext.Empty;
 		const loggerCtx: FExecutionContext = new FLoggerLabelsExecutionContext(emptyCtx, { name: "test", value: "42" });
 
-		const element: FLoggerPropertiesExecutionElement = FLoggerLabelsExecutionContext.of(loggerCtx)!;
+		const element: FLoggerLabelsExecutionElement = FLoggerLabelsExecutionContext.of(loggerCtx)!;
 		assert.isNotNull(element);
 		assert.strictEqual(element.owner, loggerCtx);
 		assert.strictEqual(element.loggerLabels.name, "test");
@@ -68,7 +68,7 @@ describe("FExecutionContext test", function () {
 		const loggerCtx2: FExecutionContext = new FLoggerLabelsExecutionContext(loggerCtx1, { name: "test", value: "43" });
 		const stubCtx = new StubExecutionContext(loggerCtx2);
 
-		const element: FLoggerPropertiesExecutionElement = FLoggerLabelsExecutionContext.of(stubCtx)!;
+		const element: FLoggerLabelsExecutionElement = FLoggerLabelsExecutionContext.of(stubCtx)!;
 		assert.isNotNull(element);
 		assert.strictEqual(element.owner, loggerCtx2);
 		assert.deepEqual({ ...element.loggerLabels }, { name: "test", value: "42" });

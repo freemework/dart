@@ -8,7 +8,7 @@ export class FLoggerLabelsExecutionContext extends FExecutionContextBase {
 
 	public static of(
 		executionContext: FExecutionContext
-	): FLoggerPropertiesExecutionElement | null {
+	): FLoggerLabelsExecutionElement | null {
 		const loggerCtx: FLoggerLabelsExecutionContext | null = FExecutionContext.findExecutionContext(
 			executionContext,
 			FLoggerLabelsExecutionContext
@@ -28,7 +28,7 @@ export class FLoggerLabelsExecutionContext extends FExecutionContextBase {
 			);
 		}
 
-		return new FLoggerPropertiesExecutionElement(loggerCtx, chain);
+		return new FLoggerLabelsExecutionElement(loggerCtx, chain);
 	}
 
 	public get loggerLabels(): FLoggerLabels { return this._loggerLabels; }
@@ -40,7 +40,7 @@ export class FLoggerLabelsExecutionContext extends FExecutionContextBase {
 		this._loggerLabels = Object.freeze({ ...loggerLabels });
 	}
 }
-export class FLoggerPropertiesExecutionElement<
+export class FLoggerLabelsExecutionElement<
 	TExecutionContextLogger extends FLoggerLabelsExecutionContext = FLoggerLabelsExecutionContext>
 	extends FExecutionElement<TExecutionContextLogger> {
 	public readonly chain: Array<FLoggerLabelsExecutionContext>;
