@@ -142,14 +142,17 @@ export abstract class FLoggerBase extends FLogger {
 	private static _resolveMessage(messageOrMessageFactory: string | FLoggerMessageFactory): string {
 		if (typeof messageOrMessageFactory === "function") {
 			try {
-			messageOrMessageFactory = messageOrMessageFactory();
-			} catch(e) {
+				messageOrMessageFactory = messageOrMessageFactory();
+				if (typeof messageOrMessageFactory !== "string") {
+					messageOrMessageFactory = `FLoggerMessageFactory contract violation detected: Non-string result. Force stringify message: ${messageOrMessageFactory}`;
+				}
+			} catch (e) {
 				messageOrMessageFactory = "FLoggerMessageFactory contract violation detected: Exception was raised."
 			}
-		}
-
-		if (typeof messageOrMessageFactory !== "string") {
-			messageOrMessageFactory = `${messageOrMessageFactory}`;
+		} else {
+			if (typeof messageOrMessageFactory !== "string") {
+				messageOrMessageFactory = `FLogger contract violation detected: Non-string message passed. Force stringify message: ${messageOrMessageFactory}`;
+			}
 		}
 
 		return messageOrMessageFactory;
