@@ -37,10 +37,10 @@ describe("Fusing tests", function () {
 		}
 	}
 
-	it("Should pass Promise result to worker", async function () {
+	it.only("Should pass Promise result to worker", async function () {
 		const disposable = new TestDisposable();
 		let executed = false;
-		await Fusing(FExecutionContext.Empty, () => Promise.resolve(disposable), (ct, instance) => {
+		await Fusing(FExecutionContext.Empty, () => Promise.resolve(disposable), (instance: TestDisposable) => {
 			executed = true;
 			assert.strictEqual(disposable, instance);
 		});
@@ -51,7 +51,7 @@ describe("Fusing tests", function () {
 	it("Should pass factory result to worker (resource is instance of Disposable)", async function () {
 		let disposable: any;
 		let executed = false;
-		await Fusing(FExecutionContext.Empty, () => (disposable = new TestDisposable()), (ct, instance) => {
+		await Fusing(FExecutionContext.Empty, () => (disposable = new TestDisposable()), (instance: TestDisposable) => {
 			executed = true;
 			assert.strictEqual(disposable, instance);
 		});
