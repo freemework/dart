@@ -141,7 +141,7 @@ export abstract class FInitableBase implements FInitable {
 	}
 
 	protected verifyNotDisposed() {
-		if (this.disposed || this.disposing) {
+		if (this.disposed) {
 			throw new Error("Wrong operation on disposed object");
 		}
 	}
