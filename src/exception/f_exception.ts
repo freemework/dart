@@ -104,4 +104,11 @@ export class FExceptionNativeErrorWrapper extends FException {
 	public get name(): string {
 		return this.nativeError.name;
 	}
+
+	public toString(): string {
+		let messageBuffer: string = this.nativeError.toString();
+		messageBuffer += "\n";
+		messageBuffer += this.nativeError.stack;
+		return messageBuffer;
+	}
 }
