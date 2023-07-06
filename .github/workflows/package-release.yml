@@ -3,7 +3,7 @@ name: NodeJS Package
 on:
   push:
     tags:
-      - '*'
+      - '*-common-typescript'
 
 jobs:
   tests:
