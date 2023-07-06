@@ -261,13 +261,13 @@ export namespace FHttpClient {
 		readonly url: URL;
 		readonly method: HttpMethod | string;
 		readonly headers?: http.OutgoingHttpHeaders;
-		readonly body?: Buffer;
+		readonly body?: Uint8Array;
 	}
 	export interface Response {
 		readonly statusCode: number;
 		readonly statusDescription: string;
 		readonly headers: http.IncomingHttpHeaders;
-		readonly body: Buffer;
+		readonly body: Uint8Array;
 	}
 
 	export type HttpInvokeChannel = FChannelInvoke<Request, Response>;
@@ -277,11 +277,11 @@ export namespace FHttpClient {
 		private readonly _url: URL;
 		private readonly _method: string;
 		private readonly _requestHeaders: http.OutgoingHttpHeaders;
-		private readonly _requestBody: Buffer;
+		private readonly _requestBody: Uint8Array;
 
 		public constructor(
 			url: URL, method: string,
-			requestHeaders: http.OutgoingHttpHeaders, requestBody: Buffer,
+			requestHeaders: http.OutgoingHttpHeaders, requestBody: Uint8Array,
 			errorMessage: string,
 			innerException?: FException
 		) {
@@ -295,7 +295,7 @@ export namespace FHttpClient {
 		public get url(): URL { return this._url; }
 		public get method(): string { return this._method; }
 		public get requestHeaders(): http.OutgoingHttpHeaders { return this._requestHeaders; }
-		public get requestBody(): Buffer { return this._requestBody; }
+		public get requestBody(): Uint8Array { return this._requestBody; }
 		public get requestObject(): any {
 			const requestHeaders: http.OutgoingHttpHeaders = this.requestHeaders;
 			let contentType: string | null = null;
@@ -313,7 +313,7 @@ export namespace FHttpClient {
 				throw new FExceptionInvalidOperation("Wrong operation. The property available only for 'application/json' content type requests.");
 			}
 
-			const requestBody: Buffer = this.requestBody;
+			const requestBody: Buffer = this.requestBody instanceof Buffer ? this.requestBody : Buffer.from(this.requestBody);
 
 			return JSON.parse(requestBody.toString("utf-8"));
 		}
@@ -326,13 +326,13 @@ export namespace FHttpClient {
 		private readonly _statusCode: number;
 		private readonly _statusDescription: string;
 		private readonly _responseHeaders: http.IncomingHttpHeaders;
-		private readonly _responseBody: Buffer;
+		private readonly _responseBody: Uint8Array;
 
 		public constructor(
 			statusCode: number, statusDescription: string,
 			url: URL, method: string,
-			requestHeaders: http.OutgoingHttpHeaders, requestBody: Buffer,
-			responseHeaders: http.IncomingHttpHeaders, responseBody: Buffer,
+			requestHeaders: http.OutgoingHttpHeaders, requestBody: Uint8Array,
+			responseHeaders: http.IncomingHttpHeaders, responseBody: Uint8Array,
 			innerException?: FException
 		) {
 			super(url, method, requestHeaders, requestBody, `${statusCode} ${statusDescription}`, innerException);
@@ -345,7 +345,7 @@ export namespace FHttpClient {
 		public get statusCode(): number { return this._statusCode; }
 		public get statusDescription(): string { return this._statusDescription; }
 		public get headers(): http.IncomingHttpHeaders { return this._responseHeaders; }
-		public get body(): Buffer { return this._responseBody; }
+		public get body(): Uint8Array { return this._responseBody; }
 		public get object(): any {
 			const headers: http.IncomingHttpHeaders = this.headers;
 			const contentTypeHeaderName: string | undefined = Object.keys(headers).find(header => header.toLowerCase() === "content-type");
@@ -363,7 +363,7 @@ export namespace FHttpClient {
 	export class CommunicationError extends HttpClientError {
 		public constructor(
 			url: URL, method: string,
-			requestHeaders: http.OutgoingHttpHeaders, requestBody: Buffer,
+			requestHeaders: http.OutgoingHttpHeaders, requestBody: Uint8Array,
 			erroMessage: string, innerException?: FException
 		) {
 			super(url, method, requestHeaders, requestBody, erroMessage, innerException);
