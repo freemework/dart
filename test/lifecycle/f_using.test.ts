@@ -37,7 +37,7 @@ describe("Fusing tests", function () {
 		}
 	}
 
-	it.only("Should pass Promise result to worker", async function () {
+	it("Should pass Promise result to worker", async function () {
 		const disposable = new TestDisposable();
 		let executed = false;
 		await Fusing(FExecutionContext.Empty, () => Promise.resolve(disposable), (instance: TestDisposable) => {
