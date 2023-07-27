@@ -3,7 +3,8 @@ export {
 	FDecimalBase,
 	FDecimalBackendNumber,
 	FDecimalBackend,
-	FDecimalFraction,
+	FDecimalFractionDigits,
 	FDecimalRoundMode,
-	FDecimalRoundModeUnreachableException
+	FDecimalRoundModeUnreachableException,
+	FDecimalSettings
 } from "./f_decimal";

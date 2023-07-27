@@ -60,7 +60,7 @@ export abstract class FDecimal {
 	public static mod(left: FDecimal, right: FDecimal, roundMode?: FDecimalRoundMode): FDecimal { return FDecimal.backend.mod(left, right, roundMode); }
 	public static multiply(left: FDecimal, right: FDecimal, roundMode?: FDecimalRoundMode): FDecimal { return FDecimal.backend.multiply(left, right, roundMode); }
 	public static parse(value: string): FDecimal { return FDecimal.backend.parse(value); }
-	public static round(value: FDecimal, fractionDigits: FDecimalFraction, roundMode?: FDecimalRoundMode): FDecimal { return FDecimal.backend.round(value, fractionDigits, roundMode); }
+	public static round(value: FDecimal, fractionDigits: FDecimalFractionDigits, roundMode?: FDecimalRoundMode): FDecimal { return FDecimal.backend.round(value, fractionDigits, roundMode); }
 	public static subtract(left: FDecimal, right: FDecimal): FDecimal { return FDecimal.backend.subtract(left, right); }
 
 	public abstract abs(): FDecimal;
@@ -73,18 +73,18 @@ export abstract class FDecimal {
 	public abstract isZero(): boolean;
 	public abstract mod(value: FDecimal, roundMode?: FDecimalRoundMode): FDecimal;
 	public abstract multiply(value: FDecimal, roundMode?: FDecimalRoundMode): FDecimal;
-	public abstract round(fractionDigits: FDecimalFraction, roundMode?: FDecimalRoundMode): FDecimal;
+	public abstract round(fractionDigits: FDecimalFractionDigits, roundMode?: FDecimalRoundMode): FDecimal;
 	public abstract subtract(value: FDecimal): FDecimal;
 	public abstract toNumber(): number;
 	public abstract toString(): string;
 	public abstract toJSON(): string;
 }
 
-export type FDecimalFraction = number;
-export function isDecimalFraction(test: number): test is FDecimalFraction {
+export type FDecimalFractionDigits = number;
+export function isDecimalFraction(test: number): test is FDecimalFractionDigits {
 	return Number.isSafeInteger(test) && test >= 0;
 }
-export function verifyDecimalFraction(test: FDecimalFraction): asserts test is FDecimalFraction {
+export function verifyDecimalFraction(test: FDecimalFractionDigits): asserts test is FDecimalFractionDigits {
 	if (!isDecimalFraction(test)) {
 		throw new FExceptionArgument("Wrong argument fraction. Expected integer >= 0");
 	}
@@ -196,7 +196,7 @@ export interface FDecimalBackend {
 	mod(left: FDecimal, right: FDecimal, roundMode?: FDecimalRoundMode): FDecimal;
 	multiply(left: FDecimal, right: FDecimal, roundMode?: FDecimalRoundMode): FDecimal;
 	parse(value: string): FDecimal;
-	round(value: FDecimal, fractionDigits: FDecimalFraction, roundMode?: FDecimalRoundMode): FDecimal;
+	round(value: FDecimal, fractionDigits: FDecimalFractionDigits, roundMode?: FDecimalRoundMode): FDecimal;
 	subtract(left: FDecimal, right: FDecimal): FDecimal;
 
 	toNumber(value: FDecimal): number;
@@ -213,7 +213,7 @@ export namespace FDecimal {
 	/**
 	 * @deprecated Use FDecimalFraction instead
 	 */
-	export type FractionDigits = FDecimalFraction;
+	export type FractionDigits = FDecimalFractionDigits;
 	/**
 	 * @deprecated Use FDecimalFraction instead
 	 */
@@ -221,11 +221,11 @@ export namespace FDecimal {
 		/**
 		 * @deprecated Use isDecimalFraction instead
 		 */
-		export const isDecimalFractionDigits: (test: number) => test is FDecimalFraction = isDecimalFraction;
+		export const isDecimalFractionDigits: (test: number) => test is FDecimalFractionDigits = isDecimalFraction;
 		/**
 		 * @deprecated Use verifyDecimalFraction instead
 		 */
-		export const verifyFraction: (test: FDecimalFraction) => asserts test is FDecimalFraction = verifyDecimalFraction;
+		export const verifyFraction: (test: FDecimalFractionDigits) => asserts test is FDecimalFractionDigits = verifyDecimalFraction;
 	}
 
 	/**
@@ -303,7 +303,7 @@ export class FDecimalBase<TInstance, TBackend extends FDecimalBackend> implement
 		return this._backend.multiply(this, value, roundMode);
 	}
 
-	public round(fractionDigits: FDecimalFraction, roundMode?: FDecimalRoundMode): FDecimal {
+	public round(fractionDigits: FDecimalFractionDigits, roundMode?: FDecimalRoundMode): FDecimal {
 		return this._backend.round(this, fractionDigits, roundMode);
 	}
 

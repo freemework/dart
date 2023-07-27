@@ -34,6 +34,7 @@
 	"git.rebaseWhenSync": true,
 	"editor.guides.indentation": true,
 	"cSpell.words": [
+		"freemework",
 		"Initable"
 	]
 }
