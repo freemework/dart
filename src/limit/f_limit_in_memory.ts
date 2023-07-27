@@ -377,7 +377,8 @@ function limitFactory(opts: FLimit.Opts): FLimit {
 		},
 		accrueTokenImmediately,
 		accrueTokenLazy: accrueTokenLazyOverrides,
-		dispose
+		dispose,
+		[Symbol.asyncDispose]() { return dispose(); },
 	};
 }
 

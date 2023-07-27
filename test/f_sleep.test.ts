@@ -1,24 +1,24 @@
 import { assert } from "chai";
 
-import { Fsleep, FCancellationTokenSourceManual, FCancellationTokenSourceTimeout, FCancellationException } from "../src";
+import { FSleep, FCancellationTokenSourceManual, FCancellationTokenSourceTimeout, FCancellationException } from "../src";
 
-describe("Fsleep tests", function () {
-	it("Should cancel Fsleep() before started", async () => {
+describe("FSleep tests", function () {
+	it("Should cancel FSleep() before started", async () => {
 		let expectedError;
 
 		const cancellationTokenSource = new FCancellationTokenSourceManual();
 		cancellationTokenSource.cancel();
-		Fsleep(cancellationTokenSource.token, 1000).catch(err => { expectedError = err; });
+		FSleep(cancellationTokenSource.token, 1000).catch(err => { expectedError = err; });
 		await new Promise(wakeup => setTimeout(wakeup, 25));
 
 		assert.isDefined(expectedError);
 		assert.instanceOf(expectedError, FCancellationException);
 	});
-	it("Should cancel Fsleep() after start", async () => {
+	it("Should cancel FSleep() after start", async () => {
 		let expectedError;
 
 		const cancellationTokenSource = new FCancellationTokenSourceManual();
-		const sleepTask = Fsleep(cancellationTokenSource.token, 1000).catch(err => { expectedError = err; });
+		const sleepTask = FSleep(cancellationTokenSource.token, 1000).catch(err => { expectedError = err; });
 		await new Promise(wakeup => setTimeout(wakeup, 25));
 
 		cancellationTokenSource.cancel();
@@ -28,11 +28,11 @@ describe("Fsleep tests", function () {
 		assert.isDefined(expectedError);
 		assert.instanceOf(expectedError, FCancellationException);
 	});
-	it("Should cancel Fsleep() via cancellationToken", async () => {
+	it("Should cancel FSleep() via cancellationToken", async () => {
 		let expectedError;
 
 		const cancellationTokenSource = new FCancellationTokenSourceManual();
-		Fsleep(cancellationTokenSource.token).catch(err => { expectedError = err; });
+		FSleep(cancellationTokenSource.token).catch(err => { expectedError = err; });
 
 		await new Promise(wakeup => setTimeout(wakeup, 10));
 
@@ -47,12 +47,12 @@ describe("Fsleep tests", function () {
 		assert.isDefined(expectedError);
 		assert.instanceOf(expectedError, FCancellationException);
 	});
-	it("Should cancel Fsleep() via Timeout", async () => {
+	it("Should cancel FSleep() via Timeout", async () => {
 		let expectedError;
 
 		const cancellationTokenSource = new FCancellationTokenSourceTimeout(25);
 
-		const sleepTask = Fsleep(cancellationTokenSource.token, 1000).catch(err => { expectedError = err; });
+		const sleepTask = FSleep(cancellationTokenSource.token, 1000).catch(err => { expectedError = err; });
 
 		await new Promise(wakeup => setTimeout(wakeup, 50));
 
@@ -62,14 +62,14 @@ describe("Fsleep tests", function () {
 		assert.isDefined(expectedError);
 		assert.instanceOf(expectedError, FCancellationException);
 	});
-	it("Should cancel Fsleep() via Timeout before start", async () => {
+	it("Should cancel FSleep() via Timeout before start", async () => {
 		let expectedError;
 
 		const cancellationTokenSource = new FCancellationTokenSourceTimeout(24 * 60 * 60 * 1000/* long timeout */);
 
 		cancellationTokenSource.cancel();
 
-		Fsleep(cancellationTokenSource.token, 1000).catch(err => { expectedError = err; });
+		FSleep(cancellationTokenSource.token, 1000).catch(err => { expectedError = err; });
 
 		await new Promise(wakeup => setTimeout(wakeup, 50));
 
@@ -77,12 +77,12 @@ describe("Fsleep tests", function () {
 		assert.isDefined(expectedError);
 		assert.instanceOf(expectedError, FCancellationException);
 	});
-	it("Should cancel Fsleep() via Timeout + call cancel()", async () => {
+	it("Should cancel FSleep() via Timeout + call cancel()", async () => {
 		let expectedError;
 
 		const cancellationTokenSource = new FCancellationTokenSourceTimeout(24 * 60 * 60 * 1000/* long timeout */);
 
-		const sleepTask = Fsleep(cancellationTokenSource.token, 1000).catch(err => { expectedError = err; });
+		const sleepTask = FSleep(cancellationTokenSource.token, 1000).catch(err => { expectedError = err; });
 
 		await new Promise(wakeup => setTimeout(wakeup, 50));
 

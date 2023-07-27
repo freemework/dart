@@ -1,23 +1,26 @@
-import { FDisposable, FDisposableBase } from "./f_disposable";
+import { FDisposable } from "./f_disposable";
 import { FExecutionContext } from "../execution_context/f_execution_context";
 import { FException, FExceptionAggregate } from "../exception";
 
-export interface FInitable extends FDisposable {
-	init(executionContext: FExecutionContext): Promise<void>;
-}
-export namespace FInitable {
-	export async function initAll(executionContext: FExecutionContext, ...instances: ReadonlyArray<FInitable>): Promise<void> {
-		const intializedInstances: Array<FInitable> = [];
+export abstract class FInitable extends FDisposable {
+	public abstract init(executionContext: FExecutionContext): Promise<void>;
+
+	public async [Symbol.asyncDispose]() {
+		await this.dispose();
+	}
+
+	public static async initAll(executionContext: FExecutionContext, ...instances: ReadonlyArray<FInitable>): Promise<void> {
+		const initializedInstances: Array<FInitable> = [];
 		try {
 			for (const instance of instances) {
 				await instance.init(executionContext);
-				intializedInstances.push(instance);
+				initializedInstances.push(instance);
 			}
 		} catch (initEx) {
 			const disposeExs: Array<FException> = [];
-			for (const intializedInstance of intializedInstances.reverse()) {
+			for (const initializedInstance of initializedInstances.reverse()) {
 				try {
-					await intializedInstance.dispose();
+					await initializedInstance.dispose();
 				} catch (disposeEx) {
 					disposeExs.push(FException.wrapIfNeeded(disposeEx));
 				}
@@ -33,7 +36,7 @@ export namespace FInitable {
 	}
 }
 
-export abstract class FInitableBase implements FInitable {
+export abstract class FInitableBase extends FInitable {
 	private _initialized?: boolean;
 	private _initializingPromise?: Promise<void>;
 	private _disposed?: boolean;
@@ -46,6 +49,7 @@ export abstract class FInitableBase implements FInitable {
 	public get disposing(): boolean { return this._disposingPromise !== undefined; }
 
 	public constructor() {
+		super();
 		this._initExecutionContext = null;
 	}
 
@@ -155,38 +159,40 @@ export abstract class FInitableBase implements FInitable {
 export class FInitableMixin extends FInitableBase {
 	public static applyMixin(targetClass: any): void {
 		Object.getOwnPropertyNames(FInitableBase.prototype).forEach(name => {
-			const propertyDescr = Object.getOwnPropertyDescriptor(FInitableBase.prototype, name);
-
 			if (name === "constructor") {
 				// Skip constructor
 				return;
 			}
 
-			if (propertyDescr !== undefined) {
-				Object.defineProperty(targetClass.prototype, name, propertyDescr);
+			const propertyDescriptor: PropertyDescriptor | undefined = Object.getOwnPropertyDescriptor(FInitableBase.prototype, name);
+
+			if (propertyDescriptor !== undefined) {
+				Object.defineProperty(targetClass.prototype, name, propertyDescriptor);
 			}
 		});
 
 		Object.getOwnPropertyNames(FInitableMixin.prototype).forEach(name => {
-			const propertyDescr = Object.getOwnPropertyDescriptor(FInitableMixin.prototype, name);
 
 			if (name === "constructor") {
 				// Skip constructor
 				return;
 			}
+
+			const propertyDescriptor: PropertyDescriptor | undefined = Object.getOwnPropertyDescriptor(FInitableMixin.prototype, name);
+
 			if (name === "onInit" || name === "onDispose") {
 				// Add NOP methods into mixed only if it not implements its
-				if (propertyDescr !== undefined) {
-					const existingPropertyDescr = Object.getOwnPropertyDescriptor(targetClass.prototype, name);
-					if (existingPropertyDescr === undefined) {
-						Object.defineProperty(targetClass.prototype, name, propertyDescr);
+				if (propertyDescriptor !== undefined) {
+					const existingPropertyDescriptor: PropertyDescriptor | undefined  = Object.getOwnPropertyDescriptor(targetClass.prototype, name);
+					if (existingPropertyDescriptor === undefined) {
+						Object.defineProperty(targetClass.prototype, name, propertyDescriptor);
 					}
 				}
 				return;
 			}
 
-			if (propertyDescr !== undefined) {
-				Object.defineProperty(targetClass.prototype, name, propertyDescr);
+			if (propertyDescriptor !== undefined) {
+				Object.defineProperty(targetClass.prototype, name, propertyDescriptor);
 			}
 		});
 	}

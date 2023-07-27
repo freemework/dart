@@ -1,22 +1,25 @@
 import { FException, FExceptionAggregate } from "../exception";
 
 export abstract class FDisposable {
+	public async [Symbol.asyncDispose]() {
+		await this.dispose();
+	}
+
 	abstract dispose(): Promise<void>;
-}
-export namespace FDisposable {
-	export async function disposeAll(...instances: ReadonlyArray<FDisposable>): Promise<void> {
-		const innerExceptions:Array<FException> = [];
+
+	public static async disposeAll(...instances: ReadonlyArray<FDisposable>): Promise<void> {
+		const innerExceptions: Array<FException> = [];
 		for (const instance of instances) {
 			try {
-			await instance.dispose();
-		  } catch (e) {
-			innerExceptions.push(FException.wrapIfNeeded(e));
-		  }
+				await instance.dispose();
+			} catch (e) {
+				innerExceptions.push(FException.wrapIfNeeded(e));
+			}
 		}
 		FExceptionAggregate.throwIfNeeded(innerExceptions);
 	}
 
-	// export async function safeDispose(disposable: any): Promise<void> {
+	// public static async safeDispose(disposable: any): Promise<void> {
 	// 	if (typeof disposable !== "object" || disposable === null) { return Promise.resolve(); }
 	// 	if (!("dispose" in disposable)) { return Promise.resolve(); }
 	// 	if (typeof disposable.dispose !== "function") { return Promise.resolve(); }
@@ -29,7 +32,7 @@ export namespace FDisposable {
 	// 			}
 	// 		} catch (e) {
 	// 			console.error(
-	// 				"Dispose method raised an error. This is unexpected behaviour due dispose() should be exception safe. The error was bypassed.",
+	// 				"Dispose method raised an error. This is unexpected behavior due dispose() should be exception safe. The error was bypassed.",
 	// 				e);
 	// 		}
 	// 	});
@@ -79,38 +82,41 @@ export abstract class FDisposableBase extends FDisposable {
 export class FDisposableMixin extends FDisposableBase {
 	public static applyMixin(targetClass: any): void {
 		Object.getOwnPropertyNames(FDisposableBase.prototype).forEach(name => {
-			const propertyDescr = Object.getOwnPropertyDescriptor(FDisposableBase.prototype, name);
 
 			if (name === "constructor") {
 				// Skip constructor
 				return;
 			}
 
-			if (propertyDescr !== undefined) {
-				Object.defineProperty(targetClass.prototype, name, propertyDescr);
+			const propertyDescriptor: PropertyDescriptor | undefined = Object.getOwnPropertyDescriptor(FDisposableBase.prototype, name);
+
+			if (propertyDescriptor !== undefined) {
+				Object.defineProperty(targetClass.prototype, name, propertyDescriptor);
 			}
 		});
 
 		Object.getOwnPropertyNames(FDisposableMixin.prototype).forEach(name => {
-			const propertyDescr = Object.getOwnPropertyDescriptor(FDisposableMixin.prototype, name);
 
 			if (name === "constructor") {
 				// Skip constructor
 				return;
 			}
+			
+			const propertyDescriptor: PropertyDescriptor | undefined = Object.getOwnPropertyDescriptor(FDisposableMixin.prototype, name);
+
 			if (name === "onDispose") {
 				// Add NOP methods into mixed only if it not implements its
-				if (propertyDescr !== undefined) {
-					const existingPropertyDescr = Object.getOwnPropertyDescriptor(targetClass.prototype, name);
-					if (existingPropertyDescr === undefined) {
-						Object.defineProperty(targetClass.prototype, name, propertyDescr);
+				if (propertyDescriptor !== undefined) {
+					const existingPropertyDescriptor: PropertyDescriptor | undefined = Object.getOwnPropertyDescriptor(targetClass.prototype, name);
+					if (existingPropertyDescriptor === undefined) {
+						Object.defineProperty(targetClass.prototype, name, propertyDescriptor);
 					}
 				}
 				return;
 			}
 
-			if (propertyDescr !== undefined) {
-				Object.defineProperty(targetClass.prototype, name, propertyDescr);
+			if (propertyDescriptor !== undefined) {
+				Object.defineProperty(targetClass.prototype, name, propertyDescriptor);
 			}
 		});
 	}

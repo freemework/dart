@@ -111,6 +111,24 @@ describe("FDisposableBase tests", function () {
 		assert.isFalse(disposable.disposing);
 	});
 
+	it("Positive test onDispose(): Promise<void> by 'await using' feature of TypeScript", async function () {
+		let disposable: TestDisposable;
+
+		{ // using scope
+			await using localDisposable = new TestDisposable();
+
+			assert.isFalse(localDisposable.disposed);
+			assert.isFalse(localDisposable.disposing);
+
+			localDisposable.verifyNotDisposed(); // should not raise an error
+
+			disposable = localDisposable;
+		}
+
+		assert.isTrue(disposable.disposed);
+		assert.isFalse(disposable.disposing);
+	});
+
 	// it("Should execute and wait for disposable task", async function () {
 	// 	let onDisposeTaskCalled = false;
 	// 	const onDisposeTask: cryptopay.Task = Task.create(() => {

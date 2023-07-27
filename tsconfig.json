@@ -1,9 +1,14 @@
 {
-	"//": "This is used in our build process. Also this file is requred by VSCode",
+	"//": "This file is used in our build process. Also this file is required by VSCode",
 	"compilerOptions": {
 		"alwaysStrict": true,
 		"declaration": true,
 		"experimentalDecorators": true,
+		"lib": [
+			"DOM",
+			"ES2022",
+			"ESNext.Disposable"
+		],
 		"module": "commonjs",
 		"moduleResolution": "node",
 		"noImplicitAny": true,

@@ -1,13 +1,13 @@
 import { assert } from "chai";
 
-import { FDecimal, FDecimalBackendNumber } from "../../../src";
+import { FDecimal,  FDecimalBackend, FDecimalBackendNumber, FDecimalRoundMode } from "../../../src";
 
 
-type TestCases = Array<[/*value: */string, /*expectedResult: */string, /*backends: */Array<FDecimal.Backend>]>;
+type TestCases = Array<[/*value: */string, /*expectedResult: */string, /*backends: */Array<FDecimalBackend>]>;
 
 const fractionalDigits = 10;
-const roundMode = FDecimal.RoundMode.Round;
-const operation: FDecimal.Backend = new FDecimalBackendNumber(fractionalDigits, roundMode);
+const roundMode = FDecimalRoundMode.Round;
+const operation: FDecimalBackend = new FDecimalBackendNumber(fractionalDigits, roundMode);
 
 const testCases: TestCases = [
 	["5", "-5", [operation]],
@@ -26,7 +26,7 @@ testCases.forEach(function (testCase) {
 	// Unwrap test case data
 	const [test, expectedResult, backends] = testCase;
 
-	backends.forEach(function (financial: FDecimal.Backend) {
+	backends.forEach(function (financial: FDecimalBackend) {
 
 		describe.skip(`inverse should be ${test} => ${expectedResult}`, function () {
 

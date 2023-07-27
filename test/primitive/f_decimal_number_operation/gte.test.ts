@@ -1,13 +1,13 @@
 import { assert } from "chai";
 
-import { FDecimal, FDecimalBackendNumber } from "../../../src";
+import { FDecimal, FDecimalBackend, FDecimalBackendNumber, FDecimalRoundMode } from "../../../src";
 
 
-type TestCases = Array<[/*left: */string, /*right: */string, /*expectedResult: */boolean, /*backends: */Array<FDecimal.Backend>]>;
+type TestCases = Array<[/*left: */string, /*right: */string, /*expectedResult: */boolean, /*backends: */Array<FDecimalBackend>]>;
 
 const fractionalDigits = 10;
-const roundMode = FDecimal.RoundMode.Round;
-const operation: FDecimal.Backend = new FDecimalBackendNumber(fractionalDigits, roundMode);
+const roundMode = FDecimalRoundMode.Round;
+const operation: FDecimalBackend = new FDecimalBackendNumber(fractionalDigits, roundMode);
 
 const testCases: TestCases = [
 	["6", "5", true, [operation]],
@@ -25,7 +25,7 @@ testCases.forEach(function (testCase) {
 	// Unwrap test case data
 	const [left, right, expectedResult, backends] = testCase;
 
-	backends.forEach(function (financial: FDecimal.Backend) {
+	backends.forEach(function (financial: FDecimalBackend) {
 
 		describe.skip(`gte should be ${left} >= ${right} = ${expectedResult}`, function () {
 

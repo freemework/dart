@@ -1,1 +1,9 @@
-export { FDecimal, FDecimalBase, FDecimalBackendNumber } from "./f_decimal";
+export {
+	FDecimal,
+	FDecimalBase,
+	FDecimalBackendNumber,
+	FDecimalBackend,
+	FDecimalFraction,
+	FDecimalRoundMode,
+	FDecimalRoundModeUnreachableException
+} from "./f_decimal";

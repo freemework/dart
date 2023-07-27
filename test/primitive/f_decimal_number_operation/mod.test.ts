@@ -1,17 +1,17 @@
 import { assert } from "chai";
 
-import { FDecimal, FDecimalBackendNumber } from "../../../src";
+import { FDecimal,  FDecimalBackend, FDecimalBackendNumber, FDecimalRoundMode } from "../../../src";
 
 
 const fractionalDigits = 10;
-const roundMode = FDecimal.RoundMode.Round;
-const operation: FDecimal.Backend = new FDecimalBackendNumber(fractionalDigits, roundMode);
+const roundMode = FDecimalRoundMode.Round;
+const operation: FDecimalBackend = new FDecimalBackendNumber(fractionalDigits, roundMode);
 
 type TestCases = Array<[
 	/*left: */string,
 	/*right: */string,
 	/*expectedResult: */string,
-	/*backends: */Array<FDecimal.Backend>
+	/*backends: */Array<FDecimalBackend>
 ]>;
 
 const testCases: TestCases = [
@@ -34,7 +34,7 @@ testCases.forEach(function (testCase) {
 	// Unwrap test case data
 	const [left, right, expectedResult, backends] = testCase;
 
-	backends.forEach(function (financial: FDecimal.Backend) {
+	backends.forEach(function (financial: FDecimalBackend) {
 		// tslint:disable-next-line: max-line-length
 		describe.skip(`mod with roundMode: ${roundMode}, fractionalDigits: ${fractionalDigits} should be ${left} mod ${right} = ${expectedResult}`, function () {
 

@@ -11,7 +11,7 @@ import { FExceptionArgument } from "../exception";
 // 	(db) => worker(db)                    // <- ! worker without executionContext
 // );
 
-export namespace Fusing {
+export namespace FUsing {
 	export type ResourceInitializerWithExecutionContext<T> = (executionContext: FExecutionContext) => T | Promise<T>;
 	export type ResourceInitializerWithoutExecutionContext<T> = () => T | Promise<T>;
 	export type ResourceInitializer<T> = ResourceInitializerWithExecutionContext<T> | ResourceInitializerWithoutExecutionContext<T>;
@@ -22,28 +22,27 @@ export namespace Fusing {
 
 	export type Result<T> = T | Promise<T>;
 }
-export function Fusing<TResource extends FInitable | FDisposable, TResult>(
+export function FUsing<TResource extends FInitable | FDisposable, TResult>(
 	executionContext: FExecutionContext,
-	resourceFactory: Fusing.ResourceInitializer<TResource>,
-	// worker: (executionContext: FExecutionContext, disposable: TResource) => Fusing.Result<TResult>
-	worker: Fusing.Worker<TResource, TResult>
+	resourceFactory: FUsing.ResourceInitializer<TResource>,
+	worker: FUsing.Worker<TResource, TResult>
 ): Promise<TResult> {
 	if (!resourceFactory || typeof resourceFactory !== "function") {
 		throw new Error("Wrong argument: resourceFactory");
 	}
 	if (!worker) { throw new Error("Wrong argument: worker"); }
 
-	async function workerExecutor(workerExecutorCancellactonToken: FExecutionContext, disposableResource: TResource): Promise<TResult> {
+	async function workerExecutor(workerExecutorCancellationToken: FExecutionContext, disposableResource: TResource): Promise<TResult> {
 		if (disposableResource instanceof FInitableBase || "init" in disposableResource) {
 			await (disposableResource as FInitable).init(executionContext);
 		}
 		try {
 
-			let workerResult: Fusing.Result<TResult>;
+			let workerResult: FUsing.Result<TResult>;
 			if (worker.length === 1) {
-				workerResult = (worker as Fusing.WorkerWithoutExecutionContext<TResource, TResult>)(disposableResource);
+				workerResult = (worker as FUsing.WorkerWithoutExecutionContext<TResource, TResult>)(disposableResource);
 			} else if (worker.length === 2) {
-				workerResult = (worker as Fusing.WorkerWithExecutionContext<TResource, TResult>)(workerExecutorCancellactonToken, disposableResource);
+				workerResult = (worker as FUsing.WorkerWithExecutionContext<TResource, TResult>)(workerExecutorCancellationToken, disposableResource);
 			} else {
 				throw new FExceptionArgument("Wrong worker function. Expect a function with 1 or 2 arguments.", "worker");
 			}

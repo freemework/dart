@@ -9,7 +9,7 @@ import {
 	FCancellationException,
 	FCancellationExecutionContext,
 	FInitableBase,
-	Fusing,
+	FUsing,
 	FException,
 } from "../../src";
 import { Deferred, nextTick } from "./tools";
@@ -40,7 +40,7 @@ describe("Fusing tests", function () {
 	it("Should pass Promise result to worker", async function () {
 		const disposable = new TestDisposable();
 		let executed = false;
-		await Fusing(FExecutionContext.Empty, () => Promise.resolve(disposable), (instance: TestDisposable) => {
+		await FUsing(FExecutionContext.Empty, () => Promise.resolve(disposable), (instance: TestDisposable) => {
 			executed = true;
 			assert.strictEqual(disposable, instance);
 		});
@@ -51,7 +51,7 @@ describe("Fusing tests", function () {
 	it("Should pass factory result to worker (resource is instance of Disposable)", async function () {
 		let disposable: any;
 		let executed = false;
-		await Fusing(FExecutionContext.Empty, () => (disposable = new TestDisposable()), (instance: TestDisposable) => {
+		await FUsing(FExecutionContext.Empty, () => (disposable = new TestDisposable()), (instance: TestDisposable) => {
 			executed = true;
 			assert.strictEqual(disposable, instance);
 		});
@@ -62,7 +62,7 @@ describe("Fusing tests", function () {
 	it("Should pass factory result to worker (resource is instance Promise<Disposable>)", async function () {
 		let disposable: any;
 		let executed = false;
-		await Fusing(FExecutionContext.Empty, () => Promise.resolve(disposable = new TestDisposable()), (ct, instance) => {
+		await FUsing(FExecutionContext.Empty, () => Promise.resolve(disposable = new TestDisposable()), (ct, instance) => {
 			executed = true;
 			assert.strictEqual(disposable, instance);
 		});
@@ -70,10 +70,10 @@ describe("Fusing tests", function () {
 		assert.isTrue(disposable.disposed);
 		assert.isFalse(disposable.disposing);
 	});
-	it("Should handle and execure worker's Promise", async function () {
+	it("Should handle and execute worker's Promise", async function () {
 		let disposable: any;
 		let executed = false;
-		await Fusing(FExecutionContext.Empty, () => Promise.resolve(disposable = new TestDisposable()), (ct, instance) => {
+		await FUsing(FExecutionContext.Empty, () => Promise.resolve(disposable = new TestDisposable()), (ct, instance) => {
 			// Create new NON-Started task
 			return Promise.resolve().then(() => {
 				executed = true;
@@ -92,7 +92,7 @@ describe("Fusing tests", function () {
 		const callSequence: Array<string> = [];
 		function disposeCallback() { callSequence.push("dispose"); }
 
-		await Fusing(FExecutionContext.Empty, () => Promise.resolve(disposable = new TestDisposable(disposeCallback)), async (ct, instance) => {
+		await FUsing(FExecutionContext.Empty, () => Promise.resolve(disposable = new TestDisposable(disposeCallback)), async (ct, instance) => {
 			executed = true;
 			assert.strictEqual(disposable, instance);
 			await new Promise(r => setTimeout(r, 25));
@@ -111,9 +111,15 @@ describe("Fusing tests", function () {
 		let expectedError: any;
 
 		try {
-			await Fusing(
+			await FUsing(
 				FExecutionContext.Empty,
-				() => ({ dispose: () => Promise.resolve().then(() => { throw new FException("Expected abnormal error"); }) }),
+				() => { 
+					const dispose = () => Promise.resolve().then(() => { throw new FException("Expected abnormal error"); });
+					return ({ 
+					dispose,
+					[Symbol.asyncDispose]() { return dispose(); },
+				 }) 
+				},
 				(ct, instance) => { executed = true; }
 			);
 		} catch (e) {
@@ -129,7 +135,7 @@ describe("Fusing tests", function () {
 		let executed = false;
 		let expectedError: any;
 		try {
-			await Fusing(FExecutionContext.Empty, () => Promise.resolve(disposable), (ct, instance) => {
+			await FUsing(FExecutionContext.Empty, () => Promise.resolve(disposable), (ct, instance) => {
 				executed = true;
 				throw new Error("Test ERROR");
 			});
@@ -148,7 +154,7 @@ describe("Fusing tests", function () {
 		let executed = false;
 		let expectedError: any;
 		try {
-			await Fusing(FExecutionContext.Empty, () => Promise.resolve(disposable), (ct, instance) => {
+			await FUsing(FExecutionContext.Empty, () => Promise.resolve(disposable), (ct, instance) => {
 				executed = true;
 				return Promise.reject(new Error("Test ERROR"));
 			});
@@ -165,7 +171,7 @@ describe("Fusing tests", function () {
 	it("Fusing test onDispose(): Promise<void>", async function () {
 		const defer = Deferred.create<number>();
 		let FusingPromiseResolved = false;
-		const FusingPromise = Fusing(FExecutionContext.Empty, () => (new TestDisposable()), (ct, instance) => defer.promise)
+		const FusingPromise = FUsing(FExecutionContext.Empty, () => (new TestDisposable()), (ct, instance) => defer.promise)
 			.then((v) => { FusingPromiseResolved = true; return v; });
 
 		assert.isFalse(FusingPromiseResolved);
@@ -187,7 +193,7 @@ describe("Fusing tests", function () {
 		const disposable: FDisposable = new TestDisposable();
 		let err;
 		try {
-			await Fusing(
+			await FUsing(
 				new FCancellationExecutionContext(FExecutionContext.Empty, token),
 				(executionContext) => {
 					FCancellationExecutionContext.of(executionContext).cancellationToken.throwIfCancellationRequested();
@@ -217,7 +223,7 @@ describe("Fusing tests", function () {
 
 		let err;
 		try {
-			await Fusing(
+			await FUsing(
 				new FCancellationExecutionContext(FExecutionContext.Empty, token),
 				(executionContext) => {
 					cts.cancel();
@@ -239,7 +245,7 @@ describe("Fusing tests", function () {
 	it("Should call init() for Initable", async function () {
 		const initable = new TestInitable();
 		let executedAfterInit = false;
-		await Fusing(
+		await FUsing(
 			FExecutionContext.Empty,
 			() => Promise.resolve(initable),
 			(ct, instance) => {

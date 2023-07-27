@@ -8,7 +8,6 @@ import {
 } from "../../src";
 
 import { assert } from "chai";
-import { URL } from "url";
 
 import { Socket, Server } from "net";
 import * as http from "http";

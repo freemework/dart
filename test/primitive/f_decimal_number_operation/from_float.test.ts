@@ -1,13 +1,13 @@
 import { assert } from "chai";
 
-import { FDecimal, FDecimalBackendNumber } from "../../../src";
+import { FDecimal,  FDecimalBackend, FDecimalBackendNumber, FDecimalRoundMode } from "../../../src";
 
 
-type TestCases = Array<[/*value: */number, /*expectedResult: */string, /*backends: */Array<FDecimal.Backend>]>;
+type TestCases = Array<[/*value: */number, /*expectedResult: */string, /*backends: */Array<FDecimalBackend>]>;
 
 const fractionalDigits = 2;
-const roundMode = FDecimal.RoundMode.Round;
-const operation: FDecimal.Backend = new FDecimalBackendNumber(fractionalDigits, roundMode);
+const roundMode = FDecimalRoundMode.Round;
+const operation: FDecimalBackend = new FDecimalBackendNumber(fractionalDigits, roundMode);
 
 const testCases: TestCases = [
 	[0.001, "0", [operation]], // should be round to zero according fractionalDigits === 2
@@ -22,7 +22,7 @@ testCases.forEach(function (testCase) {
 	// Unwrap test case data
 	const [test, expectedResult, backends] = testCase;
 
-	backends.forEach(function (financial: FDecimal.Backend) {
+	backends.forEach(function (financial: FDecimalBackend) {
 
 		describe.skip(`fromFloat should be ${test} => ${expectedResult}`, function () {
 

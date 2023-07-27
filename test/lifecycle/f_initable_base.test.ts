@@ -321,6 +321,25 @@ describe("Initable tests", function () {
 		}
 	});
 
+	it("Positive test onDispose(): Promise<void> by 'await using' feature of TypeScript", async function () {
+		let disposable: TestInitable;
+
+		{ // using scope
+			await using localDisposable = new TestInitable();
+			await localDisposable.init(FExecutionContext.Empty);
+
+			assert.isFalse(localDisposable.disposed);
+			assert.isFalse(localDisposable.disposing);
+
+			localDisposable.verifyNotDisposed(); // should not raise an error
+
+			disposable = localDisposable;
+		}
+
+		assert.isTrue(disposable.disposed);
+		assert.isFalse(disposable.disposing);
+	});
+
 	it("Positive test onDispose(): void", async function () {
 		const disposable = new TestInitable();
 		assert.isFalse(disposable.disposed);

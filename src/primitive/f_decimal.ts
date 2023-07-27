@@ -5,18 +5,18 @@ import { FExceptionInvalidOperation } from "../exception/f_exception_invalid_ope
 export abstract class FDecimal {
 	public static readonly REGEXP: RegExp = /^([+-]?)(0|[1-9][0-9]*)(\.([0-9]+))?$/;
 
-	private static _cfg: { readonly backend: FDecimal.Backend; readonly settings: FDecimal.Settings; } | null = null;
-	private static get cfg(): { readonly backend: FDecimal.Backend; readonly settings: FDecimal.Settings; } {
-		const cfg: { readonly backend: FDecimal.Backend; readonly settings: FDecimal.Settings; } | null = this._cfg;
+	private static _cfg: { readonly backend: FDecimalBackend; readonly settings: FDecimalSettings; } | null = null;
+	private static get cfg(): { readonly backend: FDecimalBackend; readonly settings: FDecimalSettings; } {
+		const cfg: { readonly backend: FDecimalBackend; readonly settings: FDecimalSettings; } | null = this._cfg;
 		if (cfg !== null) {
 			return cfg;
 		}
 		throw new FExceptionInvalidOperation(`${FDecimal.name} is not configured. Did you call ${FDecimal.name}.configure()?`);
 	}
-	private static get backend(): FDecimal.Backend { return FDecimal.cfg.backend; }
-	public static get settings(): FDecimal.Settings { return FDecimal.cfg.settings; }
+	private static get backend(): FDecimalBackend { return FDecimal.cfg.backend; }
+	public static get settings(): FDecimalSettings { return FDecimal.cfg.settings; }
 
-	public static configure(backend: FDecimal.Backend): void {
+	public static configure(backend: FDecimalBackend): void {
 		if (FDecimal._cfg !== null) {
 			throw new FExceptionInvalidOperation(`Cannot ${FDecimal.name}.configure() twice. By design you have to call ${FDecimal.name}.configure() once.`);
 		}
@@ -34,9 +34,9 @@ export abstract class FDecimal {
 	 */
 	public static abs(value: FDecimal): FDecimal { return FDecimal.backend.abs(value); }
 	public static add(left: FDecimal, right: FDecimal): FDecimal { return FDecimal.backend.add(left, right); }
-	public static divide(left: FDecimal, right: FDecimal, roundMode?: FDecimal.RoundMode): FDecimal { return FDecimal.backend.divide(left, right, roundMode); }
+	public static divide(left: FDecimal, right: FDecimal, roundMode?: FDecimalRoundMode): FDecimal { return FDecimal.backend.divide(left, right, roundMode); }
 	public static equals(left: FDecimal, right: FDecimal): boolean { return FDecimal.backend.equals(left, right); }
-	public static fromFloat(value: number, roundMode?: FDecimal.RoundMode): FDecimal { return FDecimal.backend.fromFloat(value, roundMode); }
+	public static fromFloat(value: number, roundMode?: FDecimalRoundMode): FDecimal { return FDecimal.backend.fromFloat(value, roundMode); }
 	public static fromInt(value: number): FDecimal { return FDecimal.backend.fromInt(value); }
 	public static gt(left: FDecimal, right: FDecimal): boolean { return FDecimal.backend.gt(left, right); }
 	public static gte(left: FDecimal, right: FDecimal): boolean { return FDecimal.backend.gte(left, right); }
@@ -57,164 +57,200 @@ export abstract class FDecimal {
 	 * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/min
 	 */
 	public static min(left: FDecimal, right: FDecimal): FDecimal { return FDecimal.backend.min(left, right); }
-	public static mod(left: FDecimal, right: FDecimal, roundMode?: FDecimal.RoundMode): FDecimal { return FDecimal.backend.mod(left, right, roundMode); }
-	public static multiply(left: FDecimal, right: FDecimal, roundMode?: FDecimal.RoundMode): FDecimal { return FDecimal.backend.multiply(left, right, roundMode); }
+	public static mod(left: FDecimal, right: FDecimal, roundMode?: FDecimalRoundMode): FDecimal { return FDecimal.backend.mod(left, right, roundMode); }
+	public static multiply(left: FDecimal, right: FDecimal, roundMode?: FDecimalRoundMode): FDecimal { return FDecimal.backend.multiply(left, right, roundMode); }
 	public static parse(value: string): FDecimal { return FDecimal.backend.parse(value); }
-	public static round(value: FDecimal, fractionDigits: FDecimal.FractionDigits, roundMode?: FDecimal.RoundMode): FDecimal { return FDecimal.backend.round(value, fractionDigits, roundMode); }
+	public static round(value: FDecimal, fractionDigits: FDecimalFraction, roundMode?: FDecimalRoundMode): FDecimal { return FDecimal.backend.round(value, fractionDigits, roundMode); }
 	public static subtract(left: FDecimal, right: FDecimal): FDecimal { return FDecimal.backend.subtract(left, right); }
 
 	public abstract abs(): FDecimal;
 	public abstract add(value: FDecimal): FDecimal;
-	public abstract divide(value: FDecimal, roundMode?: FDecimal.RoundMode): FDecimal;
+	public abstract divide(value: FDecimal, roundMode?: FDecimalRoundMode): FDecimal;
 	public abstract equals(value: FDecimal): boolean;
 	public abstract inverse(): FDecimal;
 	public abstract isNegative(): boolean;
 	public abstract isPositive(): boolean;
 	public abstract isZero(): boolean;
-	public abstract mod(value: FDecimal, roundMode?: FDecimal.RoundMode): FDecimal;
-	public abstract multiply(value: FDecimal, roundMode?: FDecimal.RoundMode): FDecimal;
-	public abstract round(fractionDigits: FDecimal.FractionDigits, roundMode?: FDecimal.RoundMode): FDecimal;
+	public abstract mod(value: FDecimal, roundMode?: FDecimalRoundMode): FDecimal;
+	public abstract multiply(value: FDecimal, roundMode?: FDecimalRoundMode): FDecimal;
+	public abstract round(fractionDigits: FDecimalFraction, roundMode?: FDecimalRoundMode): FDecimal;
 	public abstract subtract(value: FDecimal): FDecimal;
 	public abstract toNumber(): number;
 	public abstract toString(): string;
 	public abstract toJSON(): string;
 }
 
-export namespace FDecimal {
-	export type FractionDigits = number;
-	export namespace FractionDigits {
-		export function isFraction(test: number): test is FDecimal.FractionDigits {
-			return Number.isSafeInteger(test) && test >= 0;
-		}
-		export function verifyFraction(test: FDecimal.FractionDigits): asserts test is FDecimal.FractionDigits {
-			if (!isFraction(test)) {
-				throw new FExceptionArgument("Wrong argument fraction. Expected integer >= 0");
-			}
-		}
-	}
-
-	export interface Backend {
-		readonly settings: FDecimal.Settings;
-
-		/**
-		 * Analog of Math​.abs()
-		 * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/abs
-		 */
-		abs(value: FDecimal): FDecimal;
-		add(left: FDecimal, right: FDecimal): FDecimal;
-		divide(left: FDecimal, right: FDecimal, roundMode?: FDecimal.RoundMode): FDecimal;
-		equals(left: FDecimal, right: FDecimal): boolean;
-		fromFloat(value: number, roundMode?: FDecimal.RoundMode): FDecimal;
-		fromInt(value: number): FDecimal;
-		gt(left: FDecimal, right: FDecimal): boolean;
-		gte(left: FDecimal, right: FDecimal): boolean;
-		inverse(value: FDecimal): FDecimal;
-		isDecimal(test: any): test is FDecimal;
-		isNegative(test: FDecimal): boolean;
-		isPositive(test: FDecimal): boolean;
-		isZero(test: FDecimal): boolean;
-		lt(left: FDecimal, right: FDecimal): boolean;
-		lte(left: FDecimal, right: FDecimal): boolean;
-
-		/**
-		 * Analog of Math.max()
-		 * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/max
-		 */
-		max(left: FDecimal, right: FDecimal): FDecimal;
-		/**
-		 * Analog of Math.min()
-		 * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/min
-		 */
-		min(left: FDecimal, right: FDecimal): FDecimal;
-		mod(left: FDecimal, right: FDecimal, roundMode?: FDecimal.RoundMode): FDecimal;
-		multiply(left: FDecimal, right: FDecimal, roundMode?: FDecimal.RoundMode): FDecimal;
-		parse(value: string): FDecimal;
-		round(value: FDecimal, fractionDigits: FDecimal.FractionDigits, roundMode?: FDecimal.RoundMode): FDecimal;
-		subtract(left: FDecimal, right: FDecimal): FDecimal;
-
-		toNumber(value: FDecimal): number;
-		toString(value: FDecimal): string;
-	}
-
-	export const enum RoundMode {
-		/**
-		 * Round to the smallest Financial greater than or equal to a given Financial.
-		 * 
-		 * In other words: Round UP
-		 * 
-		 * Example of Ceil to fraction:2 
-		 * * 0.595 -> 0.60
-		 * * 0.555 -> 0.56
-		 * * 0.554 -> 0.56
-		 * * -0.595 -> -0.59
-		 * * -0.555 -> -0.55
-		 * * -0.554 -> -0.55
-		 */
-		Ceil = "Ceil",
-
-		/**
-		 * Round to the largest Financial less than or equal to a given Financial.
-		 * 
-		 * In other words: Round DOWN
-		 * 
-		 * Example of Floor to fraction:2 
-		 * * 0.595 -> 0.59
-		 * * 0.555 -> 0.55
-		 * * 0.554 -> 0.55
-		 * * -0.595 -> -0.60
-		 * * -0.555 -> -0.56
-		 * * -0.554 -> -0.56
-		 */
-		Floor = "Floor",
-
-		/**
-		 * Round to the Financial rounded to the nearest Financial.
-		 * 
-		 * In other words: Round classic
-		 * 
-		 * Example of Round to fraction:2
-		 * * 0.595 -> 0.60
-		 * * 0.555 -> 0.56
-		 * * 0.554 -> 0.55
-		 * * -0.595 -> -0.60
-		 * * -0.555 -> -0.55
-		 * * -0.554 -> -0.55
-		 */
-		Round = "Round",
-
-		/**
-		 * Round to the Financial by removing fractional digits.
-		 * 
-		 * Works same as Floor in positive range.
-		 * 
-		 * Works same as Ceil in negative range
-		 * 
-		 * Example of Trunc to fraction:2 
-		 * * 0.595 -> 0.59
-		 * * 0.555 -> 0.55
-		 * * 0.554 -> 0.55
-		 * * -0.595 -> -0.59
-		 * * -0.555 -> -0.55
-		 * * -0.554 -> -0.55
-		 */
-		Trunc = "Trunc"
-	}
-
-	export interface Settings {
-		readonly decimalSeparator: string;
-		readonly fractionalDigits: number;
-		readonly roundMode: FDecimal.RoundMode;
-	}
-
-	export class UnreachableRoundMode extends FException {
-		public constructor(roundMode: never) {
-			super(`Unsupported round mode: ${roundMode}`);
-		}
+export type FDecimalFraction = number;
+export function isDecimalFraction(test: number): test is FDecimalFraction {
+	return Number.isSafeInteger(test) && test >= 0;
+}
+export function verifyDecimalFraction(test: FDecimalFraction): asserts test is FDecimalFraction {
+	if (!isDecimalFraction(test)) {
+		throw new FExceptionArgument("Wrong argument fraction. Expected integer >= 0");
 	}
 }
 
+export const enum FDecimalRoundMode {
+	/**
+	 * Round to the smallest Financial greater than or equal to a given Financial.
+	 * 
+	 * In other words: Round UP
+	 * 
+	 * Example of Ceil to fraction:2 
+	 * * 0.595 -> 0.60
+	 * * 0.555 -> 0.56
+	 * * 0.554 -> 0.56
+	 * * -0.595 -> -0.59
+	 * * -0.555 -> -0.55
+	 * * -0.554 -> -0.55
+	 */
+	Ceil = "Ceil",
 
-export class FDecimalBase<TInstance, TBackend extends FDecimal.Backend> implements FDecimal {
+	/**
+	 * Round to the largest Financial less than or equal to a given Financial.
+	 * 
+	 * In other words: Round DOWN
+	 * 
+	 * Example of Floor to fraction:2 
+	 * * 0.595 -> 0.59
+	 * * 0.555 -> 0.55
+	 * * 0.554 -> 0.55
+	 * * -0.595 -> -0.60
+	 * * -0.555 -> -0.56
+	 * * -0.554 -> -0.56
+	 */
+	Floor = "Floor",
+
+	/**
+	 * Round to the Financial rounded to the nearest Financial.
+	 * 
+	 * In other words: Round classic
+	 * 
+	 * Example of Round to fraction:2
+	 * * 0.595 -> 0.60
+	 * * 0.555 -> 0.56
+	 * * 0.554 -> 0.55
+	 * * -0.595 -> -0.60
+	 * * -0.555 -> -0.55
+	 * * -0.554 -> -0.55
+	 */
+	Round = "Round",
+
+	/**
+	 * Round to the Financial by removing fractional digits.
+	 * 
+	 * Works same as Floor in positive range.
+	 * 
+	 * Works same as Ceil in negative range
+	 * 
+	 * Example of Trunc to fraction:2 
+	 * * 0.595 -> 0.59
+	 * * 0.555 -> 0.55
+	 * * 0.554 -> 0.55
+	 * * -0.595 -> -0.59
+	 * * -0.555 -> -0.55
+	 * * -0.554 -> -0.55
+	 */
+	Trunc = "Trunc"
+}
+
+export class FDecimalRoundModeUnreachableException extends FException {
+	public constructor(roundMode: never) {
+		super(`Unsupported round mode: ${roundMode}`);
+	}
+}
+
+export interface FDecimalBackend {
+	readonly settings: FDecimalSettings;
+
+	/**
+	 * Analog of Math​.abs()
+	 * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/abs
+	 */
+	abs(value: FDecimal): FDecimal;
+	add(left: FDecimal, right: FDecimal): FDecimal;
+	divide(left: FDecimal, right: FDecimal, roundMode?: FDecimalRoundMode): FDecimal;
+	equals(left: FDecimal, right: FDecimal): boolean;
+	fromFloat(value: number, roundMode?: FDecimalRoundMode): FDecimal;
+	fromInt(value: number): FDecimal;
+	gt(left: FDecimal, right: FDecimal): boolean;
+	gte(left: FDecimal, right: FDecimal): boolean;
+	inverse(value: FDecimal): FDecimal;
+	isDecimal(test: any): test is FDecimal;
+	isNegative(test: FDecimal): boolean;
+	isPositive(test: FDecimal): boolean;
+	isZero(test: FDecimal): boolean;
+	lt(left: FDecimal, right: FDecimal): boolean;
+	lte(left: FDecimal, right: FDecimal): boolean;
+
+	/**
+	 * Analog of Math.max()
+	 * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/max
+	 */
+	max(left: FDecimal, right: FDecimal): FDecimal;
+	/**
+	 * Analog of Math.min()
+	 * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/min
+	 */
+	min(left: FDecimal, right: FDecimal): FDecimal;
+	mod(left: FDecimal, right: FDecimal, roundMode?: FDecimalRoundMode): FDecimal;
+	multiply(left: FDecimal, right: FDecimal, roundMode?: FDecimalRoundMode): FDecimal;
+	parse(value: string): FDecimal;
+	round(value: FDecimal, fractionDigits: FDecimalFraction, roundMode?: FDecimalRoundMode): FDecimal;
+	subtract(left: FDecimal, right: FDecimal): FDecimal;
+
+	toNumber(value: FDecimal): number;
+	toString(value: FDecimal): string;
+}
+
+export interface FDecimalSettings {
+	readonly decimalSeparator: string;
+	readonly fractionalDigits: number;
+	readonly roundMode: FDecimalRoundMode;
+}
+
+export namespace FDecimal {
+	/**
+	 * @deprecated Use FDecimalFraction instead
+	 */
+	export type FractionDigits = FDecimalFraction;
+	/**
+	 * @deprecated Use FDecimalFraction instead
+	 */
+	export namespace FractionDigits {
+		/**
+		 * @deprecated Use isDecimalFraction instead
+		 */
+		export const isDecimalFractionDigits: (test: number) => test is FDecimalFraction = isDecimalFraction;
+		/**
+		 * @deprecated Use verifyDecimalFraction instead
+		 */
+		export const verifyFraction: (test: FDecimalFraction) => asserts test is FDecimalFraction = verifyDecimalFraction;
+	}
+
+	/**
+	 * @deprecated Use FDecimalBackend instead
+	 */
+	export type Backend = FDecimalBackend;
+
+	/**
+	 * @deprecated Use FDecimalRoundMode instead
+	 */
+	export type RoundMode = FDecimalRoundMode;
+
+	/**
+	 * Use FDecimalSettings instead
+	 */
+	export type Settings = FDecimalSettings;
+
+	/**
+	 * @deprecated Use FDecimalRoundModeUnreachableException instead
+	 */
+	export type UnreachableRoundMode = FDecimalRoundModeUnreachableException;
+}
+
+
+export class FDecimalBase<TInstance, TBackend extends FDecimalBackend> implements FDecimal {
 	private readonly _instance: TInstance;
 	private readonly _backend: TBackend;
 
@@ -235,7 +271,7 @@ export class FDecimalBase<TInstance, TBackend extends FDecimal.Backend> implemen
 		return this._backend.add(this, value);
 	}
 
-	public divide(value: FDecimal, roundMode?: FDecimal.RoundMode): FDecimal {
+	public divide(value: FDecimal, roundMode?: FDecimalRoundMode): FDecimal {
 		return this._backend.divide(this, value, roundMode);
 	}
 
@@ -263,11 +299,11 @@ export class FDecimalBase<TInstance, TBackend extends FDecimal.Backend> implemen
 		return this._backend.mod(this, value);
 	}
 
-	public multiply(value: FDecimal, roundMode?: FDecimal.RoundMode): FDecimal {
+	public multiply(value: FDecimal, roundMode?: FDecimalRoundMode): FDecimal {
 		return this._backend.multiply(this, value, roundMode);
 	}
 
-	public round(fractionDigits: FDecimal.FractionDigits, roundMode?: FDecimal.RoundMode): FDecimal {
+	public round(fractionDigits: FDecimalFraction, roundMode?: FDecimalRoundMode): FDecimal {
 		return this._backend.round(this, fractionDigits, roundMode);
 	}
 
@@ -290,19 +326,19 @@ export class FDecimalBase<TInstance, TBackend extends FDecimal.Backend> implemen
 	protected get backend(): TBackend { return this._backend; }
 }
 
-export class FDecimalBackendNumber implements FDecimal.Backend {
+export class FDecimalBackendNumber implements FDecimalBackend {
 	private static verifyInstance(test: FDecimal): asserts test is _FDecimalNumber {
 		if (test instanceof _FDecimalNumber) { return; }
 		throw new FExceptionInvalidOperation(`Mixed '${FDecimal.name}' implementations detected.`);
 	}
 
-	public readonly settings: FDecimal.Settings;
+	public readonly settings: FDecimalSettings;
 
 	/**
 	 * 
-	 * @param roundMode Default value is FDecimal.RoundMode.Round
+	 * @param roundMode Default value is FDecimalRoundMode.Round
 	 */
-	public constructor(fractionalDigits: number, roundMode: FDecimal.RoundMode) {
+	public constructor(fractionalDigits: number, roundMode: FDecimalRoundMode) {
 		if (fractionalDigits < 0 || fractionalDigits > 20) {
 			throw new FExceptionArgument("Range 0..20 overflow", "fractionalDigits");
 		}
@@ -324,7 +360,7 @@ export class FDecimalBackendNumber implements FDecimal.Backend {
 		return new _FDecimalNumber(left.instance + right.instance, this);
 	}
 
-	public divide(left: FDecimal, right: FDecimal, roundMode?: FDecimal.RoundMode | undefined): FDecimal {
+	public divide(left: FDecimal, right: FDecimal, roundMode?: FDecimalRoundMode | undefined): FDecimal {
 		FDecimalBackendNumber.verifyInstance(left);
 		FDecimalBackendNumber.verifyInstance(right);
 		const divideValueInstance: number = left.instance / right.instance;
@@ -338,7 +374,7 @@ export class FDecimalBackendNumber implements FDecimal.Backend {
 		return left.instance === right.instance;
 	}
 
-	public fromFloat(value: number, roundMode?: FDecimal.RoundMode | undefined): FDecimal {
+	public fromFloat(value: number, roundMode?: FDecimalRoundMode | undefined): FDecimal {
 		return new _FDecimalNumber(value, this);
 	}
 
@@ -406,7 +442,7 @@ export class FDecimalBackendNumber implements FDecimal.Backend {
 		return new _FDecimalNumber(Math.min(left.instance, right.instance), this);
 	}
 
-	public mod(left: FDecimal, right: FDecimal, roundMode?: FDecimal.RoundMode): FDecimal {
+	public mod(left: FDecimal, right: FDecimal, roundMode?: FDecimalRoundMode): FDecimal {
 		FDecimalBackendNumber.verifyInstance(left);
 		FDecimalBackendNumber.verifyInstance(right);
 		const modValueInstance: number = left.instance % right.instance;
@@ -414,7 +450,7 @@ export class FDecimalBackendNumber implements FDecimal.Backend {
 		return new _FDecimalNumber(roundedModValueInstance, this);
 	}
 
-	public multiply(left: FDecimal, right: FDecimal, roundMode?: FDecimal.RoundMode | undefined): FDecimal {
+	public multiply(left: FDecimal, right: FDecimal, roundMode?: FDecimalRoundMode | undefined): FDecimal {
 		FDecimalBackendNumber.verifyInstance(left);
 		FDecimalBackendNumber.verifyInstance(right);
 		const multiplyValueInstance: number = left.instance * right.instance;
@@ -426,14 +462,14 @@ export class FDecimalBackendNumber implements FDecimal.Backend {
 		return new _FDecimalNumber(Number.parseFloat(value), this);
 	}
 
-	public round(value: FDecimal, fractionDigits: number, roundMode?: FDecimal.RoundMode | undefined): FDecimal {
+	public round(value: FDecimal, fractionDigits: number, roundMode?: FDecimalRoundMode | undefined): FDecimal {
 		FDecimalBackendNumber.verifyInstance(value);
 
 		const roundedValueInstance = this._round(value.instance, fractionDigits, roundMode);
 
 		return new _FDecimalNumber(roundedValueInstance, this);
 	}
-	private _round(valueInstance: number, fractionDigits: number, roundMode?: FDecimal.RoundMode | undefined): number {
+	private _round(valueInstance: number, fractionDigits: number, roundMode?: FDecimalRoundMode | undefined): number {
 		class UnreachableRoundModeException extends FExceptionInvalidOperation {
 			public constructor(_: never) { super(); }
 		}
@@ -448,13 +484,13 @@ export class FDecimalBackendNumber implements FDecimal.Backend {
 
 		let powedRoundedValueInstance: number;
 		switch (roundMode) {
-			case FDecimal.RoundMode.Ceil:
+			case FDecimalRoundMode.Ceil:
 				powedRoundedValueInstance = Math.ceil(powedValueInstance); break;
-			case FDecimal.RoundMode.Floor:
+			case FDecimalRoundMode.Floor:
 				powedRoundedValueInstance = Math.floor(powedValueInstance); break;
-			case FDecimal.RoundMode.Round:
+			case FDecimalRoundMode.Round:
 				powedRoundedValueInstance = Math.round(powedValueInstance); break;
-			case FDecimal.RoundMode.Trunc:
+			case FDecimalRoundMode.Trunc:
 				powedRoundedValueInstance = Math.trunc(powedValueInstance); break;
 			default:
 				throw new UnreachableRoundModeException(roundMode);

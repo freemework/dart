@@ -1,5 +1,4 @@
 import * as http from "http";
-import { URL } from "url";
 import { assert } from "chai";
 
 import { FWebClient } from "../../src";
@@ -43,7 +42,7 @@ describe("WebClient tests", function () {
 			}
 
 			// 4 competed
-			// 6 errors - Limit tiimeout
+			// 6 errors - Limit timeout
 			assert.equal(completeCount + errors.length, 10);
 		});
 
@@ -51,7 +50,7 @@ describe("WebClient tests", function () {
 			const apiClient = new MyApiClient(new URL("http://www.google.com"), {
 				limit: {
 					instance: { perSecond: 2, perMinute: 4, perHour: 50, parallel: 2 },
-					timeout: 3000 // timeout for accure token
+					timeout: 3000 // timeout for accrue token
 				},
 				httpClient: {
 					timeout: 1000 // timeout for web request

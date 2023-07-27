@@ -6,23 +6,23 @@ import { FExecutionContext } from "../execution_context";
  * @param cancellationToken The cancellation token to cancel "sleeping"
  * @param ms Timeout delay in milliseconds. If ommited, the "sleeping" `Promise` will sleep infinitely and wait for cancellation token activation
  * @example
- * await Fsleep(FCancellationToken.Dummy, 25); // Suspend execution for 25 milliseconds
+ * await FSleep(FCancellationToken.Dummy, 25); // Suspend execution for 25 milliseconds
  * @example
  * const cancellationTokenSource = new FCancellationTokenSourceManual();
  * ...
- * await Fsleep(cancellationTokenSource.token, 25); // Suspend execution for 25 milliseconds or cancel if cancellationTokenSource activates
+ * await FSleep(cancellationTokenSource.token, 25); // Suspend execution for 25 milliseconds or cancel if cancellationTokenSource activates
  * @example
  * const cancellationTokenSource = new FCancellationTokenSourceManual();
  * ...
- * await Fsleep(cancellationTokenSource.token); // Suspend infinitely while cancellationTokenSource activates
+ * await FSleep(cancellationTokenSource.token); // Suspend infinitely while cancellationTokenSource activates
  * @example
  * const executionContext: FExecutionContext = ...;
  * ...
- * await Fsleep(executionContext); // Cancellation token will extracted from execution context
+ * await FSleep(executionContext); // Cancellation token will extracted from execution context
  */
-export function Fsleep(cancellationToken: FCancellationToken, ms?: number): Promise<void>;
-export function Fsleep(executionContext: FExecutionContext, ms?: number): Promise<void>;
-export function Fsleep(data: FExecutionContext | FCancellationToken, ms?: number): Promise<void> {
+export function FSleep(cancellationToken: FCancellationToken, ms?: number): Promise<void>;
+export function FSleep(executionContext: FExecutionContext, ms?: number): Promise<void>;
+export function FSleep(data: FExecutionContext | FCancellationToken, ms?: number): Promise<void> {
 	const cancellationToken: FCancellationToken = data instanceof FExecutionContext
 		? FCancellationExecutionContext.of(data).cancellationToken
 		: data;
