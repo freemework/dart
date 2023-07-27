@@ -11,7 +11,7 @@ export { FDecimalBackendBigNumber } from "./FDecimalBackendBigNumber";
 // export * from "./FinancialOperation";
 // export * from "./Settings";
 
-// export function setup(backend: FDecimal.Backend, settings: Settings): FinancialOperation {
+// export function setup(backend: FDecimalBackend, settings: Settings): FinancialOperation {
 // 	const backendClass = (function () {
 // 		switch (backend) {
 // 			case testBackend: {
@@ -51,7 +51,7 @@ export { FDecimalBackendBigNumber } from "./FDecimalBackendBigNumber";
 // 			throw new Error("Wrong arguments passed");
 // 		},
 
-// 		divide(left: any, right: any, roundMode?: FDecimal.RoundMode): any {
+// 		divide(left: any, right: any, roundMode?: FDecimalRoundMode): any {
 // 			if (left instanceof backendClass && right instanceof backendClass) {
 // 				return left.divide(right, settings.defaultRoundOpts.fractionalDigits, settings.defaultRoundOpts.roundMode);
 // 			} else if (_.isString(left) && _.isString(right)) {
@@ -82,7 +82,7 @@ export { FDecimalBackendBigNumber } from "./FDecimalBackendBigNumber";
 // 			return backendClass.ensureNullable(value, errorMessage);
 // 		},
 
-// 		fromFloat(value: number, roundMode?: FDecimal.RoundMode): FDecimal {
+// 		fromFloat(value: number, roundMode?: FDecimalRoundMode): FDecimal {
 // 			if (roundMode !== undefined) {
 // 				const overridenSettings: Settings = Object.freeze({
 // 					decimalSeparator: settings.decimalSeparator,
@@ -210,7 +210,7 @@ export { FDecimalBackendBigNumber } from "./FDecimalBackendBigNumber";
 // 			throw new Error("Wrong arguments passed");
 // 		},
 
-// 		mod(left: any, right: any, roundMode?: FDecimal.RoundMode): any {
+// 		mod(left: any, right: any, roundMode?: FDecimalRoundMode): any {
 // 			if (left instanceof backendClass && right instanceof backendClass) {
 // 				return left.mod(right, settings.defaultRoundOpts.fractionalDigits, settings.defaultRoundOpts.roundMode);
 // 			} else if (_.isString(left) && _.isString(right)) {
@@ -221,7 +221,7 @@ export { FDecimalBackendBigNumber } from "./FDecimalBackendBigNumber";
 // 			throw new Error("Wrong arguments passed");
 // 		},
 
-// 		multiply(left: any, right: any, roundMode?: FDecimal.RoundMode): any {
+// 		multiply(left: any, right: any, roundMode?: FDecimalRoundMode): any {
 // 			if (left instanceof backendClass && right instanceof backendClass) {
 // 				return left.multiply(right, settings.defaultRoundOpts.fractionalDigits, settings.defaultRoundOpts.roundMode);
 // 			} else if (_.isString(left) && _.isString(right)) {
@@ -240,7 +240,7 @@ export { FDecimalBackendBigNumber } from "./FDecimalBackendBigNumber";
 // 			throw new Error("Wrong arguments passed");
 // 		},
 
-// 		round(value: any, fractionDigits: FDecimal.FractionDigits, roundMode?: FDecimal.RoundMode): any {
+// 		round(value: any, fractionDigits: FDecimalFraction, roundMode?: FDecimalRoundMode): any {
 // 			if (value instanceof backendClass) {
 // 				return value.round(fractionDigits, roundMode || settings.defaultRoundOpts.roundMode);
 // 			} else if (_.isString(value)) {
@@ -289,7 +289,7 @@ export { FDecimalBackendBigNumber } from "./FDecimalBackendBigNumber";
 // 	decimalSeparator: ".",
 // 	defaultRoundOpts: {
 // 		fractionalDigits: 18,
-// 		roundMode: FDecimal.RoundMode.Round
+// 		roundMode: FDecimalRoundMode.Round
 // 	}
 // });
 

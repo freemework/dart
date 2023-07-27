@@ -1,11 +1,11 @@
-import { FDecimal } from "@freemework/common";
+import { FDecimal, FDecimalBackend, FDecimalRoundMode } from "@freemework/common";
 
 import { assert } from "chai";
 
 import { FDecimalBackendBigNumber } from "../../src/index";
 
 describe(`toJSON tests`, function () {
-	before(() => { FDecimal.configure(new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Round)); });
+	before(() => { FDecimal.configure(new FDecimalBackendBigNumber(10, FDecimalRoundMode.Round)); });
 	after(() => { (FDecimal as any)._cfg = null; });
 
 	it("toJSON() should represent decimal string", function () {

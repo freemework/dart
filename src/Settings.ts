@@ -33,6 +33,6 @@
 
 // 	export interface RoundOptions {
 // 		readonly fractionalDigits: number;
-// 		readonly roundMode: FDecimal.RoundMode;
+// 		readonly roundMode: FDecimalRoundMode;
 // 	}
 // }

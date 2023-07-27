@@ -1,6 +1,15 @@
 // This module provide a wrapper over https://www.npmjs.com/package/bignumber.js
 
-import { FDecimal, FDecimalBase, FException, FExceptionArgument, FExceptionInvalidOperation } from "@freemework/common";
+import {
+	FDecimal, FDecimalBase,
+	FDecimalBackend,
+	FDecimalRoundMode,
+	FDecimalSettings,
+	FException,
+	FExceptionArgument,
+	FExceptionInvalidOperation,
+	FDecimalFractionDigits
+} from "@freemework/common";
 
 import { BigNumber } from "bignumber.js";
 
@@ -19,7 +28,7 @@ class _FDecimalBigNumber extends FDecimalBase<BigNumber, FDecimalBackendBigNumbe
 	public get backend(): FDecimalBackendBigNumber { return super.backend; }
 }
 
-export class FDecimalBackendBigNumber implements FDecimal.Backend {
+export class FDecimalBackendBigNumber implements FDecimalBackend {
 	private static verifyText(test: string): void {
 		if (!FDecimal.REGEXP.test(test)) {
 			throw new FExceptionArgument(`Bad FDecimal value: ${test}`);
@@ -31,13 +40,13 @@ export class FDecimalBackendBigNumber implements FDecimal.Backend {
 		throw new FExceptionInvalidOperation(`Mixed '${FDecimal.name}' implementations detected.`);
 	}
 
-	public readonly settings: FDecimal.Settings;
+	public readonly settings: FDecimalSettings;
 
 	/**
 	 * 
-	 * @param roundMode Default value is FDecimal.RoundMode.Round
+	 * @param roundMode Default value is FDecimalRoundMode.Round
 	 */
-	public constructor(fractionalDigits: number, roundMode: FDecimal.RoundMode) {
+	public constructor(fractionalDigits: number, roundMode: FDecimalRoundMode) {
 		if (fractionalDigits < 0 || fractionalDigits > 32) {
 			throw new FExceptionArgument("Range 0..32 overflow", "fractionalDigits");
 		}
@@ -64,7 +73,7 @@ export class FDecimalBackendBigNumber implements FDecimal.Backend {
 		return new _FDecimalBigNumber(result, this);
 	}
 
-	public divide(left: FDecimal, right: FDecimal, roundMode?: FDecimal.RoundMode): FDecimal {
+	public divide(left: FDecimal, right: FDecimal, roundMode?: FDecimalRoundMode): FDecimal {
 		this.verifyInstance(left);
 		this.verifyInstance(right);
 		const unwrapLeftValue: BigNumber = left.instance;
@@ -94,27 +103,27 @@ export class FDecimalBackendBigNumber implements FDecimal.Backend {
 		return result;
 	}
 
-	public fromFloat(value: number, roundMode?: FDecimal.RoundMode): FDecimal {
+	public fromFloat(value: number, roundMode?: FDecimalRoundMode): FDecimal {
 
-		const fractionalDigits: FDecimal.FractionDigits = this.settings.fractionalDigits;
+		const fractionalDigits: FDecimalFractionDigits = this.settings.fractionalDigits;
 
 		const BN = getBigNumberImpl(fractionalDigits);
 		const raw = new BN(value);
 
 		if (fractionalDigits < raw.decimalPlaces()!) {
 			let rawRoundMode: BigNumber.RoundingMode;
-			const roundMode: FDecimal.RoundMode = this.settings.roundMode;
+			const roundMode: FDecimalRoundMode = this.settings.roundMode;
 			switch (roundMode) {
-				case FDecimal.RoundMode.Ceil:
+				case FDecimalRoundMode.Ceil:
 					rawRoundMode = BigNumber.ROUND_CEIL;
 					break;
-				case FDecimal.RoundMode.Floor:
+				case FDecimalRoundMode.Floor:
 					rawRoundMode = BigNumber.ROUND_FLOOR;
 					break;
-				case FDecimal.RoundMode.Round:
+				case FDecimalRoundMode.Round:
 					rawRoundMode = BigNumber.ROUND_HALF_EVEN;
 					break;
-				case FDecimal.RoundMode.Trunc:
+				case FDecimalRoundMode.Trunc:
 					rawRoundMode = BigNumber.ROUND_DOWN;
 					break;
 				default:
@@ -225,7 +234,7 @@ export class FDecimalBackendBigNumber implements FDecimal.Backend {
 		return new _FDecimalBigNumber(result, this);
 	}
 
-	public mod(left: FDecimal, right: FDecimal, roundMode?: FDecimal.RoundMode): FDecimal {
+	public mod(left: FDecimal, right: FDecimal, roundMode?: FDecimalRoundMode): FDecimal {
 		this.verifyInstance(left);
 		this.verifyInstance(right);
 		const unwrapLeftValue: BigNumber = left.instance;
@@ -246,7 +255,7 @@ export class FDecimalBackendBigNumber implements FDecimal.Backend {
 		return new _FDecimalBigNumber(roundedResult, this);
 	}
 
-	public multiply(left: FDecimal, right: FDecimal, roundMode?: FDecimal.RoundMode): FDecimal {
+	public multiply(left: FDecimal, right: FDecimal, roundMode?: FDecimalRoundMode): FDecimal {
 		this.verifyInstance(left);
 		this.verifyInstance(right);
 		const unwrapLeftValue: BigNumber = left.instance;
@@ -303,7 +312,7 @@ export class FDecimalBackendBigNumber implements FDecimal.Backend {
 		}
 	}
 
-	public round(value: FDecimal, fractionDigits: number, roundMode?: FDecimal.RoundMode): FDecimal {
+	public round(value: FDecimal, fractionDigits: number, roundMode?: FDecimalRoundMode): FDecimal {
 		FractionDigitsGuard.verifyFraction(fractionDigits);
 		this.verifyInstance(value);
 
@@ -344,12 +353,12 @@ export class FDecimalBackendBigNumber implements FDecimal.Backend {
 		return result;
 	}
 
-	private static convertRoundMode(roundMode: FDecimal.RoundMode, isPositive: boolean): BigNumber.RoundingMode {
+	private static convertRoundMode(roundMode: FDecimalRoundMode, isPositive: boolean): BigNumber.RoundingMode {
 		switch (roundMode) {
-			case FDecimal.RoundMode.Ceil: return isPositive === true ? BigNumber.ROUND_UP : BigNumber.ROUND_DOWN;
-			case FDecimal.RoundMode.Floor: return isPositive === true ? BigNumber.ROUND_DOWN : BigNumber.ROUND_UP;
-			case FDecimal.RoundMode.Round: return isPositive === true ? BigNumber.ROUND_HALF_UP : BigNumber.ROUND_HALF_DOWN;
-			case FDecimal.RoundMode.Trunc: return BigNumber.ROUND_DOWN;
+			case FDecimalRoundMode.Ceil: return isPositive === true ? BigNumber.ROUND_UP : BigNumber.ROUND_DOWN;
+			case FDecimalRoundMode.Floor: return isPositive === true ? BigNumber.ROUND_DOWN : BigNumber.ROUND_UP;
+			case FDecimalRoundMode.Round: return isPositive === true ? BigNumber.ROUND_HALF_UP : BigNumber.ROUND_HALF_DOWN;
+			case FDecimalRoundMode.Trunc: return BigNumber.ROUND_DOWN;
 			default:
 				throw new FDecimalBackendBigNumber.UnreachableRoundMode(roundMode);
 		}
@@ -365,10 +374,10 @@ export namespace FDecimalBackendBigNumber {
 }
 
 namespace FractionDigitsGuard {
-	export function isFraction(test: number): test is FDecimal.FractionDigits {
+	export function isFraction(test: number): test is FDecimalFractionDigits {
 		return Number.isSafeInteger(test) && test >= 0;
 	}
-	export function verifyFraction(test: FDecimal.FractionDigits): asserts test is FDecimal.FractionDigits {
+	export function verifyFraction(test: FDecimalFractionDigits): asserts test is FDecimalFractionDigits {
 		if (!isFraction(test)) {
 			throw new FExceptionArgument("Wrong argument fraction. Expected integer >= 0");
 		}

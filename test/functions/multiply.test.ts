@@ -1,4 +1,4 @@
-import { FDecimal } from "@freemework/common";
+import { FDecimal, FDecimalBackend, FDecimalRoundMode } from "@freemework/common";
 
 import { assert } from "chai";
 
@@ -8,50 +8,50 @@ type TestCases = Array<[
 	/*left: */string,
 	/*right: */string,
 	/*expectedResult: */string,
-	/*backends: */Array<FDecimal.Backend>
+	/*backends: */Array<FDecimalBackend>
 ]>;
 
 const testCases: TestCases = [
-	["0.5", "3.3333333333", "1.6666666667", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Round)]],
-	["-0.5", "3.3333333333", "-1.6666666666", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Round)]],
-	["-0.5", "-3.3333333333", "1.6666666667", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Round)]],
-	["0.5", "-3.3333333333", "-1.6666666666", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Round)]],
-	["0.5", "3.3333333333", "1.6666666667", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Ceil)]],
-	["-0.5", "3.3333333333", "-1.6666666666", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Ceil)]],
-	["-0.5", "-3.3333333333", "1.6666666667", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Ceil)]],
-	["0.5", "-3.3333333333", "-1.6666666666", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Ceil)]],
-	["0.5", "3.3333333333", "1.6666666666", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Floor)]],
-	["-0.5", "3.3333333333", "-1.6666666667", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Floor)]],
-	["-0.5", "-3.3333333333", "1.6666666666", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Floor)]],
-	["0.5", "-3.3333333333", "-1.6666666667", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Floor)]],
-	["0.5", "3.3333333333", "1.6666666666", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Trunc)]],
-	["-0.5", "3.3333333333", "-1.6666666666", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Trunc)]],
-	["-0.5", "-3.3333333333", "1.6666666666", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Trunc)]],
-	["0.5", "-3.3333333333", "-1.6666666666", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Trunc)]],
+	["0.5", "3.3333333333", "1.6666666667", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Round)]],
+	["-0.5", "3.3333333333", "-1.6666666666", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Round)]],
+	["-0.5", "-3.3333333333", "1.6666666667", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Round)]],
+	["0.5", "-3.3333333333", "-1.6666666666", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Round)]],
+	["0.5", "3.3333333333", "1.6666666667", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Ceil)]],
+	["-0.5", "3.3333333333", "-1.6666666666", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Ceil)]],
+	["-0.5", "-3.3333333333", "1.6666666667", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Ceil)]],
+	["0.5", "-3.3333333333", "-1.6666666666", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Ceil)]],
+	["0.5", "3.3333333333", "1.6666666666", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Floor)]],
+	["-0.5", "3.3333333333", "-1.6666666667", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Floor)]],
+	["-0.5", "-3.3333333333", "1.6666666666", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Floor)]],
+	["0.5", "-3.3333333333", "-1.6666666667", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Floor)]],
+	["0.5", "3.3333333333", "1.6666666666", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Trunc)]],
+	["-0.5", "3.3333333333", "-1.6666666666", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Trunc)]],
+	["-0.5", "-3.3333333333", "1.6666666666", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Trunc)]],
+	["0.5", "-3.3333333333", "-1.6666666666", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Trunc)]],
 
-	["0.5000000001", "3.3333333333", "1.666666667", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Round)]],
-	["-0.5000000001", "3.3333333333", "-1.666666667", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Round)]],
-	["-0.5000000001", "-3.3333333333", "1.666666667", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Round)]],
-	["0.5000000001", "-3.3333333333", "-1.666666667", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Round)]],
-	["0.5000000001", "3.3333333333", "1.666666667", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Ceil)]],
-	["-0.5000000001", "3.3333333333", "-1.6666666669", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Ceil)]],
-	["-0.5000000001", "-3.3333333333", "1.666666667", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Ceil)]],
-	["0.5000000001", "-3.3333333333", "-1.6666666669", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Ceil)]],
-	["0.5000000001", "3.3333333333", "1.6666666669", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Floor)]],
-	["-0.5000000001", "3.3333333333", "-1.666666667", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Floor)]],
-	["-0.5000000001", "-3.3333333333", "1.6666666669", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Floor)]],
-	["0.5000000001", "-3.3333333333", "-1.666666667", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Floor)]],
-	["0.5000000001", "3.3333333333", "1.6666666669", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Trunc)]],
-	["-0.5000000001", "3.3333333333", "-1.6666666669", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Trunc)]],
-	["-0.5000000001", "-3.3333333333", "1.6666666669", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Trunc)]],
-	["0.5000000001", "-3.3333333333", "-1.6666666669", [new FDecimalBackendBigNumber(10, FDecimal.RoundMode.Trunc)]]
+	["0.5000000001", "3.3333333333", "1.666666667", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Round)]],
+	["-0.5000000001", "3.3333333333", "-1.666666667", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Round)]],
+	["-0.5000000001", "-3.3333333333", "1.666666667", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Round)]],
+	["0.5000000001", "-3.3333333333", "-1.666666667", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Round)]],
+	["0.5000000001", "3.3333333333", "1.666666667", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Ceil)]],
+	["-0.5000000001", "3.3333333333", "-1.6666666669", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Ceil)]],
+	["-0.5000000001", "-3.3333333333", "1.666666667", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Ceil)]],
+	["0.5000000001", "-3.3333333333", "-1.6666666669", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Ceil)]],
+	["0.5000000001", "3.3333333333", "1.6666666669", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Floor)]],
+	["-0.5000000001", "3.3333333333", "-1.666666667", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Floor)]],
+	["-0.5000000001", "-3.3333333333", "1.6666666669", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Floor)]],
+	["0.5000000001", "-3.3333333333", "-1.666666667", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Floor)]],
+	["0.5000000001", "3.3333333333", "1.6666666669", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Trunc)]],
+	["-0.5000000001", "3.3333333333", "-1.6666666669", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Trunc)]],
+	["-0.5000000001", "-3.3333333333", "1.6666666669", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Trunc)]],
+	["0.5000000001", "-3.3333333333", "-1.6666666669", [new FDecimalBackendBigNumber(10, FDecimalRoundMode.Trunc)]]
 ];
 
 testCases.forEach(function (testCase) {
 	// Unwrap test case data
 	const [left, right, expectedResult, backends] = testCase;
 
-	backends.forEach(function (backend: FDecimal.Backend) {
+	backends.forEach(function (backend: FDecimalBackend) {
 		// tslint:disable-next-line: max-line-length
 		describe(`multiply with roundMode: ${backend.settings.roundMode}, fractionalDigits: ${backend.settings.fractionalDigits} should be ${left} * ${right} = ${expectedResult}`, function () {
 			before(() => { FDecimal.configure(backend); });

@@ -18,8 +18,8 @@
 // 	add(left: string, right: string): string;
 // 	add(left: FDecimal, right: FDecimal): FDecimal;
 
-// 	divide(left: string, right: string, roundMode?: FDecimal.RoundMode): string;
-// 	divide(left: FDecimal, right: FDecimal, roundMode?: FDecimal.RoundMode): FDecimal;
+// 	divide(left: string, right: string, roundMode?: FDecimalRoundMode): string;
+// 	divide(left: FDecimal, right: FDecimal, roundMode?: FDecimalRoundMode): FDecimal;
 
 // 	equals(left: string, right: string): boolean;
 // 	equals(left: FDecimal, right: FDecimal): boolean;
@@ -27,7 +27,7 @@
 // 	ensure(value: FDecimal, errorMessage?: string): FDecimal;
 // 	ensureNullable(value: FDecimal | null, errorMessage?: string): FDecimal | null;
 
-// 	fromFloat(value: number, roundMode?: FDecimal.RoundMode): FDecimal;
+// 	fromFloat(value: number, roundMode?: FDecimalRoundMode): FDecimal;
 
 // 	fromInt(value: number): FDecimal;
 
@@ -82,13 +82,13 @@
 // 	mod(left: string, right: string): string;
 // 	mod(left: FDecimal, right: FDecimal): FDecimal;
 
-// 	multiply(left: string, right: string, roundMode?: FDecimal.RoundMode): string;
-// 	multiply(left: FDecimal, right: FDecimal, roundMode?: FDecimal.RoundMode): FDecimal;
+// 	multiply(left: string, right: string, roundMode?: FDecimalRoundMode): string;
+// 	multiply(left: FDecimal, right: FDecimal, roundMode?: FDecimalRoundMode): FDecimal;
 
 // 	parse(value: string): FDecimal;
 
-// 	round(value: string, fractionDigits: FDecimal.FractionDigits, roundMode?: FDecimal.RoundMode): string;
-// 	round(value: FDecimal, fractionDigits: FDecimal.FractionDigits, roundMode?: FDecimal.RoundMode): FDecimal;
+// 	round(value: string, fractionDigits: FDecimalFraction, roundMode?: FDecimalRoundMode): string;
+// 	round(value: FDecimal, fractionDigits: FDecimalFraction, roundMode?: FDecimalRoundMode): FDecimal;
 
 // 	subtract(left: string, right: string): string;
 // 	subtract(left: FDecimal, right: FDecimal): FDecimal;

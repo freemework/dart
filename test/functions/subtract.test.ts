@@ -1,15 +1,15 @@
-import { FDecimal } from "@freemework/common";
+import { FDecimal, FDecimalBackend, FDecimalRoundMode } from "@freemework/common";
 
 import { assert } from "chai";
 
 import { FDecimalBackendBigNumber } from "../../src/index";
 
 const fractionalDigits = 10;
-const roundMode = FDecimal.RoundMode.Round;
+const roundMode = FDecimalRoundMode.Round;
 const testBackend = new FDecimalBackendBigNumber(fractionalDigits, roundMode);
 
 
-type TestCases = Array<[/*left: */string, /*right: */string, /*expectedResult: */string, /*backends: */Array<FDecimal.Backend>]>;
+type TestCases = Array<[/*left: */string, /*right: */string, /*expectedResult: */string, /*backends: */Array<FDecimalBackend>]>;
 
 const testCases: TestCases = [
 	["10", "5", "5", [testBackend]],
@@ -26,7 +26,7 @@ testCases.forEach(function (testCase) {
 	// Unwrap test case data
 	const [left, right, expectedResult, backends] = testCase;
 
-	backends.forEach(function (backend: FDecimal.Backend) {
+	backends.forEach(function (backend: FDecimalBackend) {
 		describe(`subtract should be ${left} - ${right} = ${expectedResult}`, function () {
 			before(() => { FDecimal.configure(backend); });
 			after(() => { (FDecimal as any)._cfg = null; });
