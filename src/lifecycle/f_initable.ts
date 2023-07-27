@@ -2,6 +2,8 @@ import { FDisposable } from "./f_disposable";
 import { FExecutionContext } from "../execution_context/f_execution_context";
 import { FException, FExceptionAggregate } from "../exception";
 
+import "./tc39";
+
 export abstract class FInitable extends FDisposable {
 	public abstract init(executionContext: FExecutionContext): Promise<void>;
 

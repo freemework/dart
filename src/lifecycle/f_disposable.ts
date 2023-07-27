@@ -1,5 +1,7 @@
 import { FException, FExceptionAggregate } from "../exception";
 
+import "./tc39";
+
 export abstract class FDisposable {
 	public async [Symbol.asyncDispose]() {
 		await this.dispose();
