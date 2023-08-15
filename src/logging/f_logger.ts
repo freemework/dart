@@ -17,7 +17,7 @@ export abstract class FLogger {
 			console.error(
 				"Logging subsystem used before call FLogger.setLoggerFactory(). Use FLoggerConsole as default logger. Please, consider to call FLogger.setLoggerFactory() at bootstrap phase."
 			);
-			this._loggerFactory = (loggerName: string) => FLoggerConsole.create(loggerName, FLoggerLevel.TRACE);
+			this._loggerFactory = (loggerName: string) => FLoggerConsole.create(loggerName, { level: FLoggerLevel.TRACE });
 		}
 		return this._loggerFactory;
 	}

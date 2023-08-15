@@ -6,11 +6,17 @@ import { FLoggerBase } from "./f_logger_base";
 import { FLoggerLabels } from "./f_logger_labels";
 import { FLoggerLevel } from "./f_logger_level";
 
-export class FLoggerConsole extends FLoggerBase {
+export abstract class FLoggerConsole extends FLoggerBase {
 	/**
 	 * Factory constructor
 	 */
-	public static create(loggerName: string, level?: FLoggerLevel): FLogger {
+	public static create(loggerName: string, opts?: {
+		readonly level?: FLoggerLevel,
+		readonly format?: FLoggerConsole.Format;
+	}): FLogger {
+		const level: FLoggerLevel | null = opts !== undefined && opts.level !== undefined ? opts.level : null;
+		const format: FLoggerConsole.Format = opts !== undefined && opts.format !== undefined ? opts.format : "text";
+
 		const levels: Map<FLoggerLevel, boolean> = new Map();
 		levels.set(FLoggerLevel.FATAL, level != null && level >= FLoggerLevel.FATAL);
 		levels.set(FLoggerLevel.ERROR, level != null && level >= FLoggerLevel.ERROR);
@@ -19,7 +25,16 @@ export class FLoggerConsole extends FLoggerBase {
 		levels.set(FLoggerLevel.DEBUG, level != null && level >= FLoggerLevel.DEBUG);
 		levels.set(FLoggerLevel.TRACE, level != null && level >= FLoggerLevel.TRACE);
 
-		return new FLoggerConsole(loggerName, levels);
+		if (format === "json") {
+			return new FLoggerConsoleJsonImpl(loggerName, levels);
+		} else {
+			return new FLoggerConsoleTextImpl(loggerName, levels);
+		}
+	}
+
+	protected constructor(loggerName: string, levels: Map<FLoggerLevel, boolean>) {
+		super(loggerName);
+		this._levels = levels;
 	}
 
 	protected isLevelEnabled(level: FLoggerLevel): boolean {
@@ -27,6 +42,15 @@ export class FLoggerConsole extends FLoggerBase {
 		return isEnabled === true;
 	}
 
+	private readonly _levels: Map<FLoggerLevel, boolean>;
+}
+
+export namespace FLoggerConsole {
+	export type Format = "text" | "json";
+}
+
+
+class FLoggerConsoleTextImpl extends FLoggerConsole {
 	protected log(
 		level: FLoggerLevel,
 		labels: FLoggerLabels,
@@ -70,9 +94,64 @@ export class FLoggerConsole extends FLoggerBase {
 
 	}
 
-	private readonly _levels: Map<FLoggerLevel, boolean>;
-	private constructor(loggerName: string, levels: Map<FLoggerLevel, boolean>) {
-		super(loggerName);
-		this._levels = levels;
+	public constructor(loggerName: string, levels: Map<FLoggerLevel, boolean>) {
+		super(loggerName, levels);
+	}
+}
+
+class FLoggerConsoleJsonImpl extends FLoggerConsole {
+	protected log(
+		level: FLoggerLevel,
+		labels: FLoggerLabels,
+		message: string,
+		exception?: FException
+	): void {
+		let name: string | null = this.name;
+		if (name === null) {
+			name = "Unnamed";
+		}
+
+		const logEntry: Record<string, string> = {
+			name,
+			date: new Date().toISOString(),
+			level: level.toString(),
+
+		};
+
+		for (const [labelName, labelValue] of Object.entries(labels)) {
+			logEntry[labelName] = labelValue;
+		}
+
+		logEntry.message = message;
+
+		if (exception != null) {
+			logEntry.exceptionName = exception.name;
+			logEntry.exceptionMessage = exception.message;
+			if (exception.stack !== undefined) {
+				logEntry.exceptionStack = exception.stack;
+			}
+		}
+
+		const logMessage: string = JSON.stringify(logEntry);
+		switch (level) {
+			case FLoggerLevel.TRACE:
+			case FLoggerLevel.DEBUG:
+				console.debug(logMessage);
+				break;
+			case FLoggerLevel.INFO:
+				console.log(logMessage);
+				break;
+			case FLoggerLevel.WARN:
+			case FLoggerLevel.ERROR:
+			case FLoggerLevel.FATAL:
+				console.error(logMessage);
+				break;
+			default:
+				throw new FExceptionInvalidOperation(`Unsupported log level '${level}'.`);
+		}
+	}
+
+	public constructor(loggerName: string, levels: Map<FLoggerLevel, boolean>) {
+		super(loggerName, levels);
 	}
 }
