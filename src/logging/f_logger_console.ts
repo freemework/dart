@@ -57,11 +57,7 @@ class FLoggerConsoleTextImpl extends FLoggerConsole {
 		message: string,
 		exception?: FException
 	): void {
-		let name: string | null = this.name;
-		if (name === null) {
-			name = "Unnamed";
-		}
-		let logMessageBuffer = `${new Date().toISOString()} ${name} [${level}]`;
+		let logMessageBuffer = `${new Date().toISOString()} ${this.name} [${level}]`;
 		for (const [labelName, labelValue] of Object.entries(labels)) {
 			logMessageBuffer += `(${labelName}:${labelValue})`;
 		}
@@ -106,13 +102,8 @@ class FLoggerConsoleJsonImpl extends FLoggerConsole {
 		message: string,
 		exception?: FException
 	): void {
-		let name: string | null = this.name;
-		if (name === null) {
-			name = "Unnamed";
-		}
-
 		const logEntry: Record<string, string> = {
-			name,
+			name: this.name,
 			date: new Date().toISOString(),
 			level: level.toString(),
 
@@ -125,10 +116,10 @@ class FLoggerConsoleJsonImpl extends FLoggerConsole {
 		logEntry.message = message;
 
 		if (exception != null) {
-			logEntry.exceptionName = exception.name;
-			logEntry.exceptionMessage = exception.message;
+			logEntry["exception.name"] = exception.name;
+			logEntry["exception.message"] = exception.message;
 			if (exception.stack !== undefined) {
-				logEntry.exceptionStack = exception.stack;
+				logEntry["exception.stack"] = exception.stack;
 			}
 		}
 
