@@ -1,5 +1,5 @@
 import {
-	FmoduleVersionGuard,
+	FModuleVersionGuard,
 	FDisposable,
 	FExecutionContext,
 	FCancellationExecutionContext,
@@ -7,7 +7,7 @@ import {
 	FChannelSubscriber
 } from "@freemework/common";
 
-FmoduleVersionGuard(require("../package.json"));
+FModuleVersionGuard(require("../package.json"));
 
 import {
 	FCancellationToken,

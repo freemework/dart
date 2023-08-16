@@ -10,7 +10,7 @@ import {
 	FCancellationExecutionContext,
 } from "@freemework/common";
 
-import { FLauncherException } from "./FLauncherException";
+import { FLauncherException, FLauncherRestartRequiredException } from "./FLauncherException";
 
 import {
 	FConfigurationCommandLine,
@@ -93,37 +93,15 @@ export function Flauncher<TConfiguration>(...args: Array<any>): void {
 		}
 
 		let runtime: FLauncherRuntime;
-		try {
-			if (runtimeStuff.parser === null) {
-				runtime = await runtimeStuff.runtimeFactory(executionContext);
-			} else {
-				const rawConfiguration: FConfiguration = await runtimeStuff.loader(executionContext);
-				const parsedConfiguration: TConfiguration = runtimeStuff.parser(rawConfiguration);
-				runtime = await runtimeStuff.runtimeFactory(executionContext, parsedConfiguration);
-			}
-
-			shutdownSignals.forEach((signal: NodeJS.Signals) => process.on(signal, () => gracefulShutdown(signal)));
-
-		} catch (e) {
-			const ex: FException = FException.wrapIfNeeded(e);
-			if (ex instanceof FCancellationException) {
-				log.warn(executionContext, "Runtime initialization was cancelled by user");
-				fireShutdownHooks().finally(function () {
-					process.exit(0);
-				});
-			}
-			if (log.isFatalEnabled) {
-				if (e instanceof Error) {
-					log.fatal(executionContext, `Runtime initialization failed with ${e.constructor.name}: ${e.message}`);
-				} else {
-					log.fatal(executionContext, `Runtime initialization failed with error: ${e}`);
-				}
-			}
-			log.debug(executionContext, "Runtime initialization failed", ex);
-			fireShutdownHooks().finally(function () {
-				process.exit(127);
-			});
+		if (runtimeStuff.parser === null) {
+			runtime = await runtimeStuff.runtimeFactory(executionContext);
+		} else {
+			const rawConfiguration: FConfiguration = await runtimeStuff.loader(executionContext);
+			const parsedConfiguration: TConfiguration = runtimeStuff.parser(rawConfiguration);
+			runtime = await runtimeStuff.runtimeFactory(executionContext, parsedConfiguration);
 		}
+
+		shutdownSignals.forEach((signal: NodeJS.Signals) => process.on(signal, () => gracefulShutdown(signal)));
 
 		async function gracefulShutdown(signal: string) {
 			if (destroyRequestCount++ === 0) {
@@ -152,23 +130,33 @@ export function Flauncher<TConfiguration>(...args: Array<any>): void {
 		})
 		.catch(e => {
 			const ex: FException = FException.wrapIfNeeded(e);
+			if (ex instanceof FCancellationException) {
+				log.warn(executionContext, "Runtime initialization was cancelled by user");
+				fireShutdownHooks().finally(function () {
+					process.exit(0);
+				});
+			}
 			if (log.isFatalEnabled) {
-				if (ex instanceof FLauncherException) {
-					log.fatal(executionContext, `Cannot launch the application due an ${e.constructor.name}: ${e.message}`);
+				if (e instanceof FLauncherException) {
+					log.fatal(executionContext, `Runtime initialization failed with ${e.constructor.name}: ${e.message}`);
 				} else {
-					log.fatal(executionContext, ex.message);
+					log.fatal(executionContext, `Runtime initialization failed with error: ${ex.message}`);
 					log.debug(executionContext, ex.message, ex);
 				}
 			}
+
+			const exitCode: number = ex instanceof FLauncherRestartRequiredException ? ex.exitCode : 127;
+
+
 			if (process.env.NODE_ENV === "development") {
 				setTimeout(() => {
 					fireShutdownHooks().finally(function () {
-						process.exit(127);
+						process.exit(exitCode);
 					});
 				}, 1000);
 			} else {
 				fireShutdownHooks().finally(function () {
-					process.exit(127);
+					process.exit(exitCode);
 				});
 			}
 		});
