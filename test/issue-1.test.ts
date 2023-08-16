@@ -1,4 +1,4 @@
-import { FDecimal, FExecutionContext, FLogger } from "@freemework/common";
+import { FDecimal, FDecimalRoundMode, FExecutionContext, FLogger } from "@freemework/common";
 import { FDecimalBackendBigNumber } from "@freemework/decimal.bignumberjs";
 import { FSqlMigrationSources } from "@freemework/sql.misc.migration";
 
@@ -53,7 +53,7 @@ const timestamp = Date.now();
 myDescribe(`Issue #1 (schema:migration_${timestamp})`, function (this: Suite) {
 
 	before(() => {
-		FDecimal.configure(new FDecimalBackendBigNumber(12, FDecimal.RoundMode.Trunc));
+		FDecimal.configure(new FDecimalBackendBigNumber(12, FDecimalRoundMode.Trunc));
 	});
 	after(() => {
 		(FDecimal as any)._cfg = null

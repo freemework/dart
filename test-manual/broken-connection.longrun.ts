@@ -7,7 +7,7 @@
 import {
 	FException,
 	FExecutionContext,
-	Fsleep, Fusing
+	FSleep, FUsing
 } from "@freemework/common";
 
 import { FSqlConnectionFactoryPostgres } from "../src";
@@ -46,21 +46,20 @@ function getOpts(): FSqlConnectionFactoryPostgres.Opts {
 }
 
 (async function main() {
-	await Fusing(
+	await FUsing(
 		FExecutionContext.Empty,
 		() => new FSqlConnectionFactoryPostgres(getOpts()),
-
-		async (cancellationToken, FSqlProviderFactory) => {
-			await FSqlProviderFactory.usingProvider(cancellationToken, async (FSqlProvider) => {
-				return (await FSqlProvider.statement("SELECT 1").executeScalar(cancellationToken)).asInteger;
+		async (cancellationToken, sqlConnectionFactory) => {
+			await sqlConnectionFactory.usingProvider(cancellationToken, async (sqlConnection) => {
+				return (await sqlConnection.statement("SELECT 1").executeScalar(cancellationToken)).asInteger;
 			});
 
 			console.log("First query was completed. Please disconnect and connect your network adapter to force terminate SQL connection. Expectation no any unhandled errors.");
 			console.log("Sleeping 30 seconds...");
-			await Fsleep(cancellationToken, 30000);
+			await FSleep(cancellationToken, 30000);
 
-			await FSqlProviderFactory.usingProvider(cancellationToken, async (FSqlProvider) => {
-				return (await FSqlProvider.statement("SELECT 1").executeScalar(cancellationToken)).asInteger;
+			await sqlConnectionFactory.usingProvider(cancellationToken, async (sqlConnection) => {
+				return (await sqlConnection.statement("SELECT 1").executeScalar(cancellationToken)).asInteger;
 			});
 			console.log("Second query was completed.");
 		}

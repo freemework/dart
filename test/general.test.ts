@@ -1,5 +1,6 @@
 import {
 	FDecimal,
+	FDecimalRoundMode,
 	FExceptionInvalidOperation,
 	FExecutionContext,
 	FLogger,
@@ -99,7 +100,7 @@ myDescribe(`PostgreSQL Tests (schema:general_test_1_${timestamp})`, function () 
 	before(async function () {
 		const constructorLogger: FLogger = FLogger.create(`general_test_1_${timestamp}`);
 
-		FDecimal.configure(new FDecimalBackendBigNumber(22, FDecimal.RoundMode.Ceil));
+		FDecimal.configure(new FDecimalBackendBigNumber(22, FDecimalRoundMode.Ceil));
 
 		sqlConnectionFactory = new FSqlConnectionFactoryPostgres({
 			url: new URL(TEST_DB_URL!),
@@ -740,7 +741,7 @@ myDescribe(`PostgreSQL Tests via usingProvider (schema:general_test_2_${timestam
 	before(async function () {
 		const constructorLogger = FLogger.create(`general_test_2_${timestamp}`);
 
-		FDecimal.configure(new FDecimalBackendBigNumber(12, FDecimal.RoundMode.Trunc));
+		FDecimal.configure(new FDecimalBackendBigNumber(12, FDecimalRoundMode.Trunc));
 
 		sqlConnectionFactory = new FSqlConnectionFactoryPostgres({
 			url: new URL(TEST_DB_URL!), defaultSchema: `general_test_2_${timestamp}`, log: constructorLogger
@@ -788,7 +789,7 @@ myDescribe(`PostgreSQL Tests via usingProviderWithTransaction (schema:general_te
 	before(async function () {
 		const constructorLogger = FLogger.create(`general_test_3_${timestamp}`);
 
-		FDecimal.configure(new FDecimalBackendBigNumber(12, FDecimal.RoundMode.Trunc));
+		FDecimal.configure(new FDecimalBackendBigNumber(12, FDecimalRoundMode.Trunc));
 
 		sqlConnectionFactory = new FSqlConnectionFactoryPostgres({
 			url: new URL(TEST_DB_URL!), defaultSchema: `general_test_3_${timestamp}`, log: constructorLogger
