@@ -1,2 +1,5 @@
 export { FLauncherException } from "./FLauncherException";
-export * from "./launcher";
+export { FLauncherInitializeRuntimeException } from "./FLauncherInitializeRuntimeException";
+export { FLauncherRestartRequiredException } from "./FLauncherRestartRequiredException";
+
+export * from "./FLauncher";

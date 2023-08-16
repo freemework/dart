@@ -1,5 +1,5 @@
 {
-	"//": "This is used in our build process. Also this file is requred by VSCode",
+	"//": "This is used in our build process. Also this file is required by VSCode",
 	"compilerOptions": {
 		"alwaysStrict": true,
 		"declaration": true,

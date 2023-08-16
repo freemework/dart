@@ -10,8 +10,6 @@ import {
 	FCancellationExecutionContext,
 } from "@freemework/common";
 
-import { FLauncherException, FLauncherRestartRequiredException } from "./FLauncherException";
-
 import {
 	FConfigurationCommandLine,
 	FConfigurationDirectory,
@@ -20,14 +18,17 @@ import {
 	FConfigurationToml
 } from "../configuration";
 
-export function Flauncher(runtimeFactory: FConfigLessRuntimeFactory): void;
+import { FLauncherException } from "./FLauncherException";
+import { FLauncherRestartRequiredException } from "./FLauncherRestartRequiredException";
+
+export function FLauncher(runtimeFactory: FConfigLessRuntimeFactory): void;
 
 /**
  * Launch an application using `defaultConfigurationLoader`
  * @param configurationParser User's function that provides configuration parser
  * @param runtimeFactory User's function that compose and start runtime
  */
-export function Flauncher<TConfiguration>(
+export function FLauncher<TConfiguration>(
 	configurationParser: ConfigurationParser<TConfiguration>,
 	runtimeFactory: FLauncherRuntimeFactory<TConfiguration>
 ): void;
@@ -38,13 +39,13 @@ export function Flauncher<TConfiguration>(
  * @param configurationParser User's function that provides configuration parser
  * @param runtimeFactory User's function that compose and start runtime
  */
-export function Flauncher<TConfiguration>(
+export function FLauncher<TConfiguration>(
 	configurationLoader: RawConfigurationLoader,
 	configurationParser: ConfigurationParser<TConfiguration>,
 	runtimeFactory: FLauncherRuntimeFactory<TConfiguration>
 ): void;
 
-export function Flauncher<TConfiguration>(...args: Array<any>): void {
+export function FLauncher<TConfiguration>(...args: Array<any>): void {
 	const log: FLogger = FLogger.create("Flauncher");
 
 	const cancellationTokenSource: FCancellationTokenSource = new FCancellationTokenSourceManual();
