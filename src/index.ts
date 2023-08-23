@@ -25,7 +25,6 @@ import * as net from "net";
 import * as http from "http";
 import * as https from "https";
 import { unescape as urlDecode } from "querystring";
-// import { parse as parseURL } from "url";
 import * as WebSocket from "ws";
 import * as _ from "lodash";
 import { pki } from "node-forge";
@@ -53,7 +52,6 @@ export interface FWebServer extends FInitableBase {
 export abstract class FAbstractWebServer<TOpts extends FHostingConfiguration.WebServerBase | FHostingConfiguration.WebServer>
 	extends FInitableBase implements FWebServer {
 	public abstract readonly underlyingServer: http.Server | https.Server;
-	// protected readonly _opts: TOpts;
 	protected readonly _trustProxy: boolean | "loopback" | "linklocal" | "uniquelocal";
 	protected readonly _name: string;
 	protected readonly _listenHost: string;
@@ -172,9 +170,9 @@ export abstract class FAbstractWebServer<TOpts extends FHostingConfiguration.Web
 				webSocketServer.close((err) => {
 					if (err !== undefined) {
 						if (logger.isWarnEnabled) {
-							logger.warn(this.initExecutionContext, `Web Socket Server was closed with error. Inner message: ${err.message} `);
+							logger.warn(this.initExecutionContext, () => `Web Socket Server was closed with error. Inner message: ${err.message} `);
 						}
-						logger.trace(this.initExecutionContext, "Web Socket Server was closed with error.", FException.wrapIfNeeded(err));
+						logger.trace(this.initExecutionContext, () => "Web Socket Server was closed with error.", FException.wrapIfNeeded(err));
 					}
 
 					// dispose never raise any errors
@@ -255,7 +253,7 @@ export abstract class FAbstractWebServer<TOpts extends FHostingConfiguration.Web
 		if (urlPath !== undefined) {
 			const wss = this._websockets[urlPath];
 			if (wss !== undefined) {
-				logger.debug(this.initExecutionContext, `Upgrade the server on url path '${urlPath}' for WebSocket server.`);
+				logger.debug(this.initExecutionContext, () => `Upgrade the server on url path '${urlPath}' for WebSocket server.`);
 				wss.handleUpgrade(req, socket, head, function (ws) {
 					wss.emit("connection", ws, req);
 				});
@@ -282,7 +280,7 @@ export abstract class FAbstractWebServer<TOpts extends FHostingConfiguration.Web
 
 		const xfccHeaderData = req && req.headers && req.headers["x-forwarded-client-cert"];
 		if (_.isString(xfccHeaderData)) {
-			logger.trace(this.initExecutionContext, `X-Forwarded-Client-Cert header: ${xfccHeaderData}`);
+			logger.trace(this.initExecutionContext, () => `X-Forwarded-Client-Cert header: ${xfccHeaderData}`);
 
 			const clientCertPem = urlDecode(xfccHeaderData);
 			const clientCert = pki.certificateFromPem(clientCertPem);
@@ -332,9 +330,9 @@ export class UnsecuredWebServer extends FAbstractWebServer<FHostingConfiguration
 					const address = server.address();
 					if (address !== null) {
 						if (typeof address === "string") {
-							logger.info(this.initExecutionContext, `Web Server was started on ${address}`);
+							logger.info(this.initExecutionContext, () => `Web Server was started on ${address}`);
 						} else {
-							logger.info(this.initExecutionContext, address.family + " Web Server was started on http://" + address.address + ":" + address.port);
+							logger.info(this.initExecutionContext, () => address.family + " Web Server was started on http://" + address.address + ":" + address.port);
 						}
 					}
 					resolve();
@@ -351,9 +349,9 @@ export class UnsecuredWebServer extends FAbstractWebServer<FHostingConfiguration
 		const address = server.address();
 		if (address !== null) {
 			if (typeof address === "string") {
-				logger.info(this.initExecutionContext, "Stopping Web Server http://" + address + "...");
+				logger.info(this.initExecutionContext, () => "Stopping Web Server http://" + address + "...");
 			} else {
-				logger.info(this.initExecutionContext, "Stopping " + address.family + " Web Server http://" + address.address + ":" + address.port + "...");
+				logger.info(this.initExecutionContext, () => "Stopping " + address.family + " Web Server http://" + address.address + ":" + address.port + "...");
 			}
 		} else {
 			logger.info(this.initExecutionContext, "Stopping Web Server...");
@@ -362,7 +360,7 @@ export class UnsecuredWebServer extends FAbstractWebServer<FHostingConfiguration
 			server.close((e) => {
 				if (e) {
 					const ex: FException = FException.wrapIfNeeded(e);
-					logger.warn(this.initExecutionContext, `The Web Server was stopped with error: ${ex.message}`);
+					logger.warn(this.initExecutionContext, () => `The Web Server was stopped with error: ${ex.message}`);
 					logger.debug(this.initExecutionContext, "The Web Server was stopped with error", ex);
 				} else {
 					logger.info(this.initExecutionContext, "The Web Server was stopped");
@@ -429,9 +427,9 @@ export class SecuredWebServer extends FAbstractWebServer<FHostingConfiguration.S
 					const address = server.address();
 					if (address !== null) {
 						if (typeof address === "string") {
-							logger.info(this.initExecutionContext, `Web Server was started on ${address}`);
+							logger.info(this.initExecutionContext, () => `Web Server was started on ${address}`);
 						} else {
-							logger.info(this.initExecutionContext, address.family + " Web Server was started on https://" + address.address + ":" + address.port);
+							logger.info(this.initExecutionContext, () => address.family + " Web Server was started on https://" + address.address + ":" + address.port);
 						}
 					}
 					resolve();
@@ -448,9 +446,9 @@ export class SecuredWebServer extends FAbstractWebServer<FHostingConfiguration.S
 		const address = server.address();
 		if (address !== null) {
 			if (typeof address === "string") {
-				logger.info(this.initExecutionContext, "Stopping Web Server https://" + address + "...");
+				logger.info(this.initExecutionContext, () => "Stopping Web Server https://" + address + "...");
 			} else {
-				logger.info(this.initExecutionContext, "Stopping " + address.family + " Web Server https://" + address.address + ":" + address.port + "...");
+				logger.info(this.initExecutionContext, () => "Stopping " + address.family + " Web Server https://" + address.address + ":" + address.port + "...");
 			}
 		} else {
 			logger.info(this.initExecutionContext, "Stopping Web Server...");
@@ -459,7 +457,7 @@ export class SecuredWebServer extends FAbstractWebServer<FHostingConfiguration.S
 			server.close((e) => {
 				if (e) {
 					const ex: FException = FException.wrapIfNeeded(e);
-					logger.warn(this.initExecutionContext, `The Web Server was stopped with error: ${ex.message}`);
+					logger.warn(this.initExecutionContext, () => `The Web Server was stopped with error: ${ex.message}`);
 					logger.debug(this.initExecutionContext, "The Web Server was stopped with error", ex);
 				} else {
 					logger.info(this.initExecutionContext, "The Web Server was stopped");
@@ -559,9 +557,7 @@ export class FWebSocketChannelSupplyEndpoint extends FServersBindEndpoint {
 			await new Promise<void>((resolve) => {
 				webSocketServer.close((err) => {
 					if (err !== undefined) {
-						if (logger.isWarnEnabled) {
-							logger.warn(this.initExecutionContext, `Web Socket Server was closed with error. Inner message: ${err.message} `);
-						}
+						logger.warn(this.initExecutionContext, () => `Web Socket Server was closed with error. Inner message: ${err.message} `);
 						logger.trace(this.initExecutionContext, "Web Socket Server was closed with error.", FException.wrapIfNeeded(err));
 					}
 
@@ -584,9 +580,9 @@ export class FWebSocketChannelSupplyEndpoint extends FServersBindEndpoint {
 
 		if (this._connectionCounter === Number.MAX_SAFE_INTEGER) { this._connectionCounter = 0; }
 		const connectionNumber: number = this._connectionCounter++;
-		const ipAddress: string | undefined = request.connection.remoteAddress;
-		if (ipAddress !== undefined && logger.isTraceEnabled) {
-			logger.trace(this.initExecutionContext, `Connection #${connectionNumber} was established from ${ipAddress} `);
+		const ipAddress: string | undefined = request.socket.remoteAddress;
+		if (ipAddress !== undefined) {
+			logger.info(this.initExecutionContext, () => `Connection #${connectionNumber} was established from ${ipAddress} `);
 		}
 		if (logger.isInfoEnabled) {
 			logger.info(this.initExecutionContext, `Connection #${connectionNumber} was established`);
@@ -595,7 +591,7 @@ export class FWebSocketChannelSupplyEndpoint extends FServersBindEndpoint {
 		const subProtocol: string = webSocket.protocol || this._defaultProtocol;
 		if (webSocket.protocol !== undefined) {
 			if (!this._allowedProtocols.has(subProtocol)) {
-				logger.warn(this.initExecutionContext, `Connection #${connectionNumber} dropped. Not supported sub-protocol: ${subProtocol}`);
+				logger.warn(this.initExecutionContext, () => `Connection #${connectionNumber} dropped. Not supported sub-protocol: ${subProtocol}`);
 				// https://tools.ietf.org/html/rfc6455#section-7.4.1
 				webSocket.close(1007, `Wrong sub-protocol: ${subProtocol}`);
 				webSocket.terminate();
@@ -651,11 +647,11 @@ export class FWebSocketChannelSupplyEndpoint extends FServersBindEndpoint {
 					}
 					await channelsTuple.textChannel.onMessage(FCancellationTokenSource.token, data);
 				} else {
-					if (logger.isDebugEnabled) {
-						logger.debug(
-							this.initExecutionContext, `Connection #${connectionNumber} cannot handle a message due not supported type. Terminate socket...`
-						);
-					}
+					logger.debug(
+						this.initExecutionContext,
+						() => `Connection #${connectionNumber} cannot handle a message due not supported type. Terminate socket...`
+					);
+
 					// https://tools.ietf.org/html/rfc6455#section-7.4.1
 					webSocket.close(1003, `Not supported message type`);
 					webSocket.terminate();
@@ -664,22 +660,14 @@ export class FWebSocketChannelSupplyEndpoint extends FServersBindEndpoint {
 			} catch (e) {
 				if (logger.isInfoEnabled || logger.isTraceEnabled) {
 					const ex: FException = FException.wrapIfNeeded(e);
-					if (logger.isInfoEnabled) {
-						logger.info(this.initExecutionContext, `Connection #${connectionNumber} onMessage failed: ${ex.message}`);
-					}
-					if (logger.isTraceEnabled) {
-						logger.trace(this.initExecutionContext, `Connection #${connectionNumber} onMessage failed:`, ex);
-					}
+					logger.info(this.initExecutionContext, () => `Connection #${connectionNumber} onMessage failed: ${ex.message}`);
+					logger.trace(this.initExecutionContext, () => `Connection #${connectionNumber} onMessage failed:`, ex);
 				}
 			}
 		};
 		webSocket.onclose = ({ code, reason }) => {
-			if (logger.isTraceEnabled) {
-				logger.trace(this.initExecutionContext, `Connection #${connectionNumber} was closed: ${JSON.stringify({ code, reason })} `);
-			}
-			if (logger.isInfoEnabled) {
-				logger.info(this.initExecutionContext, `Connection #${connectionNumber} was closed`);
-			}
+			logger.trace(this.initExecutionContext, () => `Connection #${connectionNumber} was closed: ${JSON.stringify({ code, reason })} `);
+			logger.info(this.initExecutionContext, () => `Connection #${connectionNumber} was closed`);
 
 			FCancellationTokenSource.cancel();
 			this._connections.delete(webSocket);
@@ -821,11 +809,10 @@ export class FWebSocketChannelFactoryEndpoint extends FServersBindEndpoint {
 		if (this._connectionCounter === Number.MAX_SAFE_INTEGER) { this._connectionCounter = 0; }
 		const connectionNumber: number = this._connectionCounter++;
 		const ipAddress: string | undefined = request.connection.remoteAddress;
-		if (ipAddress !== undefined && logger.isTraceEnabled) {
-			logger.trace(this.initExecutionContext, `Connection #${connectionNumber} was established from ${ipAddress} `);
-		}
-		if (logger.isInfoEnabled) {
-			logger.info(this.initExecutionContext, `Connection #${connectionNumber} was established`);
+		if (ipAddress !== undefined) {
+			logger.info(this.initExecutionContext, () => `Connection #${connectionNumber} was established from ${ipAddress} `);
+		} else {
+			logger.info(this.initExecutionContext, () => `Connection #${connectionNumber} was established`);
 		}
 
 		const subProtocol: string = webSocket.protocol || this._defaultProtocol;
@@ -883,7 +870,7 @@ export class FWebSocketChannelFactoryEndpoint extends FServersBindEndpoint {
 			} catch (e) {
 				// https://tools.ietf.org/html/rfc6455#section-7.4.1
 				const friendlyError: FException = FException.wrapIfNeeded(e);
-				logger.debug(this.initExecutionContext, `Could not create binary channel. ${friendlyError.message}`);
+				logger.debug(this.initExecutionContext, () => `Could not create binary channel. ${friendlyError.message}`);
 				logger.trace(this.initExecutionContext, "Could not create binary channel.", friendlyError);
 				webSocket.close(1011, friendlyError.message);
 				webSocket.terminate();
@@ -905,7 +892,7 @@ export class FWebSocketChannelFactoryEndpoint extends FServersBindEndpoint {
 			} catch (e) {
 				// https://tools.ietf.org/html/rfc6455#section-7.4.1
 				const friendlyError: FException = FException.wrapIfNeeded(e);
-				logger.debug(this.initExecutionContext, `Could not create text channel. ${friendlyError.message}`);
+				logger.debug(this.initExecutionContext, () => `Could not create text channel. ${friendlyError.message}`);
 				logger.trace(this.initExecutionContext, "Could not create text channel.", friendlyError);
 				webSocket.close(1011, friendlyError.message);
 				webSocket.terminate();
@@ -931,7 +918,7 @@ export class FWebSocketChannelFactoryEndpoint extends FServersBindEndpoint {
 						} catch (e) {
 							// https://tools.ietf.org/html/rfc6455#section-7.4.1
 							const friendlyError: FException = FException.wrapIfNeeded(e);
-							logger.debug(this.initExecutionContext, `Could not create binary channel. ${friendlyError.message}`);
+							logger.debug(this.initExecutionContext, () => `Could not create binary channel. ${friendlyError.message}`);
 							logger.trace(this.initExecutionContext, "Could not create binary channel.", friendlyError);
 							webSocket.close(1011, friendlyError.message);
 							webSocket.terminate();
@@ -949,7 +936,7 @@ export class FWebSocketChannelFactoryEndpoint extends FServersBindEndpoint {
 						} catch (e) {
 							// https://tools.ietf.org/html/rfc6455#section-7.4.1
 							const friendlyError: FException = FException.wrapIfNeeded(e);
-							logger.debug(this.initExecutionContext, `Could not create text channel. ${friendlyError.message}`);
+							logger.debug(this.initExecutionContext, () => `Could not create text channel. ${friendlyError.message}`);
 							logger.trace(this.initExecutionContext, "Could not create text channel.", friendlyError);
 							webSocket.close(1011, friendlyError.message);
 							webSocket.terminate();
@@ -958,11 +945,11 @@ export class FWebSocketChannelFactoryEndpoint extends FServersBindEndpoint {
 					}
 					await channelsTuple.textChannel.send(FExecutionContext.Empty, data);
 				} else {
-					if (logger.isDebugEnabled) {
-						logger.debug(
-							this.initExecutionContext, `Connection #${connectionNumber} cannot handle a message due not supported type. Terminate socket...`
-						);
-					}
+					logger.debug(
+						this.initExecutionContext,
+						() => `Connection #${connectionNumber} cannot handle a message due not supported type. Terminate socket...`
+					);
+
 					// https://tools.ietf.org/html/rfc6455#section-7.4.1
 					webSocket.close(1003, `Not supported message type`);
 					webSocket.terminate();
@@ -970,21 +957,13 @@ export class FWebSocketChannelFactoryEndpoint extends FServersBindEndpoint {
 				}
 			} catch (e) {
 				const ex: FException = FException.wrapIfNeeded(e);
-				if (logger.isInfoEnabled) {
-					logger.info(this.initExecutionContext, `Connection #${connectionNumber} onMessage failed: ${ex.message}`);
-				}
-				if (logger.isTraceEnabled) {
-					logger.trace(this.initExecutionContext, `Connection #${connectionNumber} onMessage failed:`, ex);
-				}
+				logger.info(this.initExecutionContext, () => `Connection #${connectionNumber} onMessage failed: ${ex.message}`);
+				logger.trace(this.initExecutionContext, () => `Connection #${connectionNumber} onMessage failed:`, ex);
 			}
 		};
 		webSocket.onclose = ({ code, reason }) => {
-			if (logger.isTraceEnabled) {
-				logger.trace(this.initExecutionContext, `Connection #${connectionNumber} was closed: ${JSON.stringify({ code, reason })} `);
-			}
-			if (logger.isInfoEnabled) {
-				logger.info(this.initExecutionContext, `Connection #${connectionNumber} was closed`);
-			}
+			logger.trace(this.initExecutionContext, () => `Connection #${connectionNumber} was closed: ${JSON.stringify({ code, reason })} `);
+			logger.info(this.initExecutionContext, () => `Connection #${connectionNumber} was closed`);
 
 			cancellationTokenSource.cancel();
 			this._connections.delete(webSocket);
