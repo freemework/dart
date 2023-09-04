@@ -7,7 +7,8 @@
 import {
 	FException,
 	FExecutionContext,
-	FSleep, FUsing
+	FSleep,
+	FUsing,
 } from "@freemework/common";
 
 import { FSqlConnectionFactoryPostgres } from "../src";

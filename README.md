@@ -44,7 +44,7 @@ Note: For full SSL mode you need to pass `opts.ssl` programmatically. Passing ce
 
 1. Make sure your have PostgreSQL instance or launch it as Docker container
     ```shell
-    docker run --name postgres --rm --interactive --publish 5432:5432 theanurin/devel.postgres-13:13.11.1
+    docker run --name postgres --rm --interactive --publish 5432:5432 theanurin/devel.postgres-13:13.12.6
     ```
 1. Launch tests via VSCode's launch configuration or via command line
     ```shell

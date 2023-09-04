@@ -9,6 +9,7 @@ import {
 	FSqlExceptionSyntax,
 	FSqlConnection,
 	FSqlResultRecord,
+	FDecimalRoundMode,
 } from "@freemework/common";
 import { FDecimalBackendBigNumber } from "@freemework/decimal.bignumberjs";
 import { FSqlMigrationSources } from "@freemework/sql.misc.migration";
