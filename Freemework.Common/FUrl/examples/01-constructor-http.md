@@ -1,3 +1,12 @@
+---
+layout: default
+nav_order: 1
+title: Constructor HTTP
+description: "TBD"
+parent: FUrl
+grand_parent: Freemework.Common
+---
+
 ```dart
 final httpUri = FUri(
     scheme: 'http',

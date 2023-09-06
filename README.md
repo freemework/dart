@@ -17,7 +17,7 @@ The branch contains documentation sources.
     --interactive --rm \
     --mount type=bind,source="${PWD}",target=/data \
     --publish 4000:4000 \
-    theanurin/jekyll:20230905
+    theanurin/jekyll:20230906
   ```
 1. Browse to http://127.0.0.1:4000
 
@@ -39,6 +39,6 @@ docker run --platform linux/amd64 \
   --interactive --tty --rm \
   --mount type=bind,source="${PWD}",target=/data \
   --entrypoint /bin/sh \
-  theanurin/jekyll:20230905 \
+  theanurin/jekyll:20230906 \
     -c 'cd /data && bundle install'
 ```

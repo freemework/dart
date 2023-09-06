@@ -1,10 +1,9 @@
 ---
 layout: default
-nav_order: 2
+nav_order: 1
 title: FUrl
 description: "TBD"
-parent: Common
-grand_parent: Libraries
+parent: Freemework.Common
 ---
 
 # FUri class
