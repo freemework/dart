@@ -1,0 +1,17 @@
+name: FDecimal
+staticMethods:
+  - name: parse
+    description: Creates a new `FDecimal` object by parsing a URI string.
+    remarks: TBD
+    positionalArgs:
+        - name: uriString
+          type: NativeString
+          isOptional: false
+    namedArgs:
+        - name: testOlolo
+          type: NativeString
+          isOptional: false
+    return:
+      nullable: false
+      type: FDecimal
+

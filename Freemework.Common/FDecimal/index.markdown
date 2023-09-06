@@ -1,6 +1,6 @@
 ---
 layout: default
-title: FUrl
+title: FDecimal
 description: "TBD"
 parent: Freemework.Common
 ---
@@ -14,11 +14,9 @@ parent: Freemework.Common
 {:toc}
 </details>
 
-{% assign classData = site.data.spec.FreemeworkCommon.FUrl %}
+{% assign classData = site.data.spec.FreemeworkCommon.FDecimal %}
 {% include class.markdown data=classData %}
 
 ## References
 
-- [RFC-3986](https://datatracker.ietf.org/doc/html/rfc3986)
-- [RFC-2396](https://datatracker.ietf.org/doc/html/rfc2396)
-- [RFC-2045](https://datatracker.ietf.org/doc/html/rfc2045)
+- ???

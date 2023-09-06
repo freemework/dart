@@ -1,0 +1,30 @@
+name: FUri
+staticMethods:
+  - name: parse
+    description: Creates a new `FUri` object by parsing a URI string.
+    remarks: TBD
+    positionalArgs:
+        - name: uriString
+          type: NativeString
+          isOptional: false
+    namedArgs:
+        - name: testOlolo
+          type: NativeString
+          isOptional: false
+    return:
+      nullable: false
+      type: FUri
+  - name: tryParse
+    description: Creates a new `FUri` object by parsing a URI string.
+    remarks: TBD
+    positionalArgs:
+        - name: uriString
+          type: NativeString
+          isOptional: false
+    namedArgs:
+        - name: testOlolo
+          type: NativeString
+          isOptional: false
+    return:
+      nullable: true
+      type: FUri
