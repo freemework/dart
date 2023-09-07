@@ -40,6 +40,7 @@ cd freemework
 ./workspace-configure.sh \
     --docs \
     --branch=dev \
+    --lib=common:csharp \
     --lib=common:dart \
     --lib=common:typescript \
     --lib=decimal_bignumberjs:typescript \
@@ -51,14 +52,22 @@ code "Freemework Common.code-workspace"
 
 ## Notes
 
-Add new orphan branch
+### Checking out orphan branch in new work-tree
 
 ```shell
-NEW_ORPHAN_BRANCH=mybranch
-git switch --orphan  "${NEW_ORPHAN_BRANCH}"
+NEW_BRANCH=...
+git worktree add --detach "./${NEW_BRANCH}"
+cd "./${NEW_BRANCH}"
+git checkout --orphan "${NEW_BRANCH}-work"
+git reset --hard
 git commit --allow-empty -m "Initial Commit"
-git push origin "${NEW_ORPHAN_BRANCH}"
+git push origin "${NEW_BRANCH}-work":"${NEW_BRANCH}-master"
+git push origin "${NEW_BRANCH}-work":"${NEW_BRANCH}-dev"
+git push origin "${NEW_BRANCH}-work":"${NEW_BRANCH}-work"
 ```
+
+See at [StackOverflow](https://stackoverflow.com/questions/53005845/checking-out-orphan-branch-in-new-work-tree)
+
 
 ### Remove all Git worktrees
 

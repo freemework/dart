@@ -17,7 +17,7 @@ echo "Parsing arguments..."
 echo
 USE_LIBS=()
 USE_DOC="no"
-USE_BRANCH="master"
+USE_BRANCH="work"
 while [ "${1}" != "" ]; do
 	case "${1}" in
 		--lib=*)
@@ -64,12 +64,13 @@ trap 'rm -f "${WORKSPACE_TMP_FILE}"' EXIT
 cat Freemework.code-workspace.base >> "${WORKSPACE_TMP_FILE}"
 
 if [ "${USE_DOC}" == "yes" ]; then
+	jq '.folders += [{"path": "docs"}]' "${WORKSPACE_TMP_FILE}" | sponge "${WORKSPACE_TMP_FILE}"
+
 	if [ -d "${DIR}/docs" ]; then
 		echo "WARNING: Skip docs configuration due directory '${DIR}/docs' already presented." >&2
 	else
-		jq '.folders += [{"path": "docs"}]' "${WORKSPACE_TMP_FILE}" | sponge "${WORKSPACE_TMP_FILE}"
 		set -x
-		(cd "${DIR}" && git worktree add docs docs)
+		(cd "${DIR}" && git worktree add docs docs-work)
 		set +x
 	fi
 fi
