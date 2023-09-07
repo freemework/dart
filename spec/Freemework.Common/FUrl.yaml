@@ -4,7 +4,7 @@ staticMethods:
     description: Creates a new `FUri` object by parsing a URI string.
     remarks: TBD
     positionalArgs:
-        - name: uriString
+        - name: absoluteUriString
           type: NativeString
           isOptional: false
     namedArgs:
@@ -18,7 +18,7 @@ staticMethods:
     description: Creates a new `FUri` object by parsing a URI string.
     remarks: TBD
     positionalArgs:
-        - name: uriString
+        - name: absoluteUriString
           type: NativeString
           isOptional: false
     namedArgs:
