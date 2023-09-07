@@ -1,0 +1,21 @@
+<Project>
+	<!-- See https://docs.microsoft.com/en-us/visualstudio/msbuild/customize-your-build?view=vs-2019 -->
+	<Target Name="SetupItemsForGenerateAssemblyInfo" BeforeTargets="CoreGenerateAssemblyInfo">
+		<Message Text="Setup assembly info attributes..." />
+
+		<Message Condition=" $(Configuration) == 'local' AND '$(CI_PROJECT_URL)' == '' " Text="Environment variable CI_PROJECT_URL is not set" />
+		<Message Condition=" $(Configuration) == 'local' AND '$(CI_COMMIT_SHORT_SHA)' == '' " Text="Environment variable CI_COMMIT_SHORT_SHA is not set" />
+		<Message Condition=" $(Configuration) == 'local' AND '$(CI_COMMIT_REF_NAME)' == '' " Text="Environment variable CI_COMMIT_REF_NAME is not set" />
+		<Message Condition=" $(Configuration) == 'local' AND '$(CI_JOB_URL)' == '' " Text="Environment variable CI_JOB_URL is not set" />
+
+		<Warning Condition=" $(Configuration) == 'snapshot' AND '$(CI_PROJECT_URL)' == '' " Text="Environment variable CI_PROJECT_URL is not set" />
+		<Warning Condition=" $(Configuration) == 'snapshot' AND '$(CI_COMMIT_SHORT_SHA)' == '' " Text="Environment variable CI_COMMIT_SHORT_SHA is not set" />
+		<Warning Condition=" $(Configuration) == 'snapshot' AND '$(CI_COMMIT_REF_NAME)' == '' " Text="Environment variable CI_COMMIT_REF_NAME is not set" />
+		<Warning Condition=" $(Configuration) == 'snapshot' AND '$(CI_JOB_URL)' == '' " Text="Environment variable CI_JOB_URL is not set" />
+
+		<Error Condition=" $(Configuration) == 'release' AND '$(CI_PROJECT_URL)' == '' " Text="Environment variable CI_PROJECT_URL is not set" />
+		<Error Condition=" $(Configuration) == 'release' AND '$(CI_COMMIT_SHORT_SHA)' == '' " Text="Environment variable CI_COMMIT_SHORT_SHA is not set" />
+		<Error Condition=" $(Configuration) == 'release' AND '$(CI_COMMIT_REF_NAME)' == '' " Text="Environment variable CI_COMMIT_REF_NAME is not set" />
+		<Error Condition=" $(Configuration) == 'release' AND '$(CI_JOB_URL)' == '' " Text="Environment variable CI_JOB_URL is not set" />
+	</Target>
+</Project>

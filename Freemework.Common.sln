@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Freemework.Common", "Freemework.Common\Freemework.Common.csproj", "{9C33F6C7-D522-40FB-BA07-A14371F251F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Freemework.Common.Tests", "Freemework.Common.Tests\Freemework.Common.Tests.csproj", "{B9963894-1225-4F44-A7EA-8D8F19F26F26}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9C33F6C7-D522-40FB-BA07-A14371F251F0}.Debug|Any CPU.ActiveCfg = local|Any CPU
+		{9C33F6C7-D522-40FB-BA07-A14371F251F0}.Debug|Any CPU.Build.0 = local|Any CPU
+		{9C33F6C7-D522-40FB-BA07-A14371F251F0}.Release|Any CPU.ActiveCfg = release|Any CPU
+		{9C33F6C7-D522-40FB-BA07-A14371F251F0}.Release|Any CPU.Build.0 = release|Any CPU
+		{B9963894-1225-4F44-A7EA-8D8F19F26F26}.Debug|Any CPU.ActiveCfg = local|Any CPU
+		{B9963894-1225-4F44-A7EA-8D8F19F26F26}.Debug|Any CPU.Build.0 = local|Any CPU
+		{B9963894-1225-4F44-A7EA-8D8F19F26F26}.Release|Any CPU.ActiveCfg = release|Any CPU
+		{B9963894-1225-4F44-A7EA-8D8F19F26F26}.Release|Any CPU.Build.0 = release|Any CPU
+	EndGlobalSection
+EndGlobal

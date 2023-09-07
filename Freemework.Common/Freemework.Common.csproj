@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+	<PropertyGroup>
+		<AssemblyTitle>TBD</AssemblyTitle>
+		<Description>TBD</Description>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<RootNamespace>Freemework.Common</RootNamespace>
+		<OutputType>library</OutputType>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<TargetFramework Condition=" '$(TargetFramework)' == '' AND $(NETCoreSdkVersion.StartsWith('7.0'))">net7.0</TargetFramework>
+		<TargetFramework Condition=" '$(TargetFramework)' == '' AND $(NETCoreSdkVersion.StartsWith('6.0'))">net6.0</TargetFramework>
+		<TargetFramework Condition=" '$(TargetFramework)' == '' AND $(NETCoreSdkVersion.StartsWith('5.0'))">net5.0</TargetFramework>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Define common dependencies -->
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
+		<!-- Define .NET5 specific dependencies -->
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+		<!-- Define .NET6 specific dependencies -->
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
+		<!-- Define .NET7 specific dependencies -->
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Resources/**/*" />
+	</ItemGroup>
+</Project>

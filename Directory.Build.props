@@ -1,0 +1,64 @@
+<!-- See https://docs.microsoft.com/en-us/visualstudio/msbuild/customize-your-build?view=vs-2019 -->
+<Project>
+	<PropertyGroup>
+		<Company>Freemework</Company>
+		<Product>Common</Product>
+		<Copyright>MIT</Copyright>
+		<Version>0.10.0</Version>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>Contributor</_Parameter1>
+			<_Parameter2>Max Anurin &lt;maxim.anurin@zxteam.org&gt;</_Parameter2>
+		</AssemblyAttribute>
+	</ItemGroup>
+
+	<PropertyGroup>
+		<Configurations>local;snapshot;release</Configurations>
+		<GenerateDocumentationFile>false</GenerateDocumentationFile>
+		<LangVersion>9.0</LangVersion>
+		<!-- https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/nullable-reference-types -->
+		<!-- https://habr.com/ru/company/pvs-studio/blog/455230/ -->
+		<!-- https://www.meziantou.net/csharp-8-nullable-reference-types.htm -->
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Configuration Condition=" '$(Configuration)' == '' ">local</Configuration>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)' == 'local' ">
+		<DefineConstants>$(DefineConstants);BUILD_LOCAL</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)' == 'snapshot' ">
+		<DefineConstants>$(DefineConstants);BUILD_SNAPHOT</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="*.Devel.cs" Condition=" '$(Configuration)' != 'local' AND '$(Configuration)' != 'snapshot' " />
+	</ItemGroup>
+
+	<ItemGroup>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute" Condition=" '$(CI_COMMIT_SHORT_SHA)' != '' ">
+			<_Parameter1>RepositoryCommit</_Parameter1>
+			<_Parameter2>$(CI_COMMIT_SHORT_SHA)</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute" Condition=" '$(CI_COMMIT_REF_NAME)' != '' ">
+			<_Parameter1>RepositoryReference</_Parameter1>
+			<_Parameter2>$(CI_COMMIT_REF_NAME)</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute" Condition=" '$(CI_JOB_URL)' != '' ">
+			<_Parameter1>BuildLogUrl</_Parameter1>
+			<_Parameter2>$(CI_JOB_URL)</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>BuildDate</_Parameter1>
+			<!-- https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings#time-zone-k-format-specifier -->
+			<_Parameter2 Condition=" '$(CI_COMMIT_TIMESTAMP)' != '' ">$([System.DateTime]::Parse('$(CI_COMMIT_TIMESTAMP)').ToString(yyyy-MM-ddTHH:mm:ss.ffffffK))</_Parameter2>
+			<_Parameter2 Condition=" '$(CI_COMMIT_TIMESTAMP)' == '' ">$([System.DateTime]::Now.ToString(yyyy-MM-ddTHH:mm:ss.ffffffK))</_Parameter2>
+		</AssemblyAttribute>
+	</ItemGroup>
+
+</Project>
