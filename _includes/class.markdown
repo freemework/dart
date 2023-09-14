@@ -4,6 +4,28 @@
 
 ## Properties
 
+{% assign properties = include.data.properties %}
+{% for property in properties %}
+- __{{ property.name }}__ - {{ property.description }}
+
+    ```csharp
+    public {% include native_type_resolver.markdown type=property.type targetLang='csharp' %} {{ property.name }} {% if property.keyword %}{get;}{% endif %}
+    ```
+
+    ```dart
+    {% include native_type_resolver.markdown type=property.type targetLang='dart' %} {% if property.keyword %}get{% endif %} {{ property.name }};
+    ```
+
+    ```python
+    TBD
+    ```
+
+    ```typescript
+    public {{ property.name }}: {% include native_type_resolver.markdown type=property.type targetLang='typescript' %};
+    ```
+
+{% endfor %}
+
 ## Methods
 
 ## Static Methods

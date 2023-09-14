@@ -14,12 +14,14 @@
 		"callout",
 		"callouts",
 		"classmethod",
+		"endcase",
 		"endfor",
 		"Freemework",
 		"frontmatter",
 		"jemoji",
 		"sqlmigration",
 		"theanurin",
+		"ushort",
 		"webp"
 	]
 }
