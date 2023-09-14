@@ -1,4 +1,71 @@
 name: FUri
+properties:
+  - name: authority
+    description: The authority component. The authority is formatted from the userInfo, host and port parts.
+    nullable: false
+    type: NativeString
+    keyword: get
+  - name: fragment
+    description: The Fragment marker (#) in the URI. The value is the empty string if there is no fragment identifier component.
+    nullable: false
+    type: NativeString
+    keyword: get
+  - name: host
+    description: The host part of the authority component. The value is the empty string if there is no authority component and hence no host.
+    nullable: false
+    type: NativeString
+    keyword: get
+  - name: hasAuthority
+    description: Whether the URI has an authority component.
+    nullable: false
+    type: NativeBool
+    keyword: get 
+  - name: hasFragment
+    description: Whether the URI has a fragment part.
+    type: NativeBool
+    keyword: get
+  - name: hasPort
+    description: Whether the URI has an explicit port.
+    type: NativeBool
+    keyword: get
+  - name: hasQuery
+    description: Whether the URI has a query part.
+    type: NativeBool
+    keyword: get
+  - name: hasScheme
+    description: Whether the URI has a scheme component.
+    type: NativeBool
+    keyword: get
+  - name: origin
+    description: Returns the origin of the URI in the form scheme://host:port for the schemes http and https.
+    nullable: false
+    type: NativeString
+    keyword: get
+  - name: port
+    description: The port number defines the protocol port used for contacting the server referenced in the URI. The value 80 for http, 443 for https, and 0 for everything else.
+    nullable: false
+    type: NativeUint16
+    keyword: get
+  - name: path
+    description: The path is the actual substring of the URI representing the path, and it is encoded where necessary. The path value is the empty string if there is no path component.
+    nullable: false
+    type: NativeString
+    keyword: get
+  - name: query
+    description: The Query property contains any query information included in the URI. Query information is separated from the path information by a question mark (?) and continues to the end of the URI.
+    nullable: false
+    type: NativeString
+    keyword: get
+  - name: scheme
+    description: A URI scheme is case insensitive. The returned scheme is canonicalized to lowercase letters.
+    nullable: false
+    type: NativeString
+    keyword: get
+  - name: userInfo
+    description: Gets the user name, password, or other user-specific information associated with the specified URI.
+    type: NativeString
+    nullable: false
+    keyword: get
 staticMethods:
   - name: parse
     description: Creates a new `FUri` object by parsing a URI string.
