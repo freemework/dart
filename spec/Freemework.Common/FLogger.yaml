@@ -1,0 +1,238 @@
+name: FLogger
+properties:
+  - name: isDebugEnabled
+    description: checks if debug level is enabled for your logger before.
+    nullable: true
+    type: NativeBool
+    get: true
+    set: false
+    abstract: true
+  - name: isErrorEnabled
+    description: indicates that the error level can be logged.
+    nullable: true
+    type: NativeBool
+    get: true
+    set: false
+    abstract: true
+  - name: isFatalEnabled
+    description: allows you to control whether fatal errors are logged or not.
+    nullable: true
+    type: NativeBool
+    get: true
+    set: false
+    abstract: true
+  - name: isInfoEnabled
+    description: property that indicates whether the information message logging level is enabled.
+    nullable: true
+    type: NativeBool
+    get: true
+    set: false
+    abstract: true
+  - name: name
+    description: allows other parts of the application to get the value of the name property, but does not allow you to change it.
+    type: NativeString
+    get: true
+    set: false
+    abstract: true
+  - name: isTraceEnabled
+    description: allows you to check whether the trace logging level is enabled.
+    nullable: false
+    type: NativeBool
+    get: true
+    set: false
+    abstract: true
+  - name: isWarnEnabled
+    description: used to check if the warn logging level is enabled. This method returns true if the warn logging level is enabled and false if it is disabled.
+    nullable: true
+    type: NativeBool
+    get: true
+    set: false
+    abstract: true
+
+staticMethods:
+  - name: setFLoggerFactory
+    description: TBD
+    remarks: TBD
+    positionalArgs:
+        - name: factory
+          type: FLoggerFactory
+          isOptional: false
+    namedArgs:
+        - name: testOlolo
+          type: NativeString
+          isOptional: false
+    return:
+      nullable: false
+      type: FUri
+  - name: create
+    description: TBD
+    remarks: TBD
+    positionalArgs:
+        - name: loggerName
+          type: NativeString
+          isOptional: false
+    namedArgs:
+        - name: testOlolo
+          type: NativeString
+          isOptional: false
+    return:
+      nullable: false
+      type: FUri
+
+methods:
+  - name: trace
+    description: TBD
+    remarks: TBD
+    abstract: true
+    return: false
+    positionalArgs:
+      - name: executionContext
+        type: FExecutionContext
+        isOptional: false
+      - name: message
+        type: NativeString
+        isOptional: false
+      - name: ex
+        type: FException
+        isOptional: true
+  - name: trace
+    description: TBD
+    remarks: TBD
+    abstract: true
+    return: false
+    positionalArgs:
+      - name: executionContext
+        type: FExecutionContext
+        isOptional: false
+      - name: messageFactory
+        type: FLoggerMessageFactory
+        isOptional: false
+      - name: ex
+        type: FException
+        isOptional: true
+  - name: debug
+    description: TBD
+    remarks: TBD
+    abstract: true
+    return: false
+    positionalArgs:
+      - name: executionContext
+        type: FExecutionContext
+        isOptional: false
+      - name: message
+        type: NativeString
+        isOptional: false
+      - name: ex
+        type: FException
+        isOptional: true
+  - name: debug
+    description: TBD
+    remarks: TBD
+    abstract: true
+    return: false
+    positionalArgs:
+      - name: executionContext
+        type: FExecutionContext
+        isOptional: false
+      - name: messageFactory
+        type: FLoggerMessageFactory
+        isOptional: false
+      - name: ex
+        type: FException
+        isOptional: true
+  - name: info
+    description: TBD
+    remarks: TBD
+    abstract: true
+    return: false
+    positionalArgs:
+      - name: executionContext
+        type: FExecutionContext
+        isOptional: false
+      - name: message
+        type: NativeString
+        isOptional: false
+  - name: info
+    description: TBD
+    remarks: TBD
+    abstract: true
+    return: false
+    positionalArgs:
+      - name: executionContext
+        type: FExecutionContext
+        isOptional: false
+      - name: messageFactory
+        type: FLoggerMessageFactory
+        isOptional: false
+  - name: warn
+    description: TBD
+    remarks: TBD
+    abstract: true
+    return: false
+    positionalArgs:
+      - name: executionContext
+        type: FExecutionContext
+        isOptional: false
+      - name: message
+        type: NativeString
+        isOptional: false
+  - name: warn
+    description: TBD
+    remarks: TBD
+    abstract: true
+    return: false
+    positionalArgs:
+      - name: executionContext
+        type: FExecutionContext
+        isOptional: false
+      - name: messageFactory
+        type: FLoggerMessageFactory
+        isOptional: false
+  - name: error
+    description: TBD
+    remarks: TBD
+    abstract: true
+    return: false
+    positionalArgs:
+      - name: executionContext
+        type: FExecutionContext
+        isOptional: false
+      - name: message
+        type: NativeString
+        isOptional: false
+  - name: error
+    description: TBD
+    remarks: TBD
+    abstract: true
+    return: false
+    positionalArgs:
+      - name: executionContext
+        type: FExecutionContext
+        isOptional: false
+      - name: messageFactory
+        type: FLoggerMessageFactory
+        isOptional: false
+  - name: fatal
+    description: TBD
+    remarks: TBD
+    abstract: true
+    return: false
+    positionalArgs:
+      - name: executionContext
+        type: FExecutionContext
+        isOptional: false
+      - name: message
+        type: NativeString
+        isOptional: false
+  - name: fatal
+    description: TBD
+    remarks: TBD
+    abstract: true
+    return: false
+    positionalArgs:
+      - name: executionContext
+        type: FExecutionContext
+        isOptional: false
+      - name: messageFactory
+        type: FLoggerMessageFactory
+        isOptional: false
