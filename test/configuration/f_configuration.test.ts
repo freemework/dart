@@ -174,8 +174,6 @@ describe("FConfiguration tests", function () {
 
 		assert.equal(config.get("a").asIntegerNegative, -42);
 	});
-
-
 });
 
 describe("FConfiguration Negative test", function () {
@@ -202,7 +200,7 @@ describe("FConfiguration Negative test", function () {
 
 		assert.isDefined(ex);
 		assert.instanceOf(ex, FConfigurationException);
-		assert.equal((<FConfigurationException>ex).key,"a.b.o.l.o.l.o");
+		assert.equal((<FConfigurationException>ex).key, "a.b.o.l.o.l.o");
 	});
 	it("Should be execution error Wrong argument on getConfiguration #3", function () {
 		assert.isTrue(config.getNamespace("a.b").hasNamespace("c"), "Should exist: a.b.c");
@@ -219,7 +217,7 @@ describe("FConfiguration Negative test", function () {
 
 		assert.isDefined(ex);
 		assert.instanceOf(ex, FConfigurationException);
-		assert.equal((<FConfigurationException>ex).key,"fake");
+		assert.equal((<FConfigurationException>ex).key, "fake");
 
 	});
 	it("Should be execution error Bad type of key on getBoolean", function () {
@@ -232,7 +230,7 @@ describe("FConfiguration Negative test", function () {
 
 		assert.isDefined(ex);
 		assert.instanceOf(ex, FConfigurationException);
-		assert.equal((<FConfigurationException>ex).key,"boolean");
+		assert.equal((<FConfigurationException>ex).key, "boolean");
 
 	});
 	it("Should be execution error Bad type of key on getInteger", function () {
@@ -245,7 +243,7 @@ describe("FConfiguration Negative test", function () {
 
 		assert.isDefined(ex);
 		assert.instanceOf(ex, FConfigurationException);
-		assert.equal((<FConfigurationException>ex).key,"int");
+		assert.equal((<FConfigurationException>ex).key, "int");
 
 	});
 	it("Should be execution error Bad type of key on getFloat", function () {
@@ -258,7 +256,7 @@ describe("FConfiguration Negative test", function () {
 
 		assert.isDefined(ex);
 		assert.instanceOf(ex, FConfigurationException);
-		assert.equal((<FConfigurationException>ex).key,"float");
+		assert.equal((<FConfigurationException>ex).key, "float");
 
 	});
 	it("Should be execution error Bad type of key on getEnabled", function () {
@@ -271,7 +269,7 @@ describe("FConfiguration Negative test", function () {
 
 		assert.isDefined(ex);
 		assert.instanceOf(ex, FConfigurationException);
-		assert.equal((<FConfigurationException>ex).key,"enable");
+		assert.equal((<FConfigurationException>ex).key, "enable");
 
 	});
 	it("Should be execution error Bad type of key on getBase64", function () {
@@ -284,7 +282,7 @@ describe("FConfiguration Negative test", function () {
 
 		assert.isDefined(ex);
 		assert.instanceOf(ex, FConfigurationException);
-		assert.equal((<FConfigurationException>ex).key,"base64");
+		assert.equal((<FConfigurationException>ex).key, "base64");
 	});
 	it("Should raise exception for key on get().asUrl", function () {
 		let ex;
@@ -300,6 +298,6 @@ describe("FConfiguration Negative test", function () {
 
 		assert.isDefined(ex);
 		assert.instanceOf(ex, FConfigurationException);
-		assert.equal((<FConfigurationException>ex).key,"url");
+		assert.equal((<FConfigurationException>ex).key, "url");
 	});
 });

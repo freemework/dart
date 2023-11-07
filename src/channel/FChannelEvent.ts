@@ -1,7 +1,7 @@
 import { FExecutionContext } from "../execution_context";
 
 /**
- * FChannelEvent provides a channel to handle events asynchroniosly.
+ * FChannelEvent provides a channel to handle events asynchronously.
  *
  * This is very similar to FChannelSubscriber but callback signature
  * does not accept Exception.

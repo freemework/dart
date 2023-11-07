@@ -1,12 +1,13 @@
 import { FException } from "../exception/f_exception";
 import { FExceptionInvalidOperation } from "../exception/f_exception_invalid_operation";
+import { FUtilUnreadonly } from "../util";
 
 import { FLogger } from "./f_logger";
-import { FLoggerBase } from "./f_logger_base";
+import { FLoggerBaseWithLevel } from "./f_logger_base_with_level";
 import { FLoggerLabels } from "./f_logger_labels";
 import { FLoggerLevel } from "./f_logger_level";
 
-export abstract class FLoggerConsole extends FLoggerBase {
+export abstract class FLoggerConsole extends FLoggerBaseWithLevel {
 	/**
 	 * Factory constructor
 	 */
@@ -14,35 +15,15 @@ export abstract class FLoggerConsole extends FLoggerBase {
 		readonly level?: FLoggerLevel,
 		readonly format?: FLoggerConsole.Format;
 	}): FLogger {
-		const level: FLoggerLevel | null = opts !== undefined && opts.level !== undefined ? opts.level : null;
+		const level: FLoggerLevel = opts !== undefined && opts.level !== undefined ? opts.level : FLoggerLevel.TRACE;
 		const format: FLoggerConsole.Format = opts !== undefined && opts.format !== undefined ? opts.format : "text";
 
-		const levels: Map<FLoggerLevel, boolean> = new Map();
-		levels.set(FLoggerLevel.FATAL, level != null && level >= FLoggerLevel.FATAL);
-		levels.set(FLoggerLevel.ERROR, level != null && level >= FLoggerLevel.ERROR);
-		levels.set(FLoggerLevel.WARN, level != null && level >= FLoggerLevel.WARN);
-		levels.set(FLoggerLevel.INFO, level != null && level >= FLoggerLevel.INFO);
-		levels.set(FLoggerLevel.DEBUG, level != null && level >= FLoggerLevel.DEBUG);
-		levels.set(FLoggerLevel.TRACE, level != null && level >= FLoggerLevel.TRACE);
-
 		if (format === "json") {
-			return new FLoggerConsoleJsonImpl(loggerName, levels);
+			return new FLoggerConsoleJsonImpl(loggerName, level);
 		} else {
-			return new FLoggerConsoleTextImpl(loggerName, levels);
+			return new FLoggerConsoleTextImpl(loggerName, level);
 		}
 	}
-
-	protected constructor(loggerName: string, levels: Map<FLoggerLevel, boolean>) {
-		super(loggerName);
-		this._levels = levels;
-	}
-
-	protected isLevelEnabled(level: FLoggerLevel): boolean {
-		const isEnabled: boolean | undefined = this._levels.get(level);
-		return isEnabled === true;
-	}
-
-	private readonly _levels: Map<FLoggerLevel, boolean>;
 }
 
 export namespace FLoggerConsole {
@@ -90,32 +71,50 @@ class FLoggerConsoleTextImpl extends FLoggerConsole {
 
 	}
 
-	public constructor(loggerName: string, levels: Map<FLoggerLevel, boolean>) {
-		super(loggerName, levels);
-	}
+	// public constructor(loggerName: string, level: FLoggerLevel) {
+	// 	super(loggerName, level);
+	// }
 }
 
-class FLoggerConsoleJsonImpl extends FLoggerConsole {
-	protected log(
+interface FLoggerConsoleJsonLogEntryBase {
+	readonly [label: string]: string;
+	readonly name: string;
+	readonly date: string;
+	readonly level: string;
+	readonly message: string;
+}
+interface FLoggerConsoleJsonLogEntryWithException extends FLoggerConsoleJsonLogEntryBase {
+	readonly 'exception.name': string;
+	readonly 'exception.message': string;
+}
+type FLoggerConsoleJsonLogEntry = FLoggerConsoleJsonLogEntryBase | FLoggerConsoleJsonLogEntryWithException;
+
+
+class FLoggerConsoleJsonImpl extends FLoggerBaseWithLevel {
+	public static formatLogMessage(
+		loggerName: string,
 		level: FLoggerLevel,
 		labels: FLoggerLabels,
 		message: string,
-		exception?: FException
-	): void {
-		const logEntry: Record<string, string> = {
-			name: this.name,
+		exception?: FException | null,
+	): string {
+		const logEntryBase: Pick<FLoggerConsoleJsonLogEntry, 'name' | 'date' | 'level'> = {
+			name: loggerName,
 			date: new Date().toISOString(),
 			level: level.toString(),
-
 		};
 
+		const labelsObj: Record<string, string> = {};
 		for (const [labelName, labelValue] of Object.entries(labels)) {
-			logEntry[labelName] = labelValue;
+			labelsObj[`label.${labelName}`] = labelValue;
 		}
 
-		logEntry.message = message;
-
-		if (exception != null) {
+		const logEntry: FUtilUnreadonly<FLoggerConsoleJsonLogEntry> = {
+			...logEntryBase,
+			...labelsObj,
+			message,
+		};
+		if (exception !== undefined && exception != null) {
 			logEntry["exception.name"] = exception.name;
 			logEntry["exception.message"] = exception.message;
 			if (exception.stack !== undefined) {
@@ -124,6 +123,18 @@ class FLoggerConsoleJsonImpl extends FLoggerConsole {
 		}
 
 		const logMessage: string = JSON.stringify(logEntry);
+
+		return logMessage;
+	}
+
+	protected log(level: FLoggerLevel, labels: FLoggerLabels, message: string, exception?: FException): void {
+		const logMessage: string = FLoggerConsoleJsonImpl.formatLogMessage(
+			this.name,
+			level,
+			labels,
+			message,
+			exception,
+		);
 		switch (level) {
 			case FLoggerLevel.TRACE:
 			case FLoggerLevel.DEBUG:
@@ -137,12 +148,6 @@ class FLoggerConsoleJsonImpl extends FLoggerConsole {
 			case FLoggerLevel.FATAL:
 				console.error(logMessage);
 				break;
-			default:
-				throw new FExceptionInvalidOperation(`Unsupported log level '${level}'.`);
 		}
-	}
-
-	public constructor(loggerName: string, levels: Map<FLoggerLevel, boolean>) {
-		super(loggerName, levels);
 	}
 }

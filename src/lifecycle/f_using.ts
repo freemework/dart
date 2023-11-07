@@ -5,7 +5,7 @@ import { FExceptionArgument } from "../exception";
 
 
 // TODO Add overloading
-// return Fusing(
+// return FUsing(
 // 	executionContext,
 // 	() => this.create(executionContext),  // <- ! initializer without executionContext
 // 	(db) => worker(db)                    // <- ! worker without executionContext

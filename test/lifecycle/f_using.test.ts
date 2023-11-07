@@ -14,7 +14,7 @@ import {
 } from "../../src";
 import { Deferred, nextTick } from "./tools";
 
-describe("Fusing tests", function () {
+describe("FUsing tests", function () {
 	class TestDisposable extends FDisposableBase {
 		private readonly _onDisposeCb: Function | null;
 		public constructor(onDisposeCb?: Function) {
@@ -168,7 +168,7 @@ describe("Fusing tests", function () {
 		assert.isTrue(disposable.disposed);
 		assert.isFalse(disposable.disposing);
 	});
-	it("Fusing test onDispose(): Promise<void>", async function () {
+	it("FUsing test onDispose(): Promise<void>", async function () {
 		const defer = Deferred.create<number>();
 		let FusingPromiseResolved = false;
 		const FusingPromise = FUsing(FExecutionContext.Empty, () => (new TestDisposable()), (ct, instance) => defer.promise)
