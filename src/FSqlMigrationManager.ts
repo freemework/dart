@@ -111,7 +111,7 @@ export abstract class FSqlMigrationManager {
 	/**
 	 * Rollback versions (increment version)
 	 * @param cancellationToken A cancellation token that can be used to cancel the action.
-	 * @param targetVersion Optional target version. Will use first version if omitted.
+	 * @param targetVersion Optional target version. Will rollback all versions if omitted.
 	 */
 	public async rollback(executionContext: FExecutionContext, targetVersion?: string): Promise<void> {
 		executionContext = new FLoggerLabelsExecutionContext(executionContext, {
