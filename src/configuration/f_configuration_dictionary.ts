@@ -5,22 +5,34 @@ import { FConfigurationException } from "./f_configuration_exception";;
 import { FConfigurationValue } from "./f_configuration_value";
 
 export class FConfigurationDictionary extends FConfiguration {
-
+	private static readonly NAMESPACE_DELIMITER_SYMBOL = ".";
 	private readonly _dict: FConfigurationDictionary.Data;
 	private readonly _sourceURI: URL;
 	private readonly _configurationNamespace: string | null;
 	private _keys: ReadonlyArray<string> | null;
 
-	public constructor(sourceURI: URL, dict: FConfigurationDictionary.Data, configurationNamespace?: string) {
+	public constructor(sourceURI: URL, dict: FConfigurationDictionary.Data, namespaceFull?: string) {
 		super();
 		this._dict = Object.freeze({ ...dict });
 		this._sourceURI = sourceURI;
-		this._configurationNamespace = configurationNamespace !== undefined ? configurationNamespace : null;
+		this._configurationNamespace = namespaceFull !== undefined ? namespaceFull : null;
 		this._keys = null;
 	}
 
-	public get configurationNamespace(): string | null {
+	public get namespaceFull(): string | null {
 		return this._configurationNamespace;
+	}
+
+	public get namespaceParent(): string | null {
+		const configurationNamespace = this._configurationNamespace;
+		if (configurationNamespace === null) { return null; }
+
+		const indexOfLastDelimiter: number = configurationNamespace.lastIndexOf(FConfigurationDictionary.NAMESPACE_DELIMITER_SYMBOL);
+		if (indexOfLastDelimiter === -1) {
+			return configurationNamespace;
+		}
+
+		return configurationNamespace.substring(indexOfLastDelimiter + 1);
 	}
 
 	public get keys(): ReadonlyArray<string> {
@@ -31,7 +43,7 @@ export class FConfigurationDictionary extends FConfiguration {
 		return this._sourceURI;
 	}
 
-	public findNamespace(configurationNamespace: string): FConfiguration | null {
+	public findNamespace(namespaceFull: string): FConfiguration | null {
 		throw new Error("Method not implemented.");
 	}
 
@@ -50,9 +62,9 @@ export class FConfigurationDictionary extends FConfiguration {
 		}
 	}
 
-	public getNamespace(configurationNamespace: string): FConfiguration {
+	public getNamespace(namespaceFull: string): FConfiguration {
 		const innerDict: FUtilUnreadonly<FConfigurationDictionary.Data> = {};
-		const criteria = configurationNamespace + ".";
+		const criteria = namespaceFull + FConfigurationDictionary.NAMESPACE_DELIMITER_SYMBOL;
 		const criteriaLen = criteria.length;
 		Object.keys(this._dict).forEach((key) => {
 			if (key.length > criteriaLen && key.startsWith(criteria)) {
@@ -62,7 +74,7 @@ export class FConfigurationDictionary extends FConfiguration {
 		});
 
 		const innerConfigurationNamespace = this._configurationNamespace !== null ?
-			`${this._configurationNamespace}.${configurationNamespace}` : configurationNamespace;
+			`${this._configurationNamespace}.${namespaceFull}` : namespaceFull;
 
 		if (Object.keys(innerDict).length === 0) {
 			throw new FConfigurationException(
@@ -109,8 +121,8 @@ export class FConfigurationDictionary extends FConfiguration {
 		return arrayNamespaces;
 	}
 
-	public hasNamespace(configurationNamespace: string): boolean {
-		const criteria = configurationNamespace + ".";
+	public hasNamespace(namespaceFull: string): boolean {
+		const criteria = namespaceFull + FConfigurationDictionary.NAMESPACE_DELIMITER_SYMBOL;
 		const criteriaLen = criteria.length;
 		for (const key of Object.keys(this._dict)) {
 			if (key.length > criteriaLen && key.startsWith(criteria)) {

@@ -76,10 +76,10 @@ describe("FConfigurationChain tests", function () {
 		assert.equal(endpointsConfiguration, "0");
 
 		const endpointRootConfiguration = chainConfiguration.getNamespace(`endpoint`);
-		assert.equal(endpointRootConfiguration.configurationNamespace, "endpoint");
+		assert.equal(endpointRootConfiguration.namespaceFull, "endpoint");
 
 		const endpointConfiguration = endpointRootConfiguration.getNamespace(`0`);
-		assert.equal(endpointConfiguration.configurationNamespace, "endpoint.0");
+		assert.equal(endpointConfiguration.namespaceFull, "endpoint.0");
 		assert.equal(endpointConfiguration.get("type").asString, "rest");
 		assert.equal(endpointConfiguration.get("servers").asString, "main");
 		assert.equal(endpointConfiguration.get("bindPath").asString, "/");
@@ -112,13 +112,13 @@ describe("FConfigurationChain tests", function () {
 		assert.equal(endpointConfigurations.length, 2);
 
 		const endpointConfiguration0 = endpointConfigurations[0];
-		assert.equal(endpointConfiguration0.configurationNamespace, "endpoint.0");
+		assert.equal(endpointConfiguration0.namespaceFull, "endpoint.0");
 		assert.equal(endpointConfiguration0.get("type").asString, "rest0");
 		assert.equal(endpointConfiguration0.get("servers").asString, "main0");
 		assert.equal(endpointConfiguration0.get("bindPath").asString, "/path0");
 
 		const endpointConfiguration2 = endpointConfigurations[1];
-		assert.equal(endpointConfiguration2.configurationNamespace, "endpoint.2");
+		assert.equal(endpointConfiguration2.namespaceFull, "endpoint.2");
 		assert.equal(endpointConfiguration2.get("type").asString, "rest2");
 		assert.equal(endpointConfiguration2.get("servers").asString, "main2");
 		assert.equal(endpointConfiguration2.get("bindPath").asString, "/path2");

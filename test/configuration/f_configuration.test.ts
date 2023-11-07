@@ -3,7 +3,7 @@ import _ = require("lodash");
 
 import { FConfiguration, FConfigurationException, FConfigurationValue } from "../../src";
 
-describe("FConfiguration tests", function () {
+describe.only("FConfiguration tests", function () {
 	it("factoryJson should should contains proper sourceURI 'configuration:json?data=%7B%22a%22%3A%2242%22%7D'", function () {
 		const data = {
 			"a": "42"
@@ -20,6 +20,51 @@ describe("FConfiguration tests", function () {
 		});
 
 		assert.equal(config.get("a.a.a").asString, "env-own-a");
+	});
+
+	it("Should resolve parent namespace from 'a' as null", function () {
+		const config = FConfiguration.factoryJson({
+			"a": "env-own-a"
+		});
+
+		assert.isNull(config.namespaceParent);
+	});
+
+	it("Should resolve parent namespace from 'a.b' as null", function () {
+		const config = FConfiguration.factoryJson({
+			"a.b": "env-own-a"
+		});
+
+		assert.isNull(config.namespaceParent);
+	});
+
+	it("Should resolve parent namespace from 'a.b.c' as null", function () {
+		const config = FConfiguration.factoryJson({
+			"a.b.c": "env-own-a"
+		});
+
+		assert.isNull(config.namespaceParent);
+	});
+
+
+	it("Should resolve parent namespace from 'a.b.c' with sub configuration 'a'", function () {
+		const config = FConfiguration.factoryJson({
+			"a.b.c": "env-own-a"
+		});
+
+		const subConfig = config.getNamespace("a");
+
+		assert.equal(subConfig.namespaceParent, "a");
+	});
+
+	it("Should resolve parent namespace from 'a.b.c' with sub configuration 'a.b'", function () {
+		const config = FConfiguration.factoryJson({
+			"a.b.c": "env-own-a"
+		});
+
+		const subConfig = config.getNamespace("a.b");
+
+		assert.equal(subConfig.namespaceParent, "b");
 	});
 
 	it('factoryJson should expand json of {"a":{"b":{"c":42}}} into {"a.b.c":42}', function () {

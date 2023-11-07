@@ -135,7 +135,7 @@ export abstract class FConfiguration {
 	public abstract get sourceURI(): URL;
 
 	/**
-	 * Gets configuration namespace
+	 * Gets fully qualified configuration namespace name
 	 *
 	 * @example
 	 * ```js
@@ -146,16 +146,39 @@ export abstract class FConfiguration {
 	 * 	"runtime.server.TWO.listenPort": "8082",
 	 * });
 	 *
-	 * console.log(appCfg.configurationNamespace); // null
+	 * console.log(appCfg.namespaceFull); // null
 	 *
 	 * const runtimeCfg = appCfg.getNamespace("runtime");
-	 * console.log(runtimeCfg.configurationNamespace); // "runtime"
+	 * console.log(runtimeCfg.namespaceFull); // "runtime"
 	 *
 	 * const serverTwoCfg = runtimeCfg.getNamespace("server.TWO");
-	 * console.log(serverTwoCfg.configurationNamespace); // "runtime.server.TWO"
+	 * console.log(serverTwoCfg.namespaceFull); // "runtime.server.TWO"
 	 * ```
 	 */
-	public abstract get configurationNamespace(): string | null;
+	public abstract get namespaceFull(): string | null;
+
+	/**
+	 * Gets parent configuration namespace name
+	 *
+	 * @example
+	 * ```js
+	 * const appCfg = FConfiguration.factoryJson({
+	 * 	"runtime.server.ONE.listenAddress": "localhost",
+	 * 	"runtime.server.ONE.listenPort": "8081",
+	 * 	"runtime.server.TWO.listenAddress": "localhost",
+	 * 	"runtime.server.TWO.listenPort": "8082",
+	 * });
+	 *
+	 * console.log(appCfg.namespaceParent); // null
+	 *
+	 * const runtimeCfg = appCfg.getNamespace("runtime");
+	 * console.log(runtimeCfg.namespaceParent); // "runtime"
+	 *
+	 * const serverTwoCfg = runtimeCfg.getNamespace("server.TWO");
+	 * console.log(serverTwoCfg.namespaceParent); // "TWO"
+	 * ```
+	 */
+	public abstract get namespaceParent(): string | null;
 
 	/**
 	 * Gets list of keys available in current configuration
@@ -207,11 +230,11 @@ export abstract class FConfiguration {
 	 * console.log(serverCfgs[0].keys); // ["listenAddress","listenPort"]
 	 * console.log(serverCfgs[1].keys); // ["listenAddress","listenPort"]
 	 *
-	 * console.log(serverCfgs[0].configurationNamespace); // runtime.server.ONE
+	 * console.log(serverCfgs[0].namespaceFull); // runtime.server.ONE
 	 * console.log(serverCfgs[0].get("listenAddress").asString); // localhost
 	 * console.log(serverCfgs[0].get("listenPort").asInteger); // 8081
 	 *
-	 * console.log(serverCfgs[1].configurationNamespace); // runtime.server.THREE
+	 * console.log(serverCfgs[1].namespaceFull); // runtime.server.THREE
 	 * console.log(serverCfgs[1].get("listenAddress").asString); // localhost
 	 * console.log(serverCfgs[1].get("listenPort").asInteger); // 8083
 	 * ```
@@ -233,16 +256,16 @@ export abstract class FConfiguration {
 	 * 	"runtime.server.TWO.listenPort": "8082",
 	 * });
 	 *
-	 * console.log(appCfg.configurationNamespace); // ""
+	 * console.log(appCfg.namespaceFull); // ""
 	 *
 	 * const runtimeCfg = appCfg.getNamespace("runtime");
-	 * console.log(runtimeCfg.configurationNamespace); // "runtime"
+	 * console.log(runtimeCfg.namespaceFull); // "runtime"
 	 *
 	 * const serverTwoCfg = runtimeCfg.getNamespace("server.TWO");
-	 * console.log(serverTwoCfg.configurationNamespace); // "runtime.server.TWO"
+	 * console.log(serverTwoCfg.namespaceFull); // "runtime.server.TWO"
 	 * ```
 	 */
-	public abstract getNamespace(configurationNamespace: string): FConfiguration;
+	public abstract getNamespace(namespaceFull: string): FConfiguration;
 
 	/**
 	 * @throws `FConfigurationException` if the `key` not found and no `defaultData` provided
@@ -270,11 +293,11 @@ export abstract class FConfiguration {
 	 * console.log(runtimeCfg !== null); // true
 	 * ```
 	 */
-	public abstract findNamespace(configurationNamespace: string): FConfiguration | null;
+	public abstract findNamespace(namespaceFull: string): FConfiguration | null;
 
 	public abstract find(key: string): FConfigurationValue | null;
 
-	public abstract hasNamespace(configurationNamespace: string): boolean;
+	public abstract hasNamespace(namespaceFull: string): boolean;
 
 	/**
 	 * Checks whether key is presented in current configuration

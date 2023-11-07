@@ -11,8 +11,11 @@ export class FConfigurationChain extends FConfiguration {
 	public get sourceURI(): URL {
 		return this._sourceURI;
 	}
-	public get configurationNamespace(): string | null {
-		return this._configurations[0].configurationNamespace;
+	public get namespaceFull(): string | null {
+		return this._configurations[0].namespaceFull;
+	}
+	public get namespaceParent(): string | null {
+		return this._configurations[0].namespaceParent;
 	}
 	public get keys(): readonly string[] {
 		return _.union(...this._configurations.map(item => item.keys));
@@ -50,21 +53,21 @@ export class FConfigurationChain extends FConfiguration {
 		return arrayNamespaces;
 	}
 
-	public getNamespace(configurationNamespace: string): FConfiguration {
-		const innerConfiguration: FConfiguration | null = this.findNamespace(configurationNamespace);
+	public getNamespace(namespaceFull: string): FConfiguration {
+		const innerConfiguration: FConfiguration | null = this.findNamespace(namespaceFull);
 		if (innerConfiguration !== null) {
 			return innerConfiguration;
 		}
 
 		// Force underlaying config to raise error
 		for (const configuration of this._configurations) {
-			configuration.getNamespace(configurationNamespace);
+			configuration.getNamespace(namespaceFull);
 		}
 
 		// just a guard, should not happens if underlaying configuration is implemented correctly
 		throw new FConfigurationException(
 			`Namespace was not found in the configuration.`,
-			configurationNamespace
+			namespaceFull
 		);
 	}
 
@@ -74,8 +77,8 @@ export class FConfigurationChain extends FConfiguration {
 			return foundValue;
 		}
 
-		const configurationNamespace = this.configurationNamespace;
-		const fullKey = configurationNamespace !== null ? `${configurationNamespace}.${key}` : key;
+		const namespaceFull = this.namespaceFull;
+		const fullKey = namespaceFull !== null ? `${namespaceFull}.${key}` : key;
 
 		if (defaultData !== undefined) {
 			const value: FConfigurationValue = FConfigurationValue.factory(
@@ -87,11 +90,11 @@ export class FConfigurationChain extends FConfiguration {
 		}
 	}
 
-	public findNamespace(configurationNamespace: string): FConfiguration | null {
+	public findNamespace(namespaceFull: string): FConfiguration | null {
 		const innerConfigurations: Array<FConfiguration> = [];
 		for (const configuration of this._configurations) {
-			if (configuration.hasNamespace(configurationNamespace)) {
-				innerConfigurations.push(configuration.getNamespace(configurationNamespace));
+			if (configuration.hasNamespace(namespaceFull)) {
+				innerConfigurations.push(configuration.getNamespace(namespaceFull));
 			}
 		}
 		if (innerConfigurations.length === 0) {
@@ -111,12 +114,12 @@ export class FConfigurationChain extends FConfiguration {
 		return null;
 	}
 
-	public hasNamespace(configurationNamespace: string): boolean {
+	public hasNamespace(namespaceFull: string): boolean {
 		for (const configuration of this._configurations) {
-			if (configuration.hasNamespace(configurationNamespace)) {
+			if (configuration.hasNamespace(namespaceFull)) {
 				return true;
-			} else if (configuration.has(configurationNamespace)) {
-				const isMaskedNamespace = configuration.get(configurationNamespace).isNull;
+			} else if (configuration.has(namespaceFull)) {
+				const isMaskedNamespace = configuration.get(namespaceFull).isNull;
 				if (isMaskedNamespace) {
 					// This is masked namespace
 					return false;
