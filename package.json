@@ -1,6 +1,6 @@
 {
 	"name": "@freemework/decimal.bignumberjs",
-	"version": "0.10.6",
+	"version": "0.10.13",
 	"description": "decimal.bignumberjs library of the Freemework Project.",
 	"author": {
 		"name": "Freemework Project",
@@ -43,14 +43,14 @@
 		"test:only": "tsc && mocha --require source-map-support/register \"test/**/*.test.js\" --recursive --timeout 10000"
 	},
 	"dependencies": {
-		"@freemework/common": "^0.10.6",
+		"@freemework/common": "^0.10.13",
 		"@types/node": "^18.16.0",
 		"bignumber.js": "^9.1.2"
 	},
 	"devDependencies": {
-		"@types/chai": "^4.3.6",
-		"@types/mocha": "^10.0.1",
-		"chai": "^4.3.8",
+		"@types/chai": "^4.3.9",
+		"@types/mocha": "^10.0.4",
+		"chai": "^4.3.10",
 		"mocha": "^10.2.0",
 		"nyc": "^15.1.0",
 		"source-map-support": "^0.5.21",
