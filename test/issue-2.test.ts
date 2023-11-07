@@ -74,7 +74,7 @@ myDescribe(`Issue 2 (schema:issue_2_${timestamp})`, function (this: Suite) {
 			);
 
 			const manager = new FSqlMigrationManagerPostgres({
-				migrationSources, sqlConnectionFactory
+				sqlConnectionFactory
 			});
 
 			await manager.install(FExecutionContext.Default, migrationSources);

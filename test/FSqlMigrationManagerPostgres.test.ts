@@ -74,7 +74,7 @@ myDescribe(`FSqlMigrationManagerPostgres (schema:migration_${timestamp})`, funct
 			);
 
 			const manager = new FSqlMigrationManagerPostgres({
-				migrationSources, sqlConnectionFactory
+				sqlConnectionFactory
 			});
 
 			await manager.install(FExecutionContext.Default, migrationSources);

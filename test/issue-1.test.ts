@@ -73,7 +73,7 @@ myDescribe(`Issue #1 (schema:migration_${timestamp})`, function (this: Suite) {
 				path.normalize(path.join(__dirname, "..", "test.files", "issue_1"))
 			);
 			const manager = new FSqlMigrationManagerPostgres({
-				migrationSources, sqlConnectionFactory
+				sqlConnectionFactory
 			});
 
 			await manager.install(FExecutionContext.Default, migrationSources);

@@ -9,7 +9,6 @@ import {
 	FSqlExceptionSyntax,
 	FSqlConnection,
 	FSqlResultRecord,
-	FDecimalRoundMode,
 } from "@freemework/common";
 import { FDecimalBackendBigNumber } from "@freemework/decimal.bignumberjs";
 import { FSqlMigrationSources } from "@freemework/sql.misc.migration";
@@ -116,7 +115,7 @@ myDescribe(`PostgreSQL Tests (schema:general_test_1_${timestamp})`, function () 
 			);
 
 			const manager = new FSqlMigrationManagerPostgres({
-				migrationSources, sqlConnectionFactory
+				sqlConnectionFactory
 			});
 
 			await manager.install(FExecutionContext.Default, migrationSources);
@@ -755,7 +754,7 @@ myDescribe(`PostgreSQL Tests via usingProvider (schema:general_test_2_${timestam
 			);
 
 			const manager = new FSqlMigrationManagerPostgres({
-				migrationSources, sqlConnectionFactory
+				sqlConnectionFactory
 			});
 
 			await manager.install(FExecutionContext.Default, migrationSources);
@@ -803,7 +802,7 @@ myDescribe(`PostgreSQL Tests via usingProviderWithTransaction (schema:general_te
 			);
 
 			const manager = new FSqlMigrationManagerPostgres({
-				migrationSources, sqlConnectionFactory
+				sqlConnectionFactory
 			});
 
 			await manager.install(FExecutionContext.Default, migrationSources);
