@@ -205,9 +205,9 @@ export namespace FHostingConfiguration {
 		const serverConfigurations: Array<FConfiguration> = configuration.getArray("server");
 		const servers: Array<FHostingConfiguration.WebServer> = serverConfigurations.map(serverConfiguration => {
 			let serverName: string = "Unnamed";
-			const { configurationNamespace } = serverConfiguration;
-			if (configurationNamespace !== null) {
-				const configurationNamespaceParts: Array<string> = configurationNamespace.split(".");
+			const { namespaceFull } = serverConfiguration;
+			if (namespaceFull !== null) {
+				const configurationNamespaceParts: Array<string> = namespaceFull.split(".");
 				if (configurationNamespaceParts.length > 0) {
 					// Use name of configuration index
 					serverName = configurationNamespaceParts[configurationNamespaceParts.length - 1];

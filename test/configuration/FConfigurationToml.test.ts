@@ -1,3 +1,5 @@
+import { FConfiguration } from "@freemework/common";
+
 import { assert } from "chai";
 
 import { FConfigurationToml } from "../../src";
@@ -126,3 +128,29 @@ desc = "desc3"
 	});
 });
 
+describe("FConfigurationToml Regression 0.10.11", function () {
+	it("FConfigurationToml.getArray should exclude 'index' key", function () {
+
+		const tomlData = `
+"edgebus.setup.topic.indexes" = "TOPC201f5dddf40e4ef9b6b9de17ad37bb76"
+[[edgebus.setup.topic]]
+	index = "TOPC201f5dddf40e4ef9b6b9de17ad37bb76"
+	name = "my-topic"
+	description = "Some messages"
+	mediaType = "application/json"
+`;
+
+		const config: FConfigurationToml = FConfigurationToml.factory(tomlData, "index", "indexes");
+
+		const setupNamespace: FConfiguration = config.getNamespace("edgebus.setup");
+		const topics: Array<FConfiguration> = setupNamespace.getArray("topic");
+
+		assert.equal(topics.length, 1);
+
+		const topic: FConfiguration = topics[0];
+
+		const topicKeys: ReadonlyArray<string> = topic.keys;
+
+		assert.notInclude(topicKeys, "index");
+	});
+});

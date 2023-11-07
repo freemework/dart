@@ -15,7 +15,7 @@ export class FConfigurationEnv extends FConfigurationDictionary {
 			if (value === undefined) {
 				value = "";
 			}
-			
+
 			dict[name] = value;
 		});
 

@@ -67,15 +67,22 @@ export class FConfigurationToml extends FConfigurationDictionary {
 				dict[ns] = sourceData ? "true" : "false";
 			} else if (Array.isArray(sourceData)) {
 				const indexes: Array<string> = [];
+				const indexerKey: string = `${ns}.${arrayIndexesKey}`;
+
 				for (let index = 0; index < sourceData.length; ++index) {
 					const innerSourceData = sourceData[index];
-					const indexName: string = typeof (innerSourceData) === "object" && arrayIndexKey in innerSourceData
-						? innerSourceData[arrayIndexKey] : index.toString();
+					let indexName: string;
+					if (typeof (innerSourceData) === "object" && arrayIndexKey in innerSourceData) {
+						indexName = innerSourceData[arrayIndexKey];
+						delete innerSourceData[arrayIndexKey];
+					} else {
+						indexName = index.toString();
+					}
 					const subKey = `${ns}.${indexName}`;
 					recursiveWalker(innerSourceData, subKey);
 					indexes.push(indexName);
 				}
-				const indexerKey: string = `${ns}.${arrayIndexesKey}`;
+
 				if (!(indexerKey in dict)) {
 					dict[indexerKey] = indexes.join(" ");
 				}

@@ -59,7 +59,7 @@ export { FConfigurationToml } from "./FConfigurationToml";
 // 		}
 // 	}
 
-// 	public get configurationNamespace(): string {
+// 	public get namespaceFull(): string {
 // 		if (this._parentNamespace !== undefined) {
 // 			return this._parentNamespace;
 // 		}
@@ -73,14 +73,14 @@ export { FConfigurationToml } from "./FConfigurationToml";
 // 	/**
 // 	 * @deprecated Use `getNamespace` instead
 // 	 */
-// 	public getConfiguration(configurationNamespace: string): FConfiguration {
-// 		return this.getNamespace(configurationNamespace);
+// 	public getConfiguration(namespaceFull: string): FConfiguration {
+// 		return this.getNamespace(namespaceFull);
 // 	}
 
-// 	public getNamespace(configurationNamespace: string): FConfiguration {
-// 		if (!configurationNamespace) { throw new FExceptionArgument("configurationNamespace"); }
+// 	public getNamespace(namespaceFull: string): FConfiguration {
+// 		if (!namespaceFull) { throw new FExceptionArgument("namespaceFull"); }
 // 		const subDict: ConfigurationImpl.Dictionary = {};
-// 		const criteria = configurationNamespace + ".";
+// 		const criteria = namespaceFull + ".";
 // 		const criteriaLen = criteria.length;
 // 		Object.keys(this._dict).forEach((key) => {
 // 			if (key.length > criteriaLen && key.startsWith(criteria)) {
@@ -89,14 +89,14 @@ export { FConfigurationToml } from "./FConfigurationToml";
 // 			}
 // 		});
 // 		if (Object.keys(subDict).length === 0) {
-// 			const fullKeyName = this.getFullKey(configurationNamespace);
+// 			const fullKeyName = this.getFullKey(namespaceFull);
 // 			throw new FConfigurationException(
 // 				`Namespace '${fullKeyName}' was not found in the configuration.`,
 // 				fullKeyName, null
 // 			);
 // 		}
 // 		const parentNamespace = this._parentNamespace !== undefined ?
-// 			`${this._parentNamespace}.${configurationNamespace}` : configurationNamespace;
+// 			`${this._parentNamespace}.${namespaceFull}` : namespaceFull;
 // 		return new ConfigurationImpl(subDict, parentNamespace);
 // 	}
 
@@ -232,8 +232,8 @@ export { FConfigurationToml } from "./FConfigurationToml";
 // 		return key in this._dict;
 // 	}
 
-// 	public hasNamespace(configurationNamespace: string): boolean {
-// 		const criteria = configurationNamespace + ".";
+// 	public hasNamespace(namespaceFull: string): boolean {
+// 		const criteria = namespaceFull + ".";
 // 		const criteriaLen = criteria.length;
 // 		for (const key of Object.keys(this._dict)) {
 // 			if (key.length > criteriaLen && key.startsWith(criteria)) {

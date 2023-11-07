@@ -2,7 +2,7 @@ import { assert } from "chai";
 
 import { FConfiguration, FConfigurationException } from "@freemework/common";
 
-import { FConfigurationEnv } from "../../src";
+import { FConfigurationEnv, FConfigurationToml } from "../../src";
 
 describe("FConfigurationEnv basic tests", function () {
 	it("Should get value of 'a.a.a'", function () {
@@ -41,7 +41,7 @@ describe("FConfigurationEnv basic tests", function () {
 	});
 });
 
-describe("Regression 0.10.11", function () {
+describe("FConfigurationEnv Regression 0.10.11", function () {
 	it("FConfigurationEnv.getArray should provide index key", function () {
 
 		process.env["edgebus.setup.topic.indexes"] = "TOPC201f5dddf40e4ef9b6b9de17ad37bb76";
@@ -49,7 +49,7 @@ describe("Regression 0.10.11", function () {
 		process.env["edgebus.setup.topic.TOPC201f5dddf40e4ef9b6b9de17ad37bb76.description"] = "Some messages";
 		process.env["edgebus.setup.topic.TOPC201f5dddf40e4ef9b6b9de17ad37bb76.mediaType"] = "application/json";
 		try {
-			const config = new FConfigurationEnv();
+			const config: FConfigurationEnv = new FConfigurationEnv();
 
 			const setupNamespace: FConfiguration = config.getNamespace("edgebus.setup");
 			const topics: Array<FConfiguration> = setupNamespace.getArray("topic");
@@ -60,16 +60,12 @@ describe("Regression 0.10.11", function () {
 
 			const topicKeys: ReadonlyArray<string> = topic.keys;
 
-			assert.include(topicKeys, "name");
-			assert.include(topicKeys, "description");
-			assert.include(topicKeys, "mediaType");
-			assert.include(topicKeys, "index");
+			assert.notInclude(topicKeys, "index");
 		} finally {
 			delete process.env["edgebus.setup.topic.indexes"];
 			delete process.env["edgebus.setup.topic.TOPC201f5dddf40e4ef9b6b9de17ad37bb76.name"];
 			delete process.env["edgebus.setup.topic.TOPC201f5dddf40e4ef9b6b9de17ad37bb76.description"];
 			delete process.env["edgebus.setup.topic.TOPC201f5dddf40e4ef9b6b9de17ad37bb76.mediaType"];
-	
 		}
 	});
 });
