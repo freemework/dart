@@ -478,7 +478,11 @@ export abstract class FBindEndpoint extends FInitableBase {
 		this._bindPath = opts.bindPath;
 	}
 
-	protected onInit(): void {
+	protected onInit(): void | Promise<void> {
+		// NOP
+	}
+
+	protected onDispose(): void | Promise<void> {
 		// NOP
 	}
 }
