@@ -1,6 +1,6 @@
 import { assert } from "chai";
 
-import { FDecimal,  FDecimalBackend, FDecimalBackendNumber, FDecimalRoundMode } from "../../../src";
+import { FDecimal,  FDecimalBackend, FDecimalBackendNumber, FDecimalRoundMode } from "../../../src/index.js";
 
 
 const fractionalDigits = 10;

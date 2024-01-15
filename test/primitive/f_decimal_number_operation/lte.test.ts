@@ -1,6 +1,6 @@
 import { assert } from "chai";
 
-import { FDecimal, FDecimalBackend, FDecimalBackendNumber, FDecimalRoundMode } from "../../../src";
+import { FDecimal, FDecimalBackend, FDecimalBackendNumber, FDecimalRoundMode } from "../../../src/index.js";
 
 
 type TestCases = Array<[/*left: */string, /*right: */string, /*expectedResult: */boolean, /*backends: */Array<FDecimalBackend>]>;

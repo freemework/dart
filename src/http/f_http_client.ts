@@ -1,11 +1,11 @@
 import * as http from "http";
 import * as https from "https";
 
-import { FCancellationExecutionContext, FCancellationException, FCancellationToken } from "../cancellation";
-import { FChannelInvoke } from "../channel";
-import { FException, FExceptionInvalidOperation, FExceptionNativeErrorWrapper } from "../exception";
-import { FExecutionContext } from "../execution_context";
-import { FLogger, FLoggerLabelsExecutionContext } from "../logging";
+import { FCancellationExecutionContext, FCancellationException, FCancellationToken } from "../cancellation/index.js";
+import { FChannelInvoke } from "../channel/index.js";
+import { FException, FExceptionInvalidOperation, FExceptionNativeErrorWrapper } from "../exception/index.js";
+import { FExecutionContext } from "../execution_context/index.js";
+import { FLogger, FLoggerLabelsExecutionContext } from "../logging/index.js";
 
 export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 	private readonly _log: FLogger;
@@ -104,7 +104,7 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 				return reject(e);
 			}
 
-			const request: http.ClientRequest = this.createClientRequest(executionContext, { url, method, headers }, responseHandler, this._log);
+			const request: http.ClientRequest = this.createClientRequest(executionContext, { url, method, headers: headers! }, responseHandler, this._log);
 			if (body !== undefined) {
 				if (this._log.isTraceEnabled) { this._log.trace(executionContext, "Write body: " + body.toString()); }
 				request.write(body);
@@ -357,7 +357,7 @@ export namespace FHttpClient {
 	}
 
 	/**
-	 * CommunicationError is a wrapper over underlaying network errors.
+	 * CommunicationError is a wrapper over underlying network errors.
 	 * Such a DNS lookup issues, TCP connection issues, etc...
 	 */
 	export class CommunicationError extends HttpClientError {

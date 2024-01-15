@@ -1,4 +1,4 @@
-import { FException } from "../../src";
+import { FException } from "../../src/index.js";
 
 import { EOL } from "os";
 import { assert } from "chai";

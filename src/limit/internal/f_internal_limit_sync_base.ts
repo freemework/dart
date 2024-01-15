@@ -1,6 +1,6 @@
-import { FDisposableBase } from "../../lifecycle/f_disposable";
-import { FLimit } from "../f_limit";
-import { FInternalLimit } from "./f_internal_limit";
+import { FDisposableBase } from "../../lifecycle/f_disposable.js";
+import { FLimit } from "../f_limit.js";
+import { FInternalLimit } from "./f_internal_limit.js";
 
 export abstract class FInternalLimitSyncBase extends FDisposableBase implements FInternalLimit {
 	private readonly _listeners: Array<(remainTokens: number) => void> = [];

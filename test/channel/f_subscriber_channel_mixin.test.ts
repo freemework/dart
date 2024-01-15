@@ -1,6 +1,6 @@
 import { assert } from "chai";
 
-import { FException, FExecutionContext, FChannelSubscriber, FChannelSubscriberMixin } from "../../src";
+import { FException, FExecutionContext, FChannelSubscriber, FChannelSubscriberMixin } from "../../src/index.js";
 
 describe("FChannelSubscriberMixin tests", function () {
 	class MyNotifier implements FChannelSubscriber<string> {
@@ -21,7 +21,7 @@ describe("FChannelSubscriberMixin tests", function () {
 		let callCount = 0;
 		let eventData: Array<string> = [];
 
-		function handler(executionContext: FExecutionContext, event: FChannelSubscriber.Event<string> | FException) {
+		function handler(_: FExecutionContext, event: FChannelSubscriber.Event<string> | FException) {
 			++callCount;
 
 			if (event instanceof Error) { return Promise.resolve(); }
@@ -55,7 +55,7 @@ describe("FChannelSubscriberMixin tests", function () {
 
 		let errors: Array<Error> = [];
 
-		function handler(executionContext: FExecutionContext, event: FChannelSubscriber.Event<string> | FException) {
+		function handler(_: FExecutionContext, event: FChannelSubscriber.Event<string> | FException) {
 			++callCount;
 
 			if (event instanceof Error) {
@@ -74,7 +74,7 @@ describe("FChannelSubscriberMixin tests", function () {
 
 		assert.equal(callCount, 2);
 		assert.equal(errors.length, 2);
-		assert.equal(errors[0].message, "one");
-		assert.equal(errors[1].message, "one", "handler should called twice with first exception.");
+		assert.equal(errors[0]!.message, "one");
+		assert.equal(errors[1]!.message, "one", "handler should called twice with first exception.");
 	});
 });

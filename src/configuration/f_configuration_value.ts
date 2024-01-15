@@ -1,7 +1,5 @@
-import { FException } from "../exception";
-import { FDecimal } from "../primitive";
-
-import { FConfigurationException } from "./f_configuration_exception";;
+import { FException } from "../exception/index.js";
+import { FDecimal } from "../primitive/index.js";
 
 export abstract class FConfigurationValue {
 	/**
@@ -21,7 +19,7 @@ export abstract class FConfigurationValue {
 	/**
 	 * Reference to an overriden value in chain configuration.
 	 */
-	public abstract get overriden(): FConfigurationValue | null;
+	public abstract get overridden(): FConfigurationValue | null;
 
 	/**
 	 * Get `true` if value is `null` (configuration key presents but no value)
@@ -76,11 +74,11 @@ export abstract class FConfigurationValue {
 	public abstract get asUrlNullable(): URL | null;
 }
 
-import { FConfigurationValueException } from "./f_configuration_value_exception";
+import { FConfigurationValueException } from "./f_configuration_value_exception.js";
 
 class _FConfigurationValue extends FConfigurationValue {
 	public get sourceURI(): URL | null { return this._sourceURI; }
-	public get overriden(): FConfigurationValue | null { return this._overriden; }
+	public get overridden(): FConfigurationValue | null { return this._overridden; }
 	public get key(): string { return this._key; }
 
 	public get isNull(): boolean { return this._value === null; }
@@ -186,15 +184,15 @@ class _FConfigurationValue extends FConfigurationValue {
 		private readonly _key: string,
 		private readonly _value: string | null,
 		private readonly _sourceURI: URL | null,
-		private readonly _overriden: FConfigurationValue | null
+		private readonly _overridden: FConfigurationValue | null
 	) {
 		super();
 	}
 
 	private assertNotNullValue(
-		value: string | null, callerProperty: Exclude<keyof FConfigurationValue, "sourceURI" | "overriden" | "key">
+		value: string | null, callerProperty: Exclude<keyof FConfigurationValue, "sourceURI" | "overridden" | "key">
 	): asserts value is string {
-		if (this._value === null) {
+		if (value === null) {
 			throw new FConfigurationValueException(
 				this,
 				`Cannot represent null value ${callerProperty}`,

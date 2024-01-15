@@ -6,7 +6,7 @@ import {
 	FCancellationTokenSource,
 	FCancellationTokenSourceManual,
 	FCancellationException,
-} from "../../src";
+} from "../../src/index.js";
 
 describe("FCancellationTokenSourceManual tests", function () {
 	it("Should not cancel", async function () {

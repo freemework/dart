@@ -1,9 +1,9 @@
-import { FDisposableBase } from "../lifecycle";
-import { FExecutionContext } from "../execution_context";
-import { FHttpClient } from "./f_http_client";
-import { FLimit } from "../limit/f_limit";
-import { FCancellationExecutionContext, FCancellationToken } from "../cancellation";
-import { FLimitInMemory } from "../limit/f_limit_in_memory";
+import { FDisposableBase } from "../lifecycle/index.js";
+import { FExecutionContext } from "../execution_context/index.js";
+import { FHttpClient } from "./f_http_client.js";
+import { FLimit } from "../limit/f_limit.js";
+import { FCancellationExecutionContext, FCancellationToken } from "../cancellation/index.js";
+import { FLimitInMemory } from "../limit/f_limit_in_memory.js";
 
 import * as http from "http";
 import * as querystring from "querystring";
@@ -57,7 +57,7 @@ export class FWebClient extends FDisposableBase {
 			urlPath + "?" + querystring.stringify(queryArgs) :
 			urlPath;
 
-		return this.invoke(executionContext, path, "GET", { headers, limitWeight });
+		return this.invoke(executionContext, path, "GET", { headers: headers!, limitWeight: limitWeight! });
 	}
 
 	public postJson(
@@ -115,9 +115,9 @@ export class FWebClient extends FDisposableBase {
 		})();
 
 		return this.invoke(executionContext, urlPath, "POST", {
-			body,
+			body: body!,
 			headers: friendlyHeaders,
-			limitWeight
+			limitWeight: limitWeight!
 		});
 	}
 

@@ -1,7 +1,6 @@
 import { assert } from "chai";
-import _ = require("lodash");
 
-import { FConfiguration, FConfigurationException, FConfigurationValue } from "../../src";
+import { FConfiguration, FConfigurationException, FConfigurationValue } from "../../src/index.js";
 
 describe.only("FConfiguration tests", function () {
 	it("factoryJson should should contains proper sourceURI 'configuration:json?data=%7B%22a%22%3A%2242%22%7D'", function () {
@@ -107,8 +106,8 @@ describe.only("FConfiguration tests", function () {
 
 		const array: ReadonlyArray<FConfiguration> = config.getArray("a.b");
 		assert.equal(array.length, 2);
-		assert.equal(array[0].get("c").asInteger, 40);
-		assert.equal(array[1].get("c").asInteger, 42);
+		assert.equal(array[0]!.get("c").asInteger, 40);
+		assert.equal(array[1]!.get("c").asInteger, 42);
 	});
 
 	it('factoryJson should expand json of {"a":{"b":[{"c":40,"index":"ix0"},{"c":41,"index":"ix1"},{"c":42,"index":"ix2"}]}} into {"a.b.ix0.c":40,"a.b.ix1.c":41,"a.b.ix2.c":42}', function () {
@@ -140,8 +139,8 @@ describe.only("FConfiguration tests", function () {
 
 		const array: ReadonlyArray<FConfiguration> = config.getArray("a.b");
 		assert.equal(array.length, 2);
-		assert.equal(array[0].get("c").asInteger, 40);
-		assert.equal(array[1].get("c").asInteger, 42);
+		assert.equal(array[0]!.get("c").asInteger, 40);
+		assert.equal(array[1]!.get("c").asInteger, 42);
 	});
 
 	it('factoryJson should expand json of {"a":{"b":[{"c":40,"idx":"ix0"},{"c":41,"idx":"ix1"},{"c":42,"idx":"ix2"}]}} into {"a.b.ix0.c":40,"a.b.ix1.c":41,"a.b.ix2.c":42}', function () {
@@ -174,8 +173,8 @@ describe.only("FConfiguration tests", function () {
 
 		const array: ReadonlyArray<FConfiguration> = config.getArray("a.b");
 		assert.equal(array.length, 2);
-		assert.equal(array[0].get("c").asInteger, 40);
-		assert.equal(array[1].get("c").asInteger, 42);
+		assert.equal(array[0]!.get("c").asInteger, 40);
+		assert.equal(array[1]!.get("c").asInteger, 42);
 	});
 
 	it("Empty strings should be presented as null value", function () {
@@ -184,7 +183,7 @@ describe.only("FConfiguration tests", function () {
 		const config = FConfiguration.factoryJson(data);
 
 		const aValueNullable: FConfigurationValue = config.get("a");
-		assert.throw(() => { const _ = aValueNullable.asString; }, FConfigurationException);
+		assert.throw(() => { aValueNullable.asString; }, FConfigurationException);
 		assert.isNull(aValueNullable.asStringNullable);
 	});
 

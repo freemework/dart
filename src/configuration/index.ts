@@ -1,5 +1,5 @@
-export { FConfiguration } from "./f_configuration";
-export { FConfigurationChain } from "./f_configuration_chain";
-export { FConfigurationDictionary } from "./f_configuration_dictionary";
-export { FConfigurationException } from "./f_configuration_exception";;
-export { FConfigurationValue } from "./f_configuration_value";
+export { FConfiguration, FConfigurationDictionary } from "./f_configuration.js";
+export { FConfigurationChain } from "./f_configuration_chain.js";
+// export { FConfigurationDictionary } from "./f_configuration_dictionary.js";
+export { FConfigurationException } from "./f_configuration_exception.js";
+export { FConfigurationValue } from "./f_configuration_value.js";

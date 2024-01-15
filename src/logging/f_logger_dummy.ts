@@ -1,9 +1,8 @@
-import { FException } from "../exception/f_exception";
+import { FException } from "../exception/f_exception.js";
 
-import { FLogger } from "./f_logger";
-import { FLoggerBase } from "./f_logger_base";
-import { FLoggerLabels } from "./f_logger_labels";
-import { FLoggerLevel } from "./f_logger_level";
+import { FLogger, FLoggerBase } from "./f_logger.js";
+import { FLoggerLabels } from "./f_logger_labels.js";
+import { FLoggerLevel } from "./f_logger_level.js";
 
 export class FLoggerDummy extends FLoggerBase {
 	private static _instance: FLoggerDummy | null = null;
@@ -11,7 +10,7 @@ export class FLoggerDummy extends FLoggerBase {
 	/**
 	 * Factory constructor
 	 */
-	public static create(loggerName?: string): FLogger {
+	public static override create(loggerName?: string): FLogger {
 		// Lazy singleton
 
 		if (FLoggerDummy._instance === null) {
@@ -21,8 +20,8 @@ export class FLoggerDummy extends FLoggerBase {
 		return FLoggerDummy._instance;
 	}
 
-	protected isLevelEnabled(level: FLoggerLevel): boolean { return false; }
-	protected log(level: FLoggerLevel, loggerLabels: FLoggerLabels, message: string, exception?: FException): void { }
+	protected isLevelEnabled(_: FLoggerLevel): boolean { return false; }
+	protected log(_: FLoggerLevel, __: FLoggerLabels, ___: string, ____?: FException): void { }
 
 	private constructor(loggerName: string) { super(loggerName); }
 }

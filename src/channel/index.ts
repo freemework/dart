@@ -1,6 +1,6 @@
-export { FChannelEvent } from "./FChannelEvent";
-export { FChannelEventMixin } from "./FChannelEventMixin";
-export { FChannelInvoke } from "./FChannelInvoke";
-export { FChannelPublisher } from "./FChannelPublisher";
-export { FChannelSubscriber } from "./FChannelSubscriber";
-export { FChannelSubscriberMixin } from "./FChannelSubscriberMixin";
+export type { FChannelEvent } from "./FChannelEvent.js";
+export { FChannelEventMixin } from "./FChannelEventMixin.js";
+export type { FChannelInvoke } from "./FChannelInvoke.js";
+export type { FChannelPublisher } from "./FChannelPublisher.js";
+export type { FChannelSubscriber } from "./FChannelSubscriber.js";
+export { FChannelSubscriberMixin } from "./FChannelSubscriberMixin.js";

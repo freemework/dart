@@ -1,4 +1,4 @@
-import { FCancellationTokenSourceManual } from "./f_cancellation_token_source_manual";
+import { FCancellationTokenSourceManual } from "./f_cancellation_token_source_manual.js";
 
 export class FCancellationTokenSourceTimeout extends FCancellationTokenSourceManual {
 	private _timeoutHandler: any;
@@ -12,7 +12,7 @@ export class FCancellationTokenSourceTimeout extends FCancellationTokenSourceMan
 		}, timeout);
 	}
 
-	public cancel(): void {
+	public override cancel(): void {
 		this.stopTimer();
 		super.cancel();
 	}

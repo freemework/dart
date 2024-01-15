@@ -1,7 +1,7 @@
-import { FDisposable } from "./f_disposable";
-import { FInitable, FInitableBase } from "./f_initable";
-import { FExecutionContext } from "../execution_context/f_execution_context";
-import { FExceptionArgument } from "../exception";
+import { FDisposable } from "./f_disposable.js";
+import { FInitable, FInitableBase } from "./f_initable.js";
+import { FExecutionContext } from "../execution_context/f_execution_context.js";
+import { FExceptionArgument } from "../exception/index.js";
 
 
 // TODO Add overloading

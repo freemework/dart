@@ -1,4 +1,4 @@
-import { FCancellationToken } from "./f_cancellation_token";
+import { FCancellationToken } from "./f_cancellation_token.js";
 
 export interface FCancellationTokenSource {
 	readonly isCancellationRequested: boolean;

@@ -1,4 +1,4 @@
-import { FExceptionArgument } from "../exception/f_exception_argument";
+import { FExceptionArgument } from "../exception/f_exception_argument.js";
 
 const _trace = "TRACE";
 const _debug = "DEBUG";
@@ -34,7 +34,7 @@ export class FLoggerLevel extends Object {
 		}
 	}
 
-	public valueOf(): number {
+	public override valueOf(): number {
 		return this._intValue;
 	}
 
@@ -43,7 +43,7 @@ export class FLoggerLevel extends Object {
 	// bool operator < (FLoggerLevel other) => this._intValue < other._intValue;
 	// bool operator <= (FLoggerLevel other) => this._intValue <= other._intValue;
 
-	public toString(): string {
+	public override toString(): string {
 		return this._textValue;
 	}
 

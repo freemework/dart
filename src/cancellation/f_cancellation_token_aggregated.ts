@@ -1,6 +1,6 @@
-import { FException, FExceptionAggregate } from "../exception";
+import { FException, FExceptionAggregate } from "../exception/index.js";
 
-import { FCancellationToken } from "./f_cancellation_token";
+import { FCancellationToken } from "./f_cancellation_token.js";
 
 /**
  * Wrap several tokens as FCancellationToken

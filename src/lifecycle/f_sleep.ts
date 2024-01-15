@@ -1,5 +1,5 @@
-import { FCancellationExecutionContext, FCancellationException, FCancellationToken } from "../cancellation";
-import { FExecutionContext } from "../execution_context";
+import { FCancellationExecutionContext, FCancellationException, FCancellationToken } from "../cancellation/index.js";
+import { FExecutionContext } from "../execution_context/index.js";
 
 /**
  * Provide a "sleeping" `Promise` that completes via timeout or cancellationToken

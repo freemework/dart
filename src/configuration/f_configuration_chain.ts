@@ -1,24 +1,26 @@
-import _ = require("lodash");
-import { join } from "path";
-
-import { FExceptionArgument } from "../exception";
-
-import { FConfiguration } from "./f_configuration";
-import { FConfigurationException } from "./f_configuration_exception";;
-import { FConfigurationValue } from "./f_configuration_value";
+import { FConfiguration } from "./f_configuration.js";
+import { FConfigurationException } from "./f_configuration_exception.js";
+import { FConfigurationValue } from "./f_configuration_value.js";
+import { FExceptionArgument } from "../exception/index.js";
 
 export class FConfigurationChain extends FConfiguration {
 	public get sourceURI(): URL {
 		return this._sourceURI;
 	}
 	public get namespaceFull(): string | null {
-		return this._configurations[0].namespaceFull;
+		return this._configurations[0]!.namespaceFull;
 	}
 	public get namespaceParent(): string | null {
-		return this._configurations[0].namespaceParent;
+		return this._configurations[0]!.namespaceParent;
 	}
-	public get keys(): readonly string[] {
-		return _.union(...this._configurations.map(item => item.keys));
+	public get keys(): ReadonlyArray<string> {
+		const union = new Set<string>();
+		for (const item of this._configurations) {
+			for (const key of item.keys) {
+				union.add(key);
+			}
+		}
+		return Object.freeze([...union]);
 	}
 
 	public constructor(...configurations: ReadonlyArray<FConfiguration>) {
@@ -59,12 +61,12 @@ export class FConfigurationChain extends FConfiguration {
 			return innerConfiguration;
 		}
 
-		// Force underlaying config to raise error
+		// Force underlying config to raise error
 		for (const configuration of this._configurations) {
 			configuration.getNamespace(namespaceFull);
 		}
 
-		// just a guard, should not happens if underlaying configuration is implemented correctly
+		// just a guard, should not happens if underlying configuration is implemented correctly
 		throw new FConfigurationException(
 			`Namespace was not found in the configuration.`,
 			namespaceFull
@@ -105,7 +107,7 @@ export class FConfigurationChain extends FConfiguration {
 
 	public find(key: string): FConfigurationValue | null {
 		for (let itemIndex = 0; itemIndex < this._configurations.length; ++itemIndex) {
-			const configurationItem: FConfiguration = this._configurations[itemIndex];
+			const configurationItem: FConfiguration = this._configurations[itemIndex]!;
 			if (configurationItem.has(key)) {
 				return configurationItem.get(key);
 			}
@@ -143,17 +145,17 @@ export class FConfigurationChain extends FConfiguration {
 	 */
 	private readonly _configurations: ReadonlyArray<FConfiguration>;
 
-	private static throwWrongKeyError(key: string, parentNamespace: string | null): never {
-		if (parentNamespace !== null) {
-			const fullKey: string = `${parentNamespace}.${key}`;
-			throw new FConfigurationException(
-				`A value was not found in current configuration.`,
-				fullKey
-			);
-		}
-		throw new FConfigurationException(
-			`A value was not found in current configuration.`,
-			key
-		);
-	}
+	// private static throwWrongKeyError(key: string, parentNamespace: string | null): never {
+	// 	if (parentNamespace !== null) {
+	// 		const fullKey: string = `${parentNamespace}.${key}`;
+	// 		throw new FConfigurationException(
+	// 			`A value was not found in current configuration.`,
+	// 			fullKey
+	// 		);
+	// 	}
+	// 	throw new FConfigurationException(
+	// 		`A value was not found in current configuration.`,
+	// 		key
+	// 	);
+	// }
 }

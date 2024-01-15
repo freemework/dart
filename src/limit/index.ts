@@ -1,3 +1,3 @@
-export { FLimit } from "./f_limit";
-export { FLimitException } from "./f_limit_exception";
-export { FLimitInMemory } from "./f_limit_in_memory";
+export { FLimit } from "./f_limit.js";
+export { FLimitException } from "./f_limit_exception.js";
+export { FLimitInMemory } from "./f_limit_in_memory.js";

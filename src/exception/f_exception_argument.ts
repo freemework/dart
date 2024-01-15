@@ -1,4 +1,4 @@
-import { FException } from "./f_exception";
+import { FException } from "./f_exception.js";
 
 export class FExceptionArgument extends FException {
 	public constructor();

@@ -1,8 +1,8 @@
 import { assert } from "chai";
 
-import { FDisposable, FDisposableMixin } from "../../src";
+import { FDisposable, FDisposableMixin } from "../../src/index.js";
 
-import * as tools from "./tools";
+import * as tools from "./tools.js";
 
 
 describe("FDisposableMixin tests", function () {
@@ -34,7 +34,7 @@ describe("FDisposableMixin tests", function () {
 		onDisposePromise = defer.promise;
 		try {
 			let disposablePromiseResolved = false;
-			const disposablePromise = disposable.dispose().then(() => { disposablePromiseResolved = true; });
+			disposable.dispose().then(() => { disposablePromiseResolved = true; });
 
 			assert.isFalse(disposablePromiseResolved);
 			assert.throw(() => disposable.throwIfDisposed());

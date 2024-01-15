@@ -1,8 +1,8 @@
-import { FCancellationException } from "../cancellation";
-import { FException, FExceptionAggregate, FExceptionInvalidOperation } from "../exception";
-import { FExecutionContext } from "../execution_context";
+import { FCancellationException } from "../cancellation/index.js";
+import { FException, FExceptionAggregate, FExceptionInvalidOperation } from "../exception/index.js";
+import { FExecutionContext } from "../execution_context/index.js";
 
-import { FChannelSubscriber } from "./FChannelSubscriber";
+import { FChannelSubscriber } from "./FChannelSubscriber.js";
 
 export class FChannelSubscriberMixin<
 	TData,
@@ -74,7 +74,7 @@ export class FChannelSubscriberMixin<
 			this.__callbacks.splice(0, this.__callbacks.length);
 		}
 		if (callbacks.length === 1) {
-			const callback = callbacks[0];
+			const callback = callbacks[0]!;
 			return callback(executionContext, event);
 		}
 		const promises: Array<Promise<void>> = [];

@@ -1,6 +1,6 @@
-import { FExecutionContext } from "../execution_context";
+import { FExecutionContext } from "../execution_context/index.js";
 
-import { FSqlConnectionFactory } from "./f_sql_connection_factory";
+import { FSqlConnectionFactory } from "./f_sql_connection_factory.js";
 
 export interface FSqlConnectionFactoryEmbedded extends FSqlConnectionFactory {
 	/**

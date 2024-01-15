@@ -1,4 +1,4 @@
-import { FLimit } from "../f_limit";
+import { FLimit } from "../f_limit.js";
 
 export interface FInternalLimit {
 	readonly availableWeight: number;

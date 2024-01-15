@@ -1,6 +1,6 @@
-import { FExecutionContext } from "../execution_context/f_execution_context";
-import { FDecimal } from "../primitive/f_decimal";
-import { FSqlData } from "./f_sql_data";
+import { FExecutionContext } from "../execution_context/f_execution_context.js";
+import { FDecimal } from "../primitive/f_decimal.js";
+import { FSqlData } from "./f_sql_data.js";
 
 export type FSqlStatementParam =
 null | boolean | string | number

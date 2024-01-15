@@ -1,6 +1,6 @@
 import { assert } from "chai";
 
-import { FLimit } from "../../src";
+import { FLimit } from "../../src/index.js";
 
 describe("isLimitOpts() tests", function () {
 	const positiveCases: Array<any> = [

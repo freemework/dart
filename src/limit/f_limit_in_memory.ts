@@ -1,12 +1,12 @@
-import { FCancellationToken } from "../cancellation/f_cancellation_token";
-import { FExceptionArgument, FExceptionInvalidOperation } from "../exception";
-import { FDisposableBase } from "../lifecycle";
-import { FLimit } from "./f_limit";
-import { FLimitException } from "./f_limit_exception";
-import { FInternalLimit } from "./internal/f_internal_limit";
-import { FIntrenalLimitExceptionAssert } from "./internal/f_intrenal_limit_exception_assert";
-import { FLimitInternalParallelLimit } from "./internal/f_limit_internal_parallel_limit";
-import { FLimitInternalTimespanLimit } from "./internal/f_limit_internal_timespan_limit";
+import { FCancellationToken } from "../cancellation/f_cancellation_token.js";
+import { FExceptionArgument, FExceptionInvalidOperation } from "../exception/index.js";
+import { FDisposableBase } from "../lifecycle/index.js";
+import { FLimit } from "./f_limit.js";
+import { FLimitException } from "./f_limit_exception.js";
+import { FInternalLimit } from "./internal/f_internal_limit.js";
+import { FIntrenalLimitExceptionAssert } from "./internal/f_intrenal_limit_exception_assert.js";
+import { FLimitInternalParallelLimit } from "./internal/f_limit_internal_parallel_limit.js";
+import { FLimitInternalTimeSpanLimit } from "./internal/f_limit_internal_time_span_limit.js";
 
 function buildInnerLimits(opts: FLimit.Opts): Array<FInternalLimit> {
 	const innerLimits: Array<FInternalLimit> = [];
@@ -16,21 +16,21 @@ function buildInnerLimits(opts: FLimit.Opts): Array<FInternalLimit> {
 		if (count <= 0) {
 			throw new FLimitException("perHour count value should be above zero integer");
 		}
-		innerLimits.push(new FLimitInternalTimespanLimit(1000 * 60 * 60/* 1 hour */, count));
+		innerLimits.push(new FLimitInternalTimeSpanLimit(1000 * 60 * 60/* 1 hour */, count));
 	}
 	if (opts.perMinute) {
 		let count = opts.perMinute;
 		if (count <= 0) {
 			throw new FLimitException("perMinute count value should be above zero integer");
 		}
-		innerLimits.push(new FLimitInternalTimespanLimit(1000 * 60/* 1 minute */, count));
+		innerLimits.push(new FLimitInternalTimeSpanLimit(1000 * 60/* 1 minute */, count));
 	}
 	if (opts.perSecond) {
 		const count = opts.perSecond;
 		if (count <= 0) {
 			throw new FLimitException("perSecond count value should be above zero integer");
 		}
-		innerLimits.push(new FLimitInternalTimespanLimit(1000/* 1 second */, count));
+		innerLimits.push(new FLimitInternalTimeSpanLimit(1000/* 1 second */, count));
 	}
 	if (opts.perTimespan) {
 		const count: number = opts.perTimespan.count;
@@ -41,7 +41,7 @@ function buildInnerLimits(opts: FLimit.Opts): Array<FInternalLimit> {
 		if (delay <= 0) {
 			throw new FLimitException("perTimespan delay value should be above zero integer");
 		}
-		innerLimits.push(new FLimitInternalTimespanLimit(delay, count));
+		innerLimits.push(new FLimitInternalTimeSpanLimit(delay, count));
 	}
 	if (opts.parallel) {
 		let count = opts.parallel;
@@ -93,7 +93,7 @@ function limitFactory(opts: FLimit.Opts): FLimit {
 		if (disposing) { return null; }
 		const innerTokens: Array<FLimit.Token> = [];
 		for (let innerLimitIndex = 0; innerLimitIndex < innerLimits.length; innerLimitIndex++) {
-			const innerLimit = innerLimits[innerLimitIndex];
+			const innerLimit = innerLimits[innerLimitIndex]!;
 			if (innerLimit.availableWeight < weight) {
 				busyLimits.push(innerLimit);
 			} else {

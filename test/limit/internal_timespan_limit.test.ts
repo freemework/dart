@@ -1,8 +1,9 @@
 import { assert } from "chai";
 import { spy } from "sinon";
-import { FLimitException } from "../../src";
 
-import { FLimitInternalTimespanLimit } from "../../src/limit/internal/f_limit_internal_timespan_limit";
+import { FLimitException } from "../../src/index.js";
+
+import { FLimitInternalTimeSpanLimit } from "../../src/limit/internal/f_limit_internal_time_span_limit.js";
 
 class SetTimeoutStub {
 	private readonly _clearTimeoutStub: (handle?: number) => void;
@@ -29,7 +30,7 @@ class SetTimeoutStub {
 	public timeForward(ms: number): void {
 		this._currentOffset += ms;
 		Object.keys(this._map).forEach((stubId) => {
-			const [timeout, handler] = this._map[stubId];
+			const [timeout, handler] = this._map[stubId]!;
 			if (timeout <= this._currentOffset) {
 				// expired
 				delete this._map[stubId];
@@ -39,20 +40,20 @@ class SetTimeoutStub {
 	}
 }
 
-describe("FLimitInternalTimespanLimit tests", function () {
+describe("FLimitInternalTimeSpanLimit tests", function () {
 	let timeoutStub: SetTimeoutStub;
-	let limit: FLimitInternalTimespanLimit;
+	let limit: FLimitInternalTimeSpanLimit;
 	beforeEach(function () {
 		timeoutStub = new SetTimeoutStub();
-		limit = new FLimitInternalTimespanLimit(1000, 2, {
+		limit = new FLimitInternalTimeSpanLimit(1000, 2, {
 			clearTimeoutFunc: timeoutStub.clearTimeout,
 			setTimeoutFunc: timeoutStub.setTimeout
 		});
 	});
 
 	it("Should be able to instance and destroy", async function () {
-		const mylimit = new FLimitInternalTimespanLimit(1000, 2);
-		mylimit.accrueToken(1).commit();
+		const myLimit = new FLimitInternalTimeSpanLimit(1000, 2);
+		myLimit.accrueToken(1).commit();
 	});
 	it("Should be equal maxTokens to hitCount", async function () {
 		assert.equal(limit.maxWeight, 2);
@@ -66,15 +67,15 @@ describe("FLimitInternalTimespanLimit tests", function () {
 	it("Should get 2 tokens and block 3-rd token", async function () {
 		assert.equal(limit.availableWeight, 2);
 
-		const limitToken0 = limit.accrueToken(1);
+		limit.accrueToken(1);
 		assert.equal(limit.availableWeight, 1);
 
-		const limitToken1 = limit.accrueToken(1);
+		limit.accrueToken(1);
 		assert.equal(limit.availableWeight, 0);
 
 		let expectedError;
 		try {
-			const limitToken2 = limit.accrueToken(1);
+			limit.accrueToken(1);
 		} catch (e) {
 			expectedError = e;
 		}
@@ -131,10 +132,10 @@ describe("FLimitInternalTimespanLimit tests", function () {
 		limitToken1.rollback();
 		assert.equal(limit.availableWeight, 2);
 
-		const limitToken2 = limit.accrueToken(1);
+		limit.accrueToken(1);
 		assert.equal(limit.availableWeight, 1);
 
-		const limitToken3 = limit.accrueToken(1);
+		limit.accrueToken(1);
 		assert.equal(limit.availableWeight, 0);
 	});
 	it("Should get 2 tokens at once", async function () {
@@ -148,7 +149,7 @@ describe("FLimitInternalTimespanLimit tests", function () {
 		timeoutStub.timeForward(1000);
 		assert.equal(limit.availableWeight, 2);
 
-		const limitToken2 = limit.accrueToken(2);
+		limit.accrueToken(2);
 		assert.equal(limit.availableWeight, 0);
 	});
 	it("Should NOT decrement availableTokens on multiple call commit on same token", async function () {

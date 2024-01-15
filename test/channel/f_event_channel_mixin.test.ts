@@ -1,6 +1,6 @@
 import { assert } from "chai";
 
-import { FChannelEvent, FChannelEventMixin, FException, FExceptionAggregate, FExecutionContext } from "../../src";
+import { FChannelEvent, FChannelEventMixin, FException, FExceptionAggregate, FExecutionContext } from "../../src/index.js";
 
 describe("FChannelEventMixin tests", function () {
 	class MyNotifier implements FChannelEvent<string> {
@@ -18,7 +18,7 @@ describe("FChannelEventMixin tests", function () {
 		let callCount = 0;
 		let eventData: Array<string> = [];
 
-		async function handler(executionContext: FExecutionContext, event: FChannelEvent.Event<string>) {
+		async function handler(_: FExecutionContext, event: FChannelEvent.Event<string>) {
 			await new Promise(wakeup => setTimeout(wakeup, 50));
 			++callCount;
 			eventData.push(event.data);
@@ -48,7 +48,7 @@ describe("FChannelEventMixin tests", function () {
 
 		class MyTestError extends FException { }
 
-		async function handler(executionContext: FExecutionContext, event: FChannelEvent.Event<string>) {
+		async function handler(_: FExecutionContext, event: FChannelEvent.Event<string>) {
 			await new Promise(wakeup => setTimeout(wakeup, 50));
 			++callCount;
 			throw new MyTestError(event.data);
@@ -70,7 +70,7 @@ describe("FChannelEventMixin tests", function () {
 		assert.equal((expectedError as FExceptionAggregate).innerExceptions.length, 2);
 		assert.instanceOf((expectedError as FExceptionAggregate).innerExceptions[0], MyTestError);
 		assert.instanceOf((expectedError as FExceptionAggregate).innerExceptions[1], MyTestError);
-		assert.equal((expectedError as FExceptionAggregate).innerExceptions[0].message, "nonce");
-		assert.equal((expectedError as FExceptionAggregate).innerExceptions[1].message, "nonce");
+		assert.equal((expectedError as FExceptionAggregate).innerExceptions[0]!.message, "nonce");
+		assert.equal((expectedError as FExceptionAggregate).innerExceptions[1]!.message, "nonce");
 	});
 });

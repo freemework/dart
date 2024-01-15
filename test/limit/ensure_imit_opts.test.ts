@@ -1,7 +1,6 @@
 import { assert } from "chai";
 
-import { FLimit } from "../../src";
-import { FCancellationToken, FCancellationTokenSource, FCancellationTokenSourceManual } from "../../src";
+import { FLimit } from "../../src/index.js";
 
 describe("ensureLimitOpts() tests", function () {
 	it(`Should pass`, function () {

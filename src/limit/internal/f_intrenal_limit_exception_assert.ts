@@ -1,4 +1,4 @@
-import { FExceptionInvalidOperation } from "../../exception/f_exception_invalid_operation";
+import { FExceptionInvalidOperation } from "../../exception/f_exception_invalid_operation.js";
 
 export class FIntrenalLimitExceptionAssert extends FExceptionInvalidOperation {
 	public constructor() {

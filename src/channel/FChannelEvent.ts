@@ -1,4 +1,4 @@
-import { FExecutionContext } from "../execution_context";
+import { FExecutionContext } from "../execution_context/index.js";
 
 /**
  * FChannelEvent provides a channel to handle events asynchronously.

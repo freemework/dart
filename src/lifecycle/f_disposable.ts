@@ -1,6 +1,6 @@
-import { FException, FExceptionAggregate } from "../exception";
+import { FException, FExceptionAggregate } from "../exception/index.js";
 
-import "./tc39";
+import "./tc39.js";
 
 export abstract class FDisposable {
 	public async [Symbol.asyncDispose]() {

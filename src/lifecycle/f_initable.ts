@@ -1,8 +1,8 @@
-import { FDisposable } from "./f_disposable";
-import { FExecutionContext } from "../execution_context/f_execution_context";
-import { FException, FExceptionAggregate } from "../exception";
+import { FDisposable } from "./f_disposable.js";
+import { FExecutionContext } from "../execution_context/f_execution_context.js";
+import { FException, FExceptionAggregate } from "../exception/index.js";
 
-import "./tc39";
+import "./tc39.js";
 
 export abstract class FInitable extends FDisposable {
 	public abstract init(executionContext: FExecutionContext): Promise<void>;

@@ -37,11 +37,11 @@ export class FException extends Error {
 		}
 	}
 
-	public get name(): string {
+	public override get name(): string {
 		return this.constructor.name;
 	}
 
-	public toString(): string {
+	public override toString(): string {
 		let messageBuffer: string = '';
 		let stackTraceBuffer: string = '';
 
@@ -101,11 +101,11 @@ export class FExceptionNativeErrorWrapper extends FException {
 		this.nativeError = nativeError;
 	}
 
-	public get name(): string {
+	public override get name(): string {
 		return this.nativeError.name;
 	}
 
-	public toString(): string {
+	public override toString(): string {
 		let messageBuffer: string = this.nativeError.toString();
 		messageBuffer += "\n";
 		messageBuffer += this.nativeError.stack;

@@ -1,3 +1,5 @@
+import { readFileSync } from "fs";
+
 export function FModuleVersionGuard(packageInfo: { readonly name: string; readonly version: string; }): void {
 	const { name: packageName, version: packageVersion } = packageInfo;
 	const G: any = global || window || undefined;
@@ -6,7 +8,7 @@ export function FModuleVersionGuard(packageInfo: { readonly name: string; readon
 		if (PACKAGE_GUARD in G) {
 			const conflictVersion = G[PACKAGE_GUARD];
 			const msg = `Conflict module version. Looks like two different version of package ${packageName} was loaded inside the process: ${conflictVersion} and ${packageVersion}.`;
-			if (process !== undefined && process.env !== undefined && process.env.NODE_ALLOW_CONFLICT_MODULES === "1") {
+			if (process !== undefined && process.env !== undefined && process.env["NODE_ALLOW_CONFLICT_MODULES"] === "1") {
 				console.warn(msg + " This treats as warning because NODE_ALLOW_CONFLICT_MODULES is set.");
 			} else {
 				throw new Error(msg + " Use NODE_ALLOW_CONFLICT_MODULES=\"1\" to treats this error as warning.");
@@ -16,19 +18,19 @@ export function FModuleVersionGuard(packageInfo: { readonly name: string; readon
 		}
 	}
 }
-FModuleVersionGuard(require("../package.json"));
+FModuleVersionGuard(JSON.parse(readFileSync("package.json", "utf-8")));
 
-export * from "./cancellation";
-export * from "./configuration";
-export * from "./channel";
-export * from "./exception";
-export * from "./execution_context";
-export * from "./http";
-export * from "./lifecycle";
-export * from "./limit";
-export * from "./logging";
-export * from "./primitive";
-export * from "./sql";
-export * from "./util";
+export * from "./cancellation/index.js";
+export * from "./configuration/index.js";
+export * from "./channel/index.js";
+export * from "./exception/index.js";
+export * from "./execution_context/index.js";
+export * from "./http/index.js";
+export * from "./lifecycle/index.js";
+export * from "./limit/index.js";
+export * from "./logging/index.js";
+export * from "./primitive/index.js";
+export * from "./sql/index.js";
+export * from "./util/index.js";
 
-export { FEnsure, FEnsureException } from "./f_ensure";
+export { FEnsure, FEnsureException } from "./f_ensure.js";

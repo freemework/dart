@@ -1,4 +1,4 @@
-import { FCancellationException } from "./f_cancellation_exception";
+import { FCancellationException } from "./f_cancellation_exception.js";
 
 export type FCancellationTokenCallback = (cancellationException: FCancellationException) => void;
 
@@ -10,8 +10,8 @@ export abstract class FCancellationToken {
 
 	public static readonly Dummy: FCancellationToken = Object.freeze({
 		get isCancellationRequested(): boolean { return false; },
-		addCancelListener(cb: FCancellationTokenCallback): void {/* Dummy */ },
-		removeCancelListener(cb: FCancellationTokenCallback): void {/* Dummy */ },
+		addCancelListener(_: FCancellationTokenCallback): void {/* Dummy */ },
+		removeCancelListener(_: FCancellationTokenCallback): void {/* Dummy */ },
 		throwIfCancellationRequested(): void {/* Dummy */ }
 	});
 

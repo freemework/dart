@@ -1,6 +1,6 @@
-import { FExecutionContext } from "../execution_context/f_execution_context";
-import { FDisposable } from "../lifecycle/f_disposable";
-import { FSqlStatementParam } from "./f_sql_statement";
+import { FExecutionContext } from "../execution_context/f_execution_context.js";
+import { FDisposable } from "../lifecycle/f_disposable.js";
+import { FSqlStatementParam } from "./f_sql_statement.js";
 
 export interface FSqlTemporaryTable extends FDisposable {
 	bulkInsert(

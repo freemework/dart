@@ -5,7 +5,7 @@ import {
 	FConfigurationChain,
 	FConfigurationException,
 	FConfigurationValue
-} from "../../src";
+} from "../../src/index.js";
 
 describe("FConfigurationChain tests", function () {
 
@@ -56,7 +56,7 @@ describe("FConfigurationChain tests", function () {
 
 		assert.isTrue(chain.has("foo"));
 		assert.isTrue(chain.get("foo").isNull, "Should take empty value from overrideConfig");
-		assert.throw(function () { const _ = chain.get("foo").asInteger; }, FConfigurationException);
+		assert.throw(function () { chain.get("foo").asInteger; }, FConfigurationException);
 	});
 
 	it("Bug: legacy#6.0.33", function () {
@@ -111,13 +111,13 @@ describe("FConfigurationChain tests", function () {
 		const endpointConfigurations = chainConfiguration.getArray("endpoint", "list");
 		assert.equal(endpointConfigurations.length, 2);
 
-		const endpointConfiguration0 = endpointConfigurations[0];
+		const endpointConfiguration0 = endpointConfigurations[0]!;
 		assert.equal(endpointConfiguration0.namespaceFull, "endpoint.0");
 		assert.equal(endpointConfiguration0.get("type").asString, "rest0");
 		assert.equal(endpointConfiguration0.get("servers").asString, "main0");
 		assert.equal(endpointConfiguration0.get("bindPath").asString, "/path0");
 
-		const endpointConfiguration2 = endpointConfigurations[1];
+		const endpointConfiguration2 = endpointConfigurations[1]!;
 		assert.equal(endpointConfiguration2.namespaceFull, "endpoint.2");
 		assert.equal(endpointConfiguration2.get("type").asString, "rest2");
 		assert.equal(endpointConfiguration2.get("servers").asString, "main2");
@@ -186,10 +186,10 @@ describe("FConfigurationChain tests", function () {
 		const arrayConfigs = chainConfiguration.getArray("endpoint");
 		assert.equal(arrayConfigs.length,2, "Expect two items. Only 1 and 2 defined by indexes.");
 
-		assert.equal(arrayConfigs[0].get("type").asString, "rest1");
-		assert.equal(arrayConfigs[0].get("servers").asString, "main1");
+		assert.equal(arrayConfigs[0]!.get("type").asString, "rest1");
+		assert.equal(arrayConfigs[0]!.get("servers").asString, "main1");
 
-		assert.equal(arrayConfigs[1].get("type").asString, "rest2");
-		assert.equal(arrayConfigs[1].get("servers").asString, "main2");
+		assert.equal(arrayConfigs[1]!.get("type").asString, "rest2");
+		assert.equal(arrayConfigs[1]!.get("servers").asString, "main2");
 	});
 });

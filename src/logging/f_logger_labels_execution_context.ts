@@ -1,6 +1,6 @@
-import { FExecutionContext, FExecutionElement, FExecutionContextBase } from "../execution_context/f_execution_context";
+import { FExecutionContext, FExecutionElement, FExecutionContextBase } from "../execution_context/f_execution_context.js";
 
-import { FLoggerLabels } from "../logging/f_logger_labels";
+import { FLoggerLabels } from "../logging/f_logger_labels.js";
 
 
 export class FLoggerLabelsExecutionContext extends FExecutionContextBase {

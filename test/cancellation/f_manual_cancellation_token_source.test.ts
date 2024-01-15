@@ -1,6 +1,6 @@
 import { assert } from "chai";
 
-import { FCancellationToken, FCancellationTokenSource, FCancellationTokenSourceManual } from "../../src";
+import { FCancellationToken, FCancellationTokenSource, FCancellationTokenSourceManual } from "../../src/index.js";
 
 describe("ManualCancellationTokenSource tests", function () {
 	it("Should cancel two listeners", async function () {

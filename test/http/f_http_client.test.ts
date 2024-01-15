@@ -5,7 +5,7 @@ import {
 	FExceptionInvalidOperation,
 	FExecutionContext,
 	FHttpClient
-} from "../../src";
+} from "../../src/index.js";
 
 import { assert } from "chai";
 
@@ -69,7 +69,7 @@ describe("FHttpClient tests", function () {
 		it("Should handle HTTP 301 as normal response", async function () {
 			const listeningDefer: any = {};
 			listeningDefer.promise = new Promise(r => { listeningDefer.resolve = r; });
-			const fakeServer = new http.Server((req, res) => {
+			const fakeServer = new http.Server((_, res) => {
 				res.writeHead(301, "Fake moved");
 				res.end("Fake data");
 			});
@@ -212,7 +212,7 @@ describe("FHttpClient tests", function () {
 			it("Should handle HTTP 404 as WebError", async function () {
 				const listeningDefer: any = {};
 				listeningDefer.promise = new Promise(r => { listeningDefer.resolve = r; });
-				const fakeServer = new http.Server((req, res) => {
+				const fakeServer = new http.Server((_, res) => {
 					res.writeHead(404, "Fake not found");
 					res.end("Fake data");
 				});
@@ -242,7 +242,7 @@ describe("FHttpClient tests", function () {
 			it("Should provide requestObject on WebError for application/json content", async function () {
 				const listeningDefer: any = {};
 				listeningDefer.promise = new Promise(r => { listeningDefer.resolve = r; });
-				const fakeServer = new http.Server((req, res) => {
+				const fakeServer = new http.Server((_, res) => {
 					res.writeHead(404, "Fake not found");
 					res.end("Fake data");
 				});
@@ -280,7 +280,7 @@ describe("FHttpClient tests", function () {
 			it("Should NOT provide requestObject on WebError for non application/json content", async function () {
 				const listeningDefer: any = {};
 				listeningDefer.promise = new Promise(r => { listeningDefer.resolve = r; });
-				const fakeServer = new http.Server((req, res) => {
+				const fakeServer = new http.Server((_, res) => {
 					res.writeHead(404, "Fake not found");
 					res.end("Fake data");
 				});
@@ -309,7 +309,7 @@ describe("FHttpClient tests", function () {
 					assert.instanceOf((expectedError as FHttpClient.WebError).requestBody, Buffer);
 
 					let expectedError2;
-					try { const dummy = (expectedError as FHttpClient.WebError).requestObject; } catch (e) { expectedError2 = e; }
+					try { (expectedError as FHttpClient.WebError).requestObject; } catch (e) { expectedError2 = e; }
 					assert.isDefined(expectedError2);
 					assert.instanceOf(expectedError2, FExceptionInvalidOperation);
 				} finally {
@@ -330,7 +330,7 @@ describe("FHttpClient tests", function () {
 		};
 		it("FHttpClient should GET http: with proxy", async function () {
 			const httpClient = new FHttpClient({ proxyOpts });
-			const res = await httpClient.invoke(FExecutionContext.Default, {
+			await httpClient.invoke(FExecutionContext.Default, {
 				method: "GET",
 				url: new URL("http://www.google.com?a"),
 				headers: { test: "test" }
@@ -339,7 +339,7 @@ describe("FHttpClient tests", function () {
 
 		it("FHttpClient should GET https: with proxy", async function () {
 			const httpClient = new FHttpClient({ proxyOpts });
-			const res = await httpClient.invoke(FExecutionContext.Default, {
+			await httpClient.invoke(FExecutionContext.Default, {
 				method: "GET",
 				url: new URL("http://www.google.com?a"),
 				headers: { test: "test" }

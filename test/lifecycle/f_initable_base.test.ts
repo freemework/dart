@@ -1,6 +1,6 @@
 import { assert } from "chai";
 
-import { FExecutionContext, FInitableBase } from "../../src";
+import { FExecutionContext, FInitableBase } from "../../src/index.js";
 
 interface Deferred<T = any> {
 	resolve: (value?: T) => void;
@@ -31,13 +31,13 @@ describe("Initable tests", function () {
 	let onDisposePromise: Promise<void> | null = null;
 
 	class TestInitable extends FInitableBase {
-		public verifyNotDisposed() {
+		public override verifyNotDisposed() {
 			super.verifyNotDisposed();
 		}
-		public verifyInitializedAndNotDisposed() {
+		public override verifyInitializedAndNotDisposed() {
 			super.verifyInitializedAndNotDisposed();
 		}
-		public verifyInitialized() {
+		public override verifyInitialized() {
 			super.verifyInitialized();
 		}
 
@@ -98,7 +98,7 @@ describe("Initable tests", function () {
 		assert.isFalse(disposable.disposed);
 		assert.isFalse(disposable.disposing);
 
-		const disposePromise = disposable.dispose();
+		disposable.dispose();
 
 		disposable.verifyInitialized(); // should not raise an error
 		assert.throw(() => disposable.verifyNotDisposed());
@@ -149,7 +149,7 @@ describe("Initable tests", function () {
 		onDisposePromise = defer.promise;
 		try {
 			let disposablePromiseResolved = false;
-			const disposablePromise = disposable.dispose().then(() => { disposablePromiseResolved = true; });
+			disposable.dispose().then(() => { disposablePromiseResolved = true; });
 
 			assert.isFalse(disposablePromiseResolved);
 			assert.throw(() => disposable.verifyInitializedAndNotDisposed());
@@ -223,7 +223,7 @@ describe("Initable tests", function () {
 			assert.throw(() => disposable.verifyInitialized()); // should raise an error
 			assert.throw(() => disposable.verifyInitializedAndNotDisposed()); // should raise an error
 
-			const initPromise = disposable.init(FExecutionContext.Empty);
+			disposable.init(FExecutionContext.Empty);
 
 			assert.isFalse(disposable.initialized);
 			assert.isTrue(disposable.initializing);
@@ -237,7 +237,7 @@ describe("Initable tests", function () {
 			assert.isFalse(disposable.disposed);
 			assert.isFalse(disposable.disposing);
 
-			const disposablePromise = disposable.dispose();
+			disposable.dispose();
 
 			await nextTick();
 
@@ -264,8 +264,8 @@ describe("Initable tests", function () {
 		try {
 			let initablePromiseResolved = false;
 			let disposablePromiseResolved = false;
-			const initablePromise = disposable.init(FExecutionContext.Empty).then(() => { initablePromiseResolved = true; });
-			const disposablePromise = disposable.dispose().then(() => { disposablePromiseResolved = true; });
+			disposable.init(FExecutionContext.Empty).then(() => { initablePromiseResolved = true; });
+			disposable.dispose().then(() => { disposablePromiseResolved = true; });
 
 			assert.isFalse(initablePromiseResolved);
 			assert.isFalse(disposablePromiseResolved);
@@ -398,10 +398,10 @@ describe("Initable tests", function () {
 		assert.isFalse(disposable.disposed);
 		assert.isFalse(disposable.disposing);
 
-		let isSuccessed = false;
-		const initPromise2 = disposable.init(FExecutionContext.Empty).finally(() => { isSuccessed = true; });
+		let isSuccess = false;
+		const initPromise2 = disposable.init(FExecutionContext.Empty).finally(() => { isSuccess = true; });
 		await nextTick();
-		assert.isTrue(isSuccessed);
+		assert.isTrue(isSuccess);
 		await initPromise2;
 		await disposable.dispose();
 	});
@@ -447,54 +447,4 @@ describe("Initable tests", function () {
 		assert.instanceOf(expectedError, Error);
 		assert.equal((expectedError as Error).message, "test error");
 	});
-
-	// it("Should execute and wait for initable and disposable tasks", async function () {
-	// 	let onInitTaskCalled = false;
-	// 	let onDisposeTaskCalled = false;
-
-	// 	const onInitTask: Promise<void> = Task.create(() => {
-	// 		onInitTaskCalled = true;
-	// 	});
-	// 	const onDisposeTask: Promise<void> = Task.create(() => {
-	// 		onDisposeTaskCalled = true;
-	// 	});
-
-	// 	class MyInitable extends FInitableBase {
-	// 		protected onInit(): Promise<void> { return onInitTask; }
-	// 		protected onDispose(): Promise<void> { return onDisposeTask; }
-	// 	}
-
-	// 	const initable = new MyInitable();
-
-	// 	await initable.init();
-	// 	assert.isTrue(onInitTaskCalled, "init() should execute init task");
-
-	// 	await initable.dispose();
-	// 	assert.isTrue(onDisposeTaskCalled, "dispose() should execute dispose task");
-	// });
-
-	// it("Should execute and wait for initable and disposable tasks if called both init() + dispose()", async function () {
-	// 	let onInitTaskCalled = false;
-	// 	let onDisposeTaskCalled = false;
-
-	// 	const onInitTask: cryptopay.Task = Task.create(() => {
-	// 		onInitTaskCalled = true;
-	// 	});
-	// 	const onDisposeTask: cryptopay.Task = Task.create(() => {
-	// 		onDisposeTaskCalled = true;
-	// 	});
-
-	// 	class MyInitable extends FInitableBase {
-	// 		protected onInit(): Promise<void> { return onInitTask; }
-	// 		protected onDispose(): Promise<void> { return onDisposeTask; }
-	// 	}
-
-	// 	const initable = new MyInitable();
-
-	// 	initable.init(DUMMY_CANCELLATION_TOKEN);
-	// 	await initable.dispose();
-
-	// 	assert.isTrue(onInitTaskCalled, "init() should execute init task");
-	// 	assert.isTrue(onDisposeTaskCalled, "dispose() should execute dispose task");
-	// });
 });

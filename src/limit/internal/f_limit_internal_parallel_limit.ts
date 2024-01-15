@@ -1,13 +1,13 @@
-import { FLimit } from "../f_limit";
-import { FLimitException } from "../f_limit_exception";
-import { FInternalLimitSyncBase } from "./f_internal_limit_sync_base";
-import { FIntrenalLimitTokenDeferred } from "./f_intrenal_limit_token_deferred";
+import { FLimit } from "../f_limit.js";
+import { FLimitException } from "../f_limit_exception.js";
+import { FInternalLimitSyncBase } from "./f_internal_limit_sync_base.js";
+import { FInternalLimitTokenDeferred } from "./f_internal_limit_token_deferred.js";
 
-type FLimitTokenDeferred = FIntrenalLimitTokenDeferred & { finalize: () => void };
+type FLimitTokenDeferred = FInternalLimitTokenDeferred & { finalize: () => void };
 
 export class FLimitInternalParallelLimit extends FInternalLimitSyncBase {
 	private readonly _maxWeight: number;
-	private _activeTokenDefers: Array<FIntrenalLimitTokenDeferred>;
+	private _activeTokenDefers: Array<FInternalLimitTokenDeferred>;
 
 	public constructor(totalWeight: FLimit.Weight) {
 		super();
@@ -32,7 +32,7 @@ export class FLimitInternalParallelLimit extends FInternalLimitSyncBase {
 		let defer: FLimitTokenDeferred | null = null;
 		{ // local scope
 			const realDefer: FLimitTokenDeferred = {
-				...FIntrenalLimitTokenDeferred.create<void>(weight),
+				...FInternalLimitTokenDeferred.create<void>(weight),
 				finalize: () => {
 					realDefer.resolve();
 					const index = this._activeTokenDefers.indexOf(realDefer);

@@ -1,6 +1,6 @@
-import { FCancellationToken } from "../cancellation/f_cancellation_token";
+import { FCancellationToken } from "../cancellation/f_cancellation_token.js";
 
-import { FExceptionInvalidOperation } from "../exception/f_exception_invalid_operation";
+import { FExceptionInvalidOperation } from "../exception/f_exception_invalid_operation.js";
 
 export abstract class FExecutionContext {
 	public abstract get prevContext(): FExecutionContext | null;
@@ -90,26 +90,26 @@ export abstract class FExecutionContextBase extends FExecutionContext {
 		this._prevContext = prevContext;
 	}
 
-	public static get Empty(): FExecutionContext {
+	public static override get Empty(): FExecutionContext {
 		throw new FExceptionInvalidOperation("Cannot use a member via inherit class. Use FExecutionContext.Empty instead.");
 	}
 
-	public static get Default(): FExecutionContext {
+	public static override get Default(): FExecutionContext {
 		throw new FExceptionInvalidOperation("Cannot use a member via inherit class. Use FExecutionContext.Default instead.");
 	}
 
-	protected static findExecutionContext<T extends FExecutionContext>(
-		context: FExecutionContext, clz: Function & { prototype: T; }
+	protected static override findExecutionContext<T extends FExecutionContext>(
+		_: FExecutionContext, __: Function & { prototype: T; }
 	): T | null {
 		throw new FExceptionInvalidOperation("Cannot use a member via inherit class. Use FExecutionContext.findExecutionContext instead.");
 	}
 
-	protected static getExecutionContext<T extends FExecutionContext>(context: FExecutionContext, clz: Function & { prototype: T; }): T {
+	protected static override getExecutionContext<T extends FExecutionContext>(_: FExecutionContext, __: Function & { prototype: T; }): T {
 		throw new FExceptionInvalidOperation("Cannot use a member via inherit class. Use FExecutionContext.getExecutionContext instead.");
 	}
 
-	protected static listExecutionContexts<T extends FExecutionContext>(
-		context: FExecutionContext, clz: Function & { prototype: T; }
+	protected static override listExecutionContexts<T extends FExecutionContext>(
+		_: FExecutionContext, __: Function & { prototype: T; }
 	): ReadonlyArray<T> {
 		throw new FExceptionInvalidOperation("Cannot use a member via inherit class. Use FExecutionContext.listExecutionContexts instead.");
 	}
@@ -118,7 +118,7 @@ export abstract class FExecutionContextBase extends FExecutionContext {
 }
 
 // Import here due to cyclic dependencies
-import { FCancellationExecutionContext } from "../cancellation/f_cancellation_execution_context";
+import { FCancellationExecutionContext } from "../cancellation/f_cancellation_execution_context.js";
 
 class _DefaultExecutionContext extends FExecutionContext {
 	private static _instance: _DefaultExecutionContext | null = null;

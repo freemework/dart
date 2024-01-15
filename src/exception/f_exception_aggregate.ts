@@ -1,6 +1,6 @@
 import { EOL } from "os";
 
-import { FException } from "./f_exception";
+import { FException } from "./f_exception.js";
 
 export class FExceptionAggregate extends FException {
 	static throwIfNeeded(innerExceptions: ReadonlyArray<FException>): void {
@@ -19,7 +19,7 @@ export class FExceptionAggregate extends FException {
 		let friendlyMessage: string;
 		if (innerExceptions.length > 0) {
 			friendlyInnerExceptions = [...innerExceptions];
-			friendlyInnerException = friendlyInnerExceptions.length > 0 ? friendlyInnerExceptions[0] : null;
+			friendlyInnerException = friendlyInnerExceptions.length > 0 ? friendlyInnerExceptions[0]! : null;
 		} else {
 			friendlyInnerExceptions = [];
 			friendlyInnerException = null;
@@ -39,10 +39,7 @@ export class FExceptionAggregate extends FException {
 		this.innerExceptions = Object.freeze(friendlyInnerExceptions);
 	}
 
-	/**
-	 * @override
-	 */
-	public toString(): string {
+	public override toString(): string {
 		const  messages: Array<String> = [super.toString()];
 	
 		if (this.innerExceptions.length > 0) {

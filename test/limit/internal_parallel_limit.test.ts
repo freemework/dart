@@ -1,5 +1,5 @@
-import { FLimitInternalParallelLimit } from "../../src/limit/internal/f_limit_internal_parallel_limit";
-import { FLimitException } from "../../src";
+import { FLimitInternalParallelLimit } from "../../src/limit/internal/f_limit_internal_parallel_limit.js";
+import { FLimitException } from "../../src/index.js";
 
 
 import { assert } from "chai";
@@ -21,15 +21,15 @@ describe(`${FLimitInternalParallelLimit.name} tests`, function () {
 
 		assert.equal(limit.availableWeight, 2);
 
-		const limitToken0 = limit.accrueToken(1);
+		limit.accrueToken(1);
 		assert.equal(limit.availableWeight, 1);
 
-		const limitToken1 = limit.accrueToken(1);
+		limit.accrueToken(1);
 		assert.equal(limit.availableWeight, 0);
 
 		let expectedError;
 		try {
-			const limitToken2 = limit.accrueToken(1);
+			limit.accrueToken(1);
 		} catch (e) {
 			expectedError = e;
 		}
@@ -89,10 +89,10 @@ describe(`${FLimitInternalParallelLimit.name} tests`, function () {
 		limitToken1.rollback();
 		assert.equal(limit.availableWeight, 2);
 
-		const limitToken2 = limit.accrueToken(1);
+		limit.accrueToken(1);
 		assert.equal(limit.availableWeight, 1);
 
-		const limitToken3 = limit.accrueToken(1);
+		limit.accrueToken(1);
 		assert.equal(limit.availableWeight, 0);
 	});
 	it("Should get 3 Weight and get another 1 Weight", async function () {
@@ -113,16 +113,16 @@ describe(`${FLimitInternalParallelLimit.name} tests`, function () {
 		limitToken1.rollback();
 		assert.equal(limit.availableWeight, 4);
 
-		const limitToken2 = limit.accrueToken(1);
+		limit.accrueToken(1);
 		assert.equal(limit.availableWeight, 3);
 
-		const limitToken3 = limit.accrueToken(1);
+		limit.accrueToken(1);
 		assert.equal(limit.availableWeight, 2);
 
-		const limitToken4 = limit.accrueToken(1);
+		limit.accrueToken(1);
 		assert.equal(limit.availableWeight, 1);
 
-		const limitToken5 = limit.accrueToken(1);
+		limit.accrueToken(1);
 		assert.equal(limit.availableWeight, 0);
 	});
 	it("Should NOT decrement availableTokens on multiple call commit on same token", async function () {

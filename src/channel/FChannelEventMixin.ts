@@ -1,8 +1,8 @@
-import { FCancellationException } from "../cancellation";
-import { FException, FExceptionAggregate } from "../exception";
-import { FExecutionContext } from "../execution_context";
+import { FCancellationException } from "../cancellation/index.js";
+import { FException, FExceptionAggregate } from "../exception/index.js";
+import { FExecutionContext } from "../execution_context/index.js";
 
-import { FChannelEvent } from "./FChannelEvent";
+import { FChannelEvent } from "./FChannelEvent.js";
 
 export class FChannelEventMixin<
 	TData = Uint8Array,
@@ -61,7 +61,7 @@ export class FChannelEventMixin<
 
 		const callbacks = this.__callbacks.slice();
 		if (callbacks.length === 1) {
-			const callback = callbacks[0];
+			const callback = callbacks[0]!;
 			return callback(executionContext, event);
 		}
 		const promises: Array<Promise<void>> = [];
@@ -77,7 +77,7 @@ export class FChannelEventMixin<
 		}
 
 		if (promises.length === 1 && errors.length === 0) {
-			return promises[0];
+			return promises[0]!;
 		} else if (promises.length > 0) {
 			return Promise
 				.all(promises.map(function (p: Promise<void>) {

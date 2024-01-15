@@ -1,6 +1,6 @@
-import { FException } from "../exception/f_exception";
-import { FExceptionArgument } from "../exception/f_exception_argument";
-import { FExceptionInvalidOperation } from "../exception/f_exception_invalid_operation";
+import { FException } from "../exception/f_exception.js";
+import { FExceptionArgument } from "../exception/f_exception_argument.js";
+import { FExceptionInvalidOperation } from "../exception/f_exception_invalid_operation.js";
 
 export abstract class FDecimal {
 	public static readonly REGEXP: RegExp = /^([+-]?)(0|[1-9][0-9]*)(\.([0-9]+))?$/;
@@ -374,7 +374,7 @@ export class FDecimalBackendNumber implements FDecimalBackend {
 		return left.instance === right.instance;
 	}
 
-	public fromFloat(value: number, roundMode?: FDecimalRoundMode | undefined): FDecimal {
+	public fromFloat(value: number, _?: FDecimalRoundMode | undefined): FDecimal {
 		return new _FDecimalNumber(value, this);
 	}
 

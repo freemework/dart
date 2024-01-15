@@ -1,1 +1,1 @@
-export { FUtilUnreadonly } from "./f_util_unreadonly";
+export type { FUtilUnReadonly } from "./f_util_un_readonly";

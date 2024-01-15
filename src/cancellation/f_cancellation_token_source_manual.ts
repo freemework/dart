@@ -1,8 +1,8 @@
-import { FException, FExceptionAggregate } from "../exception";
+import { FException, FExceptionAggregate } from "../exception/index.js";
 
-import { FCancellationException } from "./f_cancellation_exception";
-import { FCancellationToken } from "./f_cancellation_token";
-import { FCancellationTokenSource } from "./f_cancellation_token_source";
+import { FCancellationException } from "./f_cancellation_exception.js";
+import { FCancellationToken } from "./f_cancellation_token.js";
+import { FCancellationTokenSource } from "./f_cancellation_token_source.js";
 
 export class FCancellationTokenSourceManual implements FCancellationTokenSource {
 	private readonly _token: FCancellationToken;

@@ -1,6 +1,6 @@
 import { assert } from "chai";
 
-import { FSleep, FCancellationTokenSourceManual, FCancellationTokenSourceTimeout, FCancellationException } from "../src";
+import { FSleep, FCancellationTokenSourceManual, FCancellationTokenSourceTimeout, FCancellationException } from "../src/index.js";
 
 describe("FSleep tests", function () {
 	it("Should cancel FSleep() before started", async () => {

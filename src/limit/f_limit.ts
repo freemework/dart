@@ -1,5 +1,5 @@
-import { FCancellationToken } from "../cancellation/f_cancellation_token";
-import { FDisposable } from "../lifecycle";
+import { FCancellationToken } from "../cancellation/index.js";
+import { FDisposable } from "../lifecycle/index.js";
 
 export namespace FLimit {
 	export type Weight = number;

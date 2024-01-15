@@ -1,15 +1,15 @@
 import { assert } from "chai";
 
-import { FDisposableBase } from "../../src";
+import { FDisposableBase } from "../../src/index.js";
 
-import * as tools from "./tools";
+import * as tools from "./tools.js";
 
 describe("FDisposableBase tests", function () {
 
 	let onDisposePromise: Promise<void> | null = null;
 
 	class TestDisposable extends FDisposableBase {
-		public verifyNotDisposed() {
+		public override verifyNotDisposed() {
 			super.verifyNotDisposed();
 		}
 
@@ -31,7 +31,7 @@ describe("FDisposableBase tests", function () {
 		onDisposePromise = defer.promise;
 		try {
 			let disposablePromiseResolved = false;
-			const disposablePromise = disposable.dispose().then(() => { disposablePromiseResolved = true; });
+			disposable.dispose().then(() => { disposablePromiseResolved = true; });
 
 			assert.isFalse(disposablePromiseResolved);
 			assert.throw(() => disposable.verifyNotDisposed());

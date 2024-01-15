@@ -1,6 +1,6 @@
 import { assert } from "chai";
 
-import { FLimit, FLimitInMemory } from "../../src";
+import { FLimit, FLimitInMemory } from "../../src/index.js";
 
 async function nextTick() {
 	return new Promise(r => process.nextTick(r));

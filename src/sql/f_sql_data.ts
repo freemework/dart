@@ -1,4 +1,4 @@
-import { FDecimal } from "../primitive/f_decimal";
+import { FDecimal } from "../primitive/f_decimal.js";
 
 export interface FSqlData {
 	readonly asBoolean: boolean;

@@ -4,8 +4,7 @@ import {
 	FExecutionContext, FExecutionContextBase,
 	FLoggerLabelsExecutionContext,
 	FLoggerLabelsExecutionElement,
-	FLoggerLabels
-} from "../../src";
+} from "../../src/index.js";
 
 import { assert } from "chai";
 
@@ -58,8 +57,8 @@ describe("FExecutionContext test", function () {
 		const element: FLoggerLabelsExecutionElement = FLoggerLabelsExecutionContext.of(loggerCtx)!;
 		assert.isNotNull(element);
 		assert.strictEqual(element.owner, loggerCtx);
-		assert.strictEqual(element.loggerLabels.name, "test");
-		assert.strictEqual(element.loggerLabels.value, "42");
+		assert.strictEqual(element.loggerLabels["name"], "test");
+		assert.strictEqual(element.loggerLabels["value"], "42");
 	});
 
 	it("Logger execution context should be resolved on chain", function () {

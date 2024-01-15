@@ -1,6 +1,6 @@
-import "./tc39";
+import "./tc39.js";
 
-export { FDisposable, FDisposableBase, FDisposableMixin } from "./f_disposable";
-export { FInitable, FInitableBase, FInitableMixin } from "./f_initable";
-export { FSleep } from "./f_sleep";
-export { FUsing } from "./f_using";
+export { FDisposable, FDisposableBase, FDisposableMixin } from "./f_disposable.js";
+export { FInitable, FInitableBase, FInitableMixin } from "./f_initable.js";
+export { FSleep } from "./f_sleep.js";
+export { FUsing } from "./f_using.js";

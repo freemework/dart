@@ -1,5 +1,5 @@
-import { FException } from "../exception";
-import { FExecutionContext } from "../execution_context";
+import { FException } from "../exception/index.js";
+import { FExecutionContext } from "../execution_context/index.js";
 
 /** Define some kind of Publish-Subscribe pattern. See https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern */
 export interface FChannelSubscriber<

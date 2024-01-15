@@ -1,13 +1,13 @@
 import * as http from "http";
 import { assert } from "chai";
 
-import { FWebClient } from "../../src";
-import { FCancellationTokenSourceManual, FCancellationException, FExecutionContext, FCancellationExecutionContext } from "../../src";
+import { FWebClient } from "../../src/index.js";
+import { FCancellationTokenSourceManual, FCancellationException, FExecutionContext, FCancellationExecutionContext } from "../../src/index.js";
 
 describe("WebClient tests", function () {
 	describe("Tests with limits", function () {
 		class MyApiClient extends FWebClient {
-			public invoke(executionContext: FExecutionContext, path: string, method: "GET" | "POST" | string, opts?: {
+			public override invoke(executionContext: FExecutionContext, path: string, method: "GET" | "POST" | string, opts?: {
 				headers?: http.OutgoingHttpHeaders
 			}) {
 				return super.invoke(executionContext, path, method, opts);

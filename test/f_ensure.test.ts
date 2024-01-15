@@ -1,13 +1,13 @@
 import { assert } from "chai";
 
-import { FEnsure, FEnsureException } from "../src";
+import { FEnsure, FEnsureException } from "../src/index.js";
 
 describe("FEnsure tests", function () {
 	let ensure: FEnsure;
 	let ensureWithCustomError: FEnsure;
 	beforeEach(function () {
 		ensure = FEnsure.create();
-		ensureWithCustomError = FEnsure.create((m, d) => { throw new Error(m); });
+		ensureWithCustomError = FEnsure.create((m, _) => { throw new Error(m); });
 	});
 
 	const specs = {

@@ -1,16 +1,21 @@
 {
 	"//": "This file is used in our build process. Also this file is required by VSCode",
+	"$schema": "https://json.schemastore.org/tsconfig",
+	"extends": [
+		"@tsconfig/node18/tsconfig.json",
+		"@tsconfig/strictest/tsconfig.json",
+	],
 	"compilerOptions": {
 		"alwaysStrict": true,
-		"declaration": true,
+		"declaration": false,
 		"experimentalDecorators": true,
 		"lib": [
 			"DOM",
 			"ES2022",
 			"ESNext.Disposable"
 		],
-		"module": "commonjs",
-		"moduleResolution": "node",
+		"module": "ES2022",
+		"moduleResolution": "Node",
 		"noImplicitAny": true,
 		"noImplicitThis": true,
 		"target": "es2022",
@@ -19,6 +24,6 @@
 		"strictNullChecks": true,
 		"strictPropertyInitialization": true,
 		"strictFunctionTypes": true,
-		"strictBindCallApply": true,
+		"strictBindCallApply": true
 	}
 }

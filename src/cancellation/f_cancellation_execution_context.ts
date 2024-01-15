@@ -1,7 +1,7 @@
-import { FCancellationToken } from "../cancellation/f_cancellation_token";
-import { FCancellationTokenAggregated } from "../cancellation/f_cancellation_token_aggregated";
+import { FCancellationToken } from "../cancellation/f_cancellation_token.js";
+import { FCancellationTokenAggregated } from "../cancellation/f_cancellation_token_aggregated.js";
 
-import { FExecutionContext, FExecutionElement, FExecutionContextBase } from "../execution_context/f_execution_context";
+import { FExecutionContext, FExecutionElement, FExecutionContextBase } from "../execution_context/f_execution_context.js";
 
 export class FCancellationExecutionContext extends FExecutionContextBase {
 	private readonly _cancellationToken: FCancellationToken;
