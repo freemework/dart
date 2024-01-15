@@ -1,25 +1,32 @@
-import { FCancellationToken } from "../cancellation/f_cancellation_token.js";
-
 import { FExceptionInvalidOperation } from "../exception/f_exception_invalid_operation.js";
 
 export abstract class FExecutionContext {
+	private static _defaultExecutionContext: FExecutionContext | null = null;
+
 	public abstract get prevContext(): FExecutionContext | null;
 
 	/**
 	 * Provide empty execution context. Usually used as root of execution context chain.
 	 */
 	public static get Empty(): FExecutionContext {
-		return _EmptyExecutionContext.instance;
+		return emptyExecutionContext;
 	}
 
 	/**
 	 * Provide default execution context.
-	 *
-	 * The execution context contains:
-	 * * `FCancellationExecutionContext` with `FCancellationToken.Dummy`
 	 */
 	public static get Default(): FExecutionContext {
-		return _DefaultExecutionContext.instance;
+		if(FExecutionContext._defaultExecutionContext === null) {
+			throw new FExceptionInvalidOperation(`Default execution context was not set yet. Try to call ${FExecutionContext.name}.setDefaultExecutionContext() before.`);
+		}
+		return FExecutionContext._defaultExecutionContext;
+	}
+
+	public static setDefaultExecutionContext(executionContext: FExecutionContext): void {
+		if(FExecutionContext._defaultExecutionContext !== null) {
+			throw new FExceptionInvalidOperation("Unable to set default execution context twice.");
+		}
+		FExecutionContext._defaultExecutionContext = executionContext;
 	}
 
 	/**
@@ -117,40 +124,7 @@ export abstract class FExecutionContextBase extends FExecutionContext {
 	private readonly _prevContext: FExecutionContext;
 }
 
-// Import here due to cyclic dependencies
-import { FCancellationExecutionContext } from "../cancellation/f_cancellation_execution_context.js";
-
-class _DefaultExecutionContext extends FExecutionContext {
-	private static _instance: _DefaultExecutionContext | null = null;
-	public static get instance(): _DefaultExecutionContext {
-		if (_DefaultExecutionContext._instance === null) {
-			_DefaultExecutionContext._instance = new _DefaultExecutionContext();
-		}
-		return _DefaultExecutionContext._instance;
-	}
-
-	private readonly _prevContext: FExecutionContext;
-
-	public constructor() {
-		super();
-
-		this._prevContext = new FCancellationExecutionContext(
-			_EmptyExecutionContext.instance,
-			FCancellationToken.Dummy,
-		);
-	}
-
-	public get prevContext(): FExecutionContext | null { return this._prevContext; }
-}
-
 class _EmptyExecutionContext extends FExecutionContext {
-	private static _instance: _EmptyExecutionContext | null = null;
-	public static get instance(): _EmptyExecutionContext {
-		if (_EmptyExecutionContext._instance === null) {
-			_EmptyExecutionContext._instance = new _EmptyExecutionContext();
-		}
-		return _EmptyExecutionContext._instance;
-	}
-
 	public get prevContext(): FExecutionContext | null { return null; }
 }
+const emptyExecutionContext: _EmptyExecutionContext = new _EmptyExecutionContext();
