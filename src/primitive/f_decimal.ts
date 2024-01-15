@@ -90,7 +90,7 @@ export function verifyDecimalFraction(test: FDecimalFractionDigits): asserts tes
 	}
 }
 
-export const enum FDecimalRoundMode {
+export enum FDecimalRoundMode {
 	/**
 	 * Round to the smallest Financial greater than or equal to a given Financial.
 	 * 

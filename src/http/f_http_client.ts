@@ -245,7 +245,7 @@ export namespace FHttpClient {
 		passphrase: string;
 	}
 
-	export const enum HttpMethod {
+	export enum HttpMethod {
 		CONNECT = "CONNECT",
 		DELETE = "DELETE",
 		HEAD = "HEAD",
