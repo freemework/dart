@@ -315,7 +315,7 @@ export namespace FSqlMigrationSources {
 		}
 	}
 
-	export const enum Direction {
+	export enum Direction {
 		INSTALL = "install",
 		ROLLBACK = "rollback"
 	}

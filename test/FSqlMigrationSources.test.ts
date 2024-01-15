@@ -1,12 +1,15 @@
-import * as Mustache from "mustache";
-
-import { assert } from "chai";
-import * as fs from "fs";
-import * as path from "path";
-import { pathToFileURL } from "url";
-
-import { FSqlMigrationSources } from "../src";
 import { FExecutionContext } from "@freemework/common";
+
+import Mustache from "mustache";
+import { dirname } from 'path';
+import { assert } from "chai";
+import path from "path";
+import { fileURLToPath, pathToFileURL } from 'url';
+
+import { FSqlMigrationSources } from "../src/index.js";
+
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 describe("FSqlMigrationSources tests", function () {
 

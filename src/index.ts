@@ -1,2 +1,2 @@
-export { FSqlMigrationManager } from "./FSqlMigrationManager";
-export { FSqlMigrationSources } from "./FSqlMigrationSources";
+export { FSqlMigrationManager } from "./FSqlMigrationManager.js";
+export { FSqlMigrationSources } from "./FSqlMigrationSources.js";

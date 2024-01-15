@@ -8,12 +8,11 @@ import {
 	FSqlConnection,
 	FSqlConnectionFactory,
 	FException,
-	FLoggerLabels,
 	FLoggerMessageFactory,
 	FLoggerLabelsExecutionContext,
 } from "@freemework/common";
 
-import { FSqlMigrationSources } from "./FSqlMigrationSources";
+import { FSqlMigrationSources } from "./FSqlMigrationSources.js";
 
 export abstract class FSqlMigrationManager {
 	private readonly _sqlConnectionFactory: FSqlConnectionFactory;
@@ -242,8 +241,8 @@ Promise.resolve().then(() => migration(__private.executionContext, __private.sql
 
 	protected async _getRollbackScripts(
 		executionContext: FExecutionContext,
-		sqlConnection: FSqlConnection,
-		version: string
+		_sqlConnection: FSqlConnection,
+		_version: string
 	): Promise<Array<FSqlMigrationSources.Script>> {
 		// TODO Make abstract method
 		this.logger.fatal(executionContext, "_getRollbackScripts: Not implemented yet");
@@ -253,9 +252,9 @@ Promise.resolve().then(() => migration(__private.executionContext, __private.sql
 
 	protected async _insertRollbackScripts(
 		executionContext: FExecutionContext,
-		sqlConnection: FSqlConnection,
-		version: string,
-		scripts: ReadonlyArray<FSqlMigrationSources.Script>
+		_sqlConnection: FSqlConnection,
+		_version: string,
+		_scripts: ReadonlyArray<FSqlMigrationSources.Script>
 	): Promise<void> {
 		// TODO Make abstract method
 		this.logger.fatal(executionContext, "_insertRollbackScripts: Not implemented yet");
@@ -275,7 +274,7 @@ Promise.resolve().then(() => migration(__private.executionContext, __private.sql
 
 	protected async _listVersions(
 		executionContext: FExecutionContext,
-		sqlConnection: FSqlConnection
+		_sqlConnection: FSqlConnection
 	): Promise<Array<string>> {
 		// TODO Make abstract method
 		this.logger.fatal(executionContext, "_listVersions: Not implemented yet");
