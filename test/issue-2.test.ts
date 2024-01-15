@@ -2,13 +2,16 @@ import { FDecimal, FDecimalRoundMode, FExecutionContext, FLogger } from "@freeme
 import { FDecimalBackendBigNumber } from "@freemework/decimal.bignumberjs";
 import { FSqlMigrationSources } from "@freemework/sql.misc.migration";
 
-import { assert } from "chai";
 import { PendingSuiteFunction, Suite, SuiteFunction } from "mocha";
 import * as path from "path";
+import { URL, fileURLToPath } from 'url'; // in Browser, the URL in native accessible on window
 
-import { } from "../src";
-import { FSqlConnectionFactoryPostgres } from "../src/FSqlConnectionFactoryPostgres";
-import { FSqlMigrationManagerPostgres } from "../src/FSqlMigrationManagerPostgres";
+import { FSqlConnectionFactoryPostgres, FSqlMigrationManagerPostgres } from "../src/index.js";
+import { dirname } from "path";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const __filename = new URL('', import.meta.url).pathname;
+
 
 const { myDescribe, TEST_DB_URL } = (function (): {
 	myDescribe: PendingSuiteFunction | SuiteFunction;

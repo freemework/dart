@@ -22,13 +22,11 @@ import {
 	FSqlExceptionNoSuchRecord,
 	FSqlConnectionFactory,
 	FCancellationExecutionContext,
-	FLoggerLabels,
-	FLoggerLabelsExecutionContext,
 	FCancellationException
 } from "@freemework/common";
 
-import * as _ from "lodash";
-import * as pg from "pg";
+// import {  } from "lodash-es";
+import pg from "pg";
 
 /**
  * Package oid contains OID constants as defined by the Postgres server.
@@ -235,9 +233,9 @@ export class FSqlConnectionFactoryPostgres extends FInitableBase implements FSql
 
 		const poolConfig: pg.PoolConfig = { host: this._url.hostname };
 
-		if (!_.isEmpty(this._url.port)) { poolConfig.port = Number.parseInt(this._url.port); }
-		if (!_.isEmpty(this._url.username)) { poolConfig.user = this._url.username; }
-		if (!_.isEmpty(this._url.password)) { poolConfig.password = this._url.password; }
+		if (this._url.port !== "") { poolConfig.port = Number.parseInt(this._url.port); }
+		if (this._url.username !== "") { poolConfig.user = this._url.username; }
+		if (this._url.password !== "") { poolConfig.password = this._url.password; }
 
 		// DB name
 		let pathname = this._url.pathname;
@@ -253,11 +251,11 @@ export class FSqlConnectionFactoryPostgres extends FInitableBase implements FSql
 		poolConfig.keepAliveInitialDelayMillis = (opts.keepAliveInitialDelayMillis !== undefined) ? opts.keepAliveInitialDelayMillis : 5000;
 
 		// App name
-		if (!_.isEmpty(opts.applicationName)) {
+		if (opts.applicationName !== "") {
 			poolConfig.application_name = opts.applicationName;
 		} else {
 			const appNameFromUrl: string | null = this._url.searchParams.get("app");
-			if (appNameFromUrl !== null && !_.isEmpty(appNameFromUrl)) {
+			if (appNameFromUrl !== null && appNameFromUrl !== "") {
 				poolConfig.application_name = appNameFromUrl;
 			}
 		}
@@ -298,7 +296,7 @@ export class FSqlConnectionFactoryPostgres extends FInitableBase implements FSql
 		}
 
 		this._pool = new pg.Pool(poolConfig);
-		this._pool.on("error", (e: Error, connection: pg.PoolClient) => {
+		this._pool.on("error", (e: Error, _connection: pg.PoolClient) => {
 			/*
 				https://node-postgres.com/api/pool
 				When a client is sitting idly in the pool it can still emit errors
@@ -544,11 +542,11 @@ class FSqlStatementPostgres implements FSqlStatement {
 		const underlyingResultRows = underlyingResult.rows;
 		const underlyingResultFields = underlyingResult.fields;
 
-		if (underlyingResultFields[0].dataTypeID === PostgresObjectID.refcursor) {
+		if (underlyingResultFields[0]!.dataTypeID === PostgresObjectID.refcursor) {
 			throw new FExceptionInvalidOperation("executeQuery: does not support multiset request yet");
 		}
 
-		if (underlyingResultRows.length > 0 && !(underlyingResultFields[0].dataTypeID === PostgresObjectID.void)) {
+		if (underlyingResultRows.length > 0 && !(underlyingResultFields[0]!.dataTypeID === PostgresObjectID.void)) {
 			return underlyingResultRows.map(row => new FSqlResultRecordPostgres(row, underlyingResultFields));
 		} else {
 			return [];
@@ -574,7 +572,7 @@ class FSqlStatementPostgres implements FSqlStatement {
 			cancellationToken.throwIfCancellationRequested();
 
 			// Verify that this is a multi-request
-			if (resultFetchs.fields[0].dataTypeID !== PostgresObjectID.refcursor) {
+			if (resultFetchs.fields[0]!.dataTypeID !== PostgresObjectID.refcursor) {
 				// This is not a multi request. Raise exception.
 				const trimmedSqlText: string = helpers.trimSqlTextForException(this._sqlText);
 				throw new FExceptionInvalidOperation(`executeQueryMultiSets: cannot execute this script: ${trimmedSqlText}`);
@@ -623,13 +621,13 @@ class FSqlStatementPostgres implements FSqlStatement {
 			throw new FExceptionInvalidOperation("executeScalar: SQL query returns no result");
 		}
 
-		if (underlyingFields[0].dataTypeID === PostgresObjectID.refcursor) {
+		if (underlyingFields[0]!.dataTypeID === PostgresObjectID.refcursor) {
 			throw new FExceptionInvalidOperation("executeScalar: does not support multiset request yet");
 		}
 
-		const underlyingFirstRow = underlyingRows[0];
-		const value = underlyingFirstRow[Object.keys(underlyingFirstRow)[0]];
-		const fi = underlyingFields[0];
+		const underlyingFirstRow = underlyingRows[0]!;
+		const value = underlyingFirstRow[Object.keys(underlyingFirstRow)[0]!];
+		const fi = underlyingFields[0]!;
 		if (value !== undefined || fi !== undefined) {
 			return new FSqlDataPostgres(value, fi);
 		} else {
@@ -648,13 +646,13 @@ class FSqlStatementPostgres implements FSqlStatement {
 		const underlyingRows = underlyingResult.rows;
 		const underlyingFields = underlyingResult.fields;
 		if (underlyingRows.length > 0) {
-			if (underlyingFields[0].dataTypeID === PostgresObjectID.refcursor) {
+			if (underlyingFields[0]!.dataTypeID === PostgresObjectID.refcursor) {
 				throw new FExceptionInvalidOperation("executeScalarOrNull: does not support multiset request yet");
 			}
 
 			const underlyingFirstRow = underlyingRows[0];
-			const value = underlyingFirstRow[Object.keys(underlyingFirstRow)[0]];
-			const fi = underlyingFields[0];
+			const value = underlyingFirstRow[Object.keys(underlyingFirstRow)[0]!];
+			const fi = underlyingFields[0]!;
 			if (value !== undefined || fi !== undefined) {
 				return new FSqlDataPostgres(value, fi);
 			} else {
@@ -680,15 +678,15 @@ class FSqlStatementPostgres implements FSqlStatement {
 			throw new FExceptionInvalidOperation("executeSingle: SQL query returns no result");
 		}
 
-		if (underlyingResultFields[0].dataTypeID === PostgresObjectID.refcursor) {
+		if (underlyingResultFields[0]!.dataTypeID === PostgresObjectID.refcursor) {
 			throw new FExceptionInvalidOperation("executeSingle: does not support multi request");
 		}
 
 		if (underlyingResultRows.length === 0) {
 			const trimmedSqlText: string = helpers.trimSqlTextForException(this._sqlText);
 			throw new FSqlExceptionNoSuchRecord(`executeSingle: No record for query ${trimmedSqlText}`);
-		} else if (underlyingResultRows.length === 1 && !(underlyingResultFields[0].dataTypeID === PostgresObjectID.void)) {
-			return new FSqlResultRecordPostgres(underlyingResultRows[0], underlyingResultFields);
+		} else if (underlyingResultRows.length === 1 && !(underlyingResultFields[0]!.dataTypeID === PostgresObjectID.void)) {
+			return new FSqlResultRecordPostgres(underlyingResultRows[0]!, underlyingResultFields);
 		} else {
 			throw new FExceptionInvalidOperation(`executeSingle: SQL query returns non-single result`);
 		}
@@ -711,13 +709,13 @@ class FSqlStatementPostgres implements FSqlStatement {
 			throw new FExceptionInvalidOperation("executeSingleOrNull: SQL query returns no result");
 		}
 
-		if (underlyingResultFields[0].dataTypeID === PostgresObjectID.refcursor) {
+		if (underlyingResultFields[0]!.dataTypeID === PostgresObjectID.refcursor) {
 			throw new FExceptionInvalidOperation("executeSingleOrNull: does not support multi request");
 		}
 
 		if (underlyingResultRows.length === 0) {
 			return null;
-		} else if (underlyingResultRows.length === 1 && !(underlyingResultFields[0].dataTypeID === PostgresObjectID.void)) {
+		} else if (underlyingResultRows.length === 1 && !(underlyingResultFields[0]!.dataTypeID === PostgresObjectID.void)) {
 			return new FSqlResultRecordPostgres(underlyingResultRows[0], underlyingResultFields);
 		} else {
 			throw new FExceptionInvalidOperation("executeSingleOrNull: SQL query returns non-single result");
@@ -758,7 +756,7 @@ class FSqlResultRecordPostgres implements FSqlResultRecord {
 			const nameMap: FSqlResultRecordPostgres.NameMap = {};
 			const total = this._fieldsInfo.length;
 			for (let index = 0; index < total; ++index) {
-				const fi: pg.FieldDef = this._fieldsInfo[index];
+				const fi: pg.FieldDef = this._fieldsInfo[index]!;
 				if (fi.name in nameMap) { throw new Error("Cannot access FSqlResultRecord by name due result set has name duplicates"); }
 				nameMap[fi.name] = fi;
 			}
@@ -768,7 +766,7 @@ class FSqlResultRecordPostgres implements FSqlResultRecord {
 	}
 
 	private getByIndex(index: number): FSqlData {
-		const fi: pg.FieldDef = this._fieldsInfo[index];
+		const fi: pg.FieldDef = this._fieldsInfo[index]!;
 		if (fi === undefined) {
 			throw new FExceptionArgument(`PostgresSqlResultRecord does not have field with index '${index}'`, "index");
 		}
@@ -850,7 +848,7 @@ class FSqlDataPostgres implements FSqlData {
 	public get asString(): string {
 		if (this._postgresValue === null) {
 			throw new FExceptionInvalidOperation(this.formatWrongDataTypeMessage("asString"));
-		} else if (_.isString(this._postgresValue)) {
+		} else if (typeof this._postgresValue === "string") {
 			return this._postgresValue;
 		} else {
 			throw new FExceptionInvalidOperation(this.formatWrongDataTypeMessage("asString"));
@@ -859,7 +857,7 @@ class FSqlDataPostgres implements FSqlData {
 	public get asStringNullable(): string | null {
 		if (this._postgresValue === null) {
 			return null;
-		} else if (_.isString(this._postgresValue)) {
+		} else if (typeof this._postgresValue === "string") {
 			return this._postgresValue;
 		} else {
 			throw new FExceptionInvalidOperation(this.formatWrongDataTypeMessage("asStringNullable"));
@@ -868,7 +866,7 @@ class FSqlDataPostgres implements FSqlData {
 	public get asInteger(): number {
 		if (this._postgresValue === null) {
 			throw new FExceptionInvalidOperation(this.formatWrongDataTypeMessage("asInteger"));
-		} else if (_.isNumber(this._postgresValue) && Number.isInteger(this._postgresValue)) {
+		} else if (typeof this._postgresValue === "number" && Number.isInteger(this._postgresValue)) {
 			return this._postgresValue;
 		} else {
 			throw new FExceptionInvalidOperation(this.formatWrongDataTypeMessage("asInteger"));
@@ -877,7 +875,7 @@ class FSqlDataPostgres implements FSqlData {
 	public get asIntegerNullable(): number | null {
 		if (this._postgresValue === null) {
 			return null;
-		} else if (_.isNumber(this._postgresValue) && Number.isInteger(this._postgresValue)) {
+		} else if (typeof this._postgresValue === "number" && Number.isInteger(this._postgresValue)) {
 			return this._postgresValue;
 		} else {
 			throw new FExceptionInvalidOperation(this.formatWrongDataTypeMessage("asIntegerNullable"));
@@ -886,9 +884,9 @@ class FSqlDataPostgres implements FSqlData {
 	public get asNumber(): number {
 		if (this._postgresValue === null) {
 			throw new FExceptionInvalidOperation(this.formatWrongDataTypeMessage("asNumber"));
-		} else if (_.isNumber(this._postgresValue)) {
+		} else if (typeof this._postgresValue === "number") {
 			return this._postgresValue;
-		} else if (this._fi.dataTypeID === PostgresObjectID.numeric && _.isString(this._postgresValue)) {
+		} else if (this._fi.dataTypeID === PostgresObjectID.numeric && typeof this._postgresValue === "string") {
 			return Number.parseFloat(this._postgresValue);
 		} else {
 			throw new FExceptionInvalidOperation(this.formatWrongDataTypeMessage("asNumber"));
@@ -897,9 +895,9 @@ class FSqlDataPostgres implements FSqlData {
 	public get asNumberNullable(): number | null {
 		if (this._postgresValue === null) {
 			return null;
-		} else if (_.isNumber(this._postgresValue)) {
+		} else if (typeof this._postgresValue === "number") {
 			return this._postgresValue;
-		} else if (this._fi.dataTypeID === PostgresObjectID.numeric && _.isString(this._postgresValue)) {
+		} else if (this._fi.dataTypeID === PostgresObjectID.numeric && typeof this._postgresValue === "string") {
 			return Number.parseFloat(this._postgresValue);
 		} else {
 			throw new FExceptionInvalidOperation(this.formatWrongDataTypeMessage("asNumberNullable"));
@@ -908,9 +906,9 @@ class FSqlDataPostgres implements FSqlData {
 	public get asDecimal(): FDecimal {
 		if (this._postgresValue === null) {
 			throw new FExceptionInvalidOperation(this.formatWrongDataTypeMessage("asDecimal"));
-		} else if (_.isNumber(this._postgresValue)) {
+		} else if (typeof this._postgresValue === "number") {
 			return FDecimal.fromFloat(this._postgresValue);
-		} else if (_.isString(this._postgresValue)) {
+		} else if (typeof this._postgresValue === "string") {
 			return FDecimal.parse(this._postgresValue);
 		} else {
 			throw new FExceptionInvalidOperation(this.formatWrongDataTypeMessage("asDecimal"));
@@ -919,9 +917,9 @@ class FSqlDataPostgres implements FSqlData {
 	public get asDecimalNullable(): FDecimal | null {
 		if (this._postgresValue === null) {
 			return null;
-		} else if (_.isNumber(this._postgresValue)) {
+		} else if (typeof this._postgresValue === "number") {
 			return FDecimal.fromFloat(this._postgresValue);
-		} else if (_.isString(this._postgresValue)) {
+		} else if (typeof this._postgresValue === "string") {
 			return FDecimal.parse(this._postgresValue);
 		} else {
 			throw new FExceptionInvalidOperation(this.formatWrongDataTypeMessage("asDecimalNullable"));
@@ -935,6 +933,7 @@ class FSqlDataPostgres implements FSqlData {
 			// 	return new Date(this._postgresValue.getTime() - this._postgresValue.getTimezoneOffset() * 60000);
 		} else if (this._fi.dataTypeID === PostgresObjectID.timestamp && typeof this._postgresValue === "string") {
 			// `pg` library make Date with local zone shift, so we need to make opposite changes to retrieve correct date from UTC timestamp
+			console.log("this._postgresValue:", this._postgresValue);
 			return new Date(`${this._postgresValue}+0000`);
 		} else {
 			throw new FExceptionInvalidOperation(this.formatWrongDataTypeMessage(
@@ -1053,6 +1052,7 @@ namespace helpers {
 	export async function executeRunQuery(
 		executionContext: FExecutionContext, db: pg.PoolClient, sqlText: string, values: Array<FSqlStatementParam>
 	): Promise<pg.QueryResult> {
+		FCancellationExecutionContext.of(executionContext).cancellationToken.throwIfCancellationRequested();
 		try {
 			return await new Promise<pg.QueryResult>((resolve, reject) => {
 				db.query(sqlText, values,
@@ -1086,7 +1086,7 @@ namespace helpers {
 					case "44000":
 						throw new FSqlExceptionConstraint(
 							`SQL Constraint restriction happened. Query: ${trimmedSqlText}. Reason Message: ${err.message}. See innerError for details.`,
-							_.isString(reason.constraint) ? reason.constraint : "???",
+							typeof reason.constraint === "string" ? reason.constraint : "???",
 							err
 						);
 					case "42501":
@@ -1118,7 +1118,7 @@ namespace helpers {
 	}
 	export function parsingValue(res: pg.QueryResult): Array<any> {
 		const rows = res.rows;
-		return rows.map((row) => row[Object.keys(row)[0]]);
+		return rows.map((row: any) => row[Object.keys(row)[0]!]);
 	}
 	export function trimSqlTextForException(sqlText: string): string {
 		const trimmedSqlText: string = sqlText.length > 996

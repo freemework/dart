@@ -14,10 +14,15 @@ import { FDecimalBackendBigNumber } from "@freemework/decimal.bignumberjs";
 import { FSqlMigrationSources } from "@freemework/sql.misc.migration";
 
 import * as chai from "chai";
-import { PendingSuiteFunction, Suite, SuiteFunction } from "mocha";
+import { PendingSuiteFunction, SuiteFunction } from "mocha";
 import * as path from "path";
+import { dirname } from "path";
+import { URL, fileURLToPath } from 'url'; // in Browser, the URL in native accessible on window
 
-import { FSqlMigrationManagerPostgres, FSqlConnectionFactoryPostgres } from "../src";
+import { FSqlConnectionFactoryPostgres, FSqlMigrationManagerPostgres } from "../src/index.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const __filename = new URL('', import.meta.url).pathname;
 
 declare global {
 	namespace Chai {
@@ -27,8 +32,8 @@ declare global {
 	}
 }
 
-chai.use(require("chai-datetime"));
-chai.use(function (c, u) {
+// chai.use(chaiDateTime);
+chai.use(function (c, _) {
 	const a = c.assert;
 	a.equalBytes = function (actual: Uint8Array, expected: Uint8Array, msg?: string) {
 		const message = (msg === null || msg === undefined) ?
@@ -148,7 +153,7 @@ myDescribe(`PostgreSQL Tests (schema:general_test_1_${timestamp})`, function () 
 		let expectedError: any;
 
 		try {
-			const result = await getFSqlProvider()
+			await getFSqlProvider()
 				.statement("SELECT * FROM sp_multi_fetch_ints()")
 				.executeScalar(FExecutionContext.Default);
 		} catch (err) {
@@ -330,9 +335,10 @@ myDescribe(`PostgreSQL Tests (schema:general_test_1_${timestamp})`, function () 
 	it("Read 2018-05-01T12:01:03.345 as Date through executeScalar", async function () {
 		const result = await getFSqlProvider()
 			.statement(
-				"SELECT '2018-05-01 12:01:02.345'::TIMESTAMP AS c0, now() AT TIME ZONE 'utc' AS c1 UNION ALL SELECT now() AT TIME ZONE 'utc', now() AT TIME ZONE 'utc'")
+				"SELECT '2018-05-01 12:01:02.345'::TIMESTAMP WITHOUT TIME ZONE AS c0, now() AT TIME ZONE 'utc' AS c1 UNION ALL SELECT now() AT TIME ZONE 'utc', now() AT TIME ZONE 'utc'")
 			.executeScalar(FExecutionContext.Default); // executeScalar() should return first row + first column
-		assert.equalDate(result.asDate, new Date(2018, 4/*May month = 4*/, 1, 12, 1, 2, 345));
+			const expected: Date = new Date("2018-05-01T12:01:02.345Z");
+			assert.equal(result.asDate.getTime(), expected.getTime());
 	});
 	it("Read NULL as nullable Date through executeScalar", async function () {
 		const result = await getFSqlProvider()
@@ -362,12 +368,12 @@ myDescribe(`PostgreSQL Tests (schema:general_test_1_${timestamp})`, function () 
 			.executeQuery(FExecutionContext.Default);
 		assert.instanceOf(resultArray, Array);
 		assert.equal(resultArray.length, 3);
-		assert.equal(resultArray[0].get("c0").asBoolean, true);
-		assert.equal(resultArray[0].get("c1").asBoolean, false);
-		assert.equal(resultArray[1].get("c0").asBoolean, false);
-		assert.equal(resultArray[1].get("c1").asBoolean, false);
-		assert.equal(resultArray[2].get("c0").asBoolean, true);
-		assert.equal(resultArray[2].get("c1").asBoolean, false);
+		assert.equal(resultArray[0]!.get("c0").asBoolean, true);
+		assert.equal(resultArray[0]!.get("c1").asBoolean, false);
+		assert.equal(resultArray[1]!.get("c0").asBoolean, false);
+		assert.equal(resultArray[1]!.get("c1").asBoolean, false);
+		assert.equal(resultArray[2]!.get("c0").asBoolean, true);
+		assert.equal(resultArray[2]!.get("c1").asBoolean, false);
 	});
 	it("Read strings through executeQuery", async function () {
 		const resultArray = await getFSqlProvider()
@@ -376,12 +382,12 @@ myDescribe(`PostgreSQL Tests (schema:general_test_1_${timestamp})`, function () 
 			.executeQuery(FExecutionContext.Default);
 		assert.instanceOf(resultArray, Array);
 		assert.equal(resultArray.length, 3);
-		assert.equal(resultArray[0].get("c0").asString, "one");
-		assert.equal(resultArray[0].get("c1").asString, "two");
-		assert.equal(resultArray[1].get("c0").asString, "three");
-		assert.equal(resultArray[1].get("c1").asString, "four");
-		assert.equal(resultArray[2].get("c0").asString, "five");
-		assert.equal(resultArray[2].get("c1").asString, "six");
+		assert.equal(resultArray[0]!.get("c0").asString, "one");
+		assert.equal(resultArray[0]!.get("c1").asString, "two");
+		assert.equal(resultArray[1]!.get("c0").asString, "three");
+		assert.equal(resultArray[1]!.get("c1").asString, "four");
+		assert.equal(resultArray[2]!.get("c0").asString, "five");
+		assert.equal(resultArray[2]!.get("c1").asString, "six");
 	});
 	it("Read strings through executeQuery (Stored Proc)", async function () {
 		const resultArray = await getFSqlProvider()
@@ -390,9 +396,9 @@ myDescribe(`PostgreSQL Tests (schema:general_test_1_${timestamp})`, function () 
 
 		assert.instanceOf(resultArray, Array);
 		assert.equal(resultArray.length, 3);
-		assert.equal(resultArray[0].get("varchar").asString, "one");
-		assert.equal(resultArray[1].get("varchar").asString, "two");
-		assert.equal(resultArray[2].get("varchar").asString, "three");
+		assert.equal(resultArray[0]!.get("varchar").asString, "one");
+		assert.equal(resultArray[1]!.get("varchar").asString, "two");
+		assert.equal(resultArray[2]!.get("varchar").asString, "three");
 	});
 	it("executeQuery should raise error with text 'does not support multiset request yet' for MultiSet SQL Response", async function () {
 		let expectedError: any;
@@ -452,10 +458,9 @@ myDescribe(`PostgreSQL Tests (schema:general_test_1_${timestamp})`, function () 
 
 			assert.instanceOf(resultArray, Array);
 			assert.equal(resultArray.length, 2);
-			assert.equal(resultArray[0].get("title").asString, "test title 1");
-			assert.equal(resultArray[0].get("value").asNumber, 1);
-			assert.equal(resultArray[1].get("title").asString, "test title 2");
-			assert.equal(resultArray[1].get("value").asNumber, 2);
+			assert.equal(resultArray[0]!.get("title").asString, "test title 1");
+			assert.equal(resultArray[0]!.get("value").asNumber, 1);
+			assert.equal(resultArray[1]!.get("title").asString, "test title 2");
 		} finally {
 			await tempTable.dispose();
 		}
@@ -465,8 +470,8 @@ myDescribe(`PostgreSQL Tests (schema:general_test_1_${timestamp})`, function () 
 
 		assert.instanceOf(resultArrayAfterDestoroyTempTable, Array);
 		assert.equal(resultArrayAfterDestoroyTempTable.length, 3);
-		assert.equal(resultArrayAfterDestoroyTempTable[0].get("int").asNumber, 1);
-		assert.equal(resultArrayAfterDestoroyTempTable[0].get("varchar").asString, "one");
+		assert.equal(resultArrayAfterDestoroyTempTable[0]!.get("int").asNumber, 1);
+		assert.equal(resultArrayAfterDestoroyTempTable[0]!.get("varchar").asString, "one");
 	});
 
 	it("Should be able to pass null into executeScalar args", async function () {
@@ -497,25 +502,25 @@ myDescribe(`PostgreSQL Tests (schema:general_test_1_${timestamp})`, function () 
 		assert.equal(resultSets.length, 2, "The procedure 'sp_multi_fetch' should return two result sets");
 
 		{ // Verify first result set
-			const firstResultSet = resultSets[0];
+			const firstResultSet = resultSets[0]!;
 			assert.isArray(firstResultSet);
 			assert.equal(firstResultSet.length, 3);
-			assert.equal(firstResultSet[0].get("varchar").asString, "one");
-			assert.equal(firstResultSet[0].get("int").asInteger, 1);
-			assert.equal(firstResultSet[1].get("varchar").asString, "two");
-			assert.equal(firstResultSet[1].get("int").asInteger, 2);
-			assert.equal(firstResultSet[2].get("varchar").asString, "three");
-			assert.equal(firstResultSet[2].get("int").asInteger, 3);
+			assert.equal(firstResultSet[0]!.get("varchar").asString, "one");
+			assert.equal(firstResultSet[0]!.get("int").asInteger, 1);
+			assert.equal(firstResultSet[1]!.get("varchar").asString, "two");
+			assert.equal(firstResultSet[1]!.get("int").asInteger, 2);
+			assert.equal(firstResultSet[2]!.get("varchar").asString, "three");
+			assert.equal(firstResultSet[2]!.get("int").asInteger, 3);
 		}
 
 		{ // Verify second result set
-			const secondResultSet = resultSets[1];
+			const secondResultSet = resultSets[1]!;
 			assert.isArray(secondResultSet);
 			assert.equal(secondResultSet.length, 2);
-			assert.equal(secondResultSet[0].get("first_name").asString, "Maxim");
-			assert.equal(secondResultSet[0].get("last_name").asString, "Anurin");
-			assert.equal(secondResultSet[1].get("first_name").asString, "Serhii");
-			assert.equal(secondResultSet[1].get("last_name").asString, "Zghama");
+			assert.equal(secondResultSet[0]!.get("first_name").asString, "Maxim");
+			assert.equal(secondResultSet[0]!.get("last_name").asString, "Anurin");
+			assert.equal(secondResultSet[1]!.get("first_name").asString, "Serhii");
+			assert.equal(secondResultSet[1]!.get("last_name").asString, "Zghama");
 		}
 	});
 	it("Read result through executeQuery (SELECT) WHERE IN many", async function () {
@@ -571,7 +576,7 @@ myDescribe(`PostgreSQL Tests (schema:general_test_1_${timestamp})`, function () 
 			.executeSingle(FExecutionContext.Default);
 		let expectedError: any;
 		try {
-			const stub = result.get("tstz").asDate;
+			result.get("tstz").asDate;
 		} catch (e) {
 			expectedError = e;
 		}

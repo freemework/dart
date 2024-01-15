@@ -1,2 +1,2 @@
-export { FSqlConnectionFactoryPostgres } from "./FSqlConnectionFactoryPostgres";
-export { FSqlMigrationManagerPostgres } from "./FSqlMigrationManagerPostgres";
+export { FSqlConnectionFactoryPostgres } from "./FSqlConnectionFactoryPostgres.js";
+export { FSqlMigrationManagerPostgres } from "./FSqlMigrationManagerPostgres.js";

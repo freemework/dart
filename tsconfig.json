@@ -1,24 +1,7 @@
 {
-	"//": "This is used in our build process. Also this file is required by VSCode",
-	"compilerOptions": {
-		"alwaysStrict": true,
-		"declaration": true,
-		"experimentalDecorators": true,
-		"lib": [
-			"DOM",
-			"ES2022",
-			"ESNext.Disposable"
-		],
-		"module": "commonjs",
-		"moduleResolution": "node",
-		"noImplicitAny": true,
-		"noImplicitThis": true,
-		"target": "es2022",
-		"sourceMap": true,
-		"strict": true,
-		"strictNullChecks": true,
-		"strictPropertyInitialization": true,
-		"strictFunctionTypes": true,
-		"strictBindCallApply": true,
-	}
+	"extends": "./tsconfig-base.json",
+	"include": [
+		"src/**/*",
+		"test/**/*"
+	]
 }

@@ -2,14 +2,12 @@ import {
 	FExceptionInvalidOperation,
 	FExecutionContext,
 	FSqlConnection,
-	FSqlData,
 	FSqlResultRecord,
-	FSqlStatement
 } from "@freemework/common";
 
 import { FSqlMigrationManager, FSqlMigrationSources } from "@freemework/sql.misc.migration";
 
-import { FSqlConnectionFactoryPostgres } from "./FSqlConnectionFactoryPostgres";
+import { FSqlConnectionFactoryPostgres } from "./FSqlConnectionFactoryPostgres.js";
 
 export class FSqlMigrationManagerPostgres extends FSqlMigrationManager {
 	private readonly _schema: string;
@@ -82,7 +80,7 @@ export class FSqlMigrationManagerPostgres extends FSqlMigrationManager {
 		`).execute(executionContext);
 	}
 
-	protected async _insertRollbackScripts(
+	protected override async _insertRollbackScripts(
 		executionContext: FExecutionContext,
 		sqlConnection: FSqlConnection,
 		version: string,
@@ -166,7 +164,7 @@ export class FSqlMigrationManagerPostgres extends FSqlMigrationManager {
 		).execute(executionContext, version);
 	}
 
-	protected async _getRollbackScripts(executionContext: FExecutionContext, sqlConnection: FSqlConnection, version: string): Promise<Array<FSqlMigrationSources.Script>> {
+	protected override async _getRollbackScripts(executionContext: FExecutionContext, sqlConnection: FSqlConnection, version: string): Promise<Array<FSqlMigrationSources.Script>> {
 
 		const sqlRecords: ReadonlyArray<FSqlResultRecord> = await sqlConnection
 			.statement(`
@@ -209,7 +207,7 @@ export class FSqlMigrationManagerPostgres extends FSqlMigrationManager {
 		// SELECT * FROM information_schema.columns WHERE table_schema = '????' AND table_name = '${this.versionTableName}'
 	}
 
-	protected async _listVersions(executionContext: FExecutionContext, sqlConnection: FSqlConnection): Promise<Array<string>> {
+	protected override async _listVersions(executionContext: FExecutionContext, sqlConnection: FSqlConnection): Promise<Array<string>> {
 		// get the version SQL rows as an array
 		const sqlRecords: ReadonlyArray<FSqlResultRecord> = await sqlConnection
 			.statement(`SELECT "version" FROM "__migration"`)

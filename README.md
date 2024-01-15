@@ -2,7 +2,7 @@
 [![npm version badge](https://img.shields.io/npm/v/@freemework/sql.postgres.svg)](https://www.npmjs.com/package/@freemework/sql.postgres)
 [![downloads badge](https://img.shields.io/npm/dm/@freemework/sql.postgres.svg)](https://www.npmjs.org/package/@freemework/sql.postgres)
 [![commit activity badge](https://img.shields.io/github/commit-activity/m/freemework/sql.postgres)](https://github.com/freemework/sql.postgres/pulse)
-[![last commit badge](https://img.shields.io/github/last-commit/freemework/sql.postgres)](https://github.com/freemework/sql.postgres/graphs/commit-activity)
+[![last commit badge](https://img.shields.io/github/last-commit/freemework/freemework)](https://github.com/freemework/freemework/graphs/commit-activity)
 
 ## Version table
 ```sql
@@ -44,7 +44,7 @@ Note: For full SSL mode you need to pass `opts.ssl` programmatically. Passing ce
 
 1. Make sure your have PostgreSQL instance or launch it as Docker container
     ```shell
-    docker run --name postgres --rm --interactive --publish 5432:5432 theanurin/devel.postgres-13:13.12.6
+    docker run --name postgres --rm --interactive --publish 5432:5432 theanurin/devel.postgres-13
     ```
 1. Launch tests via VSCode's launch configuration or via command line
     ```shell
