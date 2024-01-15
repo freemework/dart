@@ -1,7 +1,8 @@
 // This module provide a wrapper over https://www.npmjs.com/package/bignumber.js
 
 import {
-	FDecimal, FDecimalBase,
+	FDecimal,
+	FDecimalBase,
 	FDecimalBackend,
 	FDecimalRoundMode,
 	FDecimalSettings,
@@ -19,13 +20,13 @@ function getBigNumberImpl(DECIMAL_PLACES: BigNumber.Config["DECIMAL_PLACES"]): t
 	const existentBN = DECIMAL_PLACES_MAP.get(DECIMAL_PLACES);
 	if (existentBN !== undefined) { return existentBN; }
 	const newBN = BigNumber.clone();
-	newBN.config({ DECIMAL_PLACES });
+	newBN.config({ DECIMAL_PLACES: DECIMAL_PLACES! });
 	DECIMAL_PLACES_MAP.set(DECIMAL_PLACES, newBN);
 	return newBN;
 }
 
 class _FDecimalBigNumber extends FDecimalBase<BigNumber, FDecimalBackendBigNumber> {
-	public get backend(): FDecimalBackendBigNumber { return super.backend; }
+	public override get backend(): FDecimalBackendBigNumber { return super.backend; }
 }
 
 export class FDecimalBackendBigNumber implements FDecimalBackend {
@@ -103,7 +104,7 @@ export class FDecimalBackendBigNumber implements FDecimalBackend {
 		return result;
 	}
 
-	public fromFloat(value: number, roundMode?: FDecimalRoundMode): FDecimal {
+	public fromFloat(value: number, _?: FDecimalRoundMode): FDecimal {
 
 		const fractionalDigits: FDecimalFractionDigits = this.settings.fractionalDigits;
 

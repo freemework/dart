@@ -1,0 +1,7 @@
+{
+	"extends": "./tsconfig-package.json",
+	"compilerOptions": {
+		"module": "ES2022",
+		"outDir": ".dist/lib/esm/"
+	}
+}

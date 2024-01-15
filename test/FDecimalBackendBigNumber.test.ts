@@ -1,8 +1,8 @@
-import { FDecimal, FDecimalBackend, FDecimalRoundMode } from "@freemework/common";
+import { FDecimalRoundMode } from "@freemework/common";
 
 import { assert } from "chai";
 
-import { FDecimalBackendBigNumber } from "../src";
+import { FDecimalBackendBigNumber } from "../src/index.js";
 
 describe(`FDecimalBackendBigNumber Tests`, function () {
 	it("Should miss precision (due overflow)", function () {

@@ -1,8 +1,8 @@
-import { FDecimal, FDecimalBackend, FDecimalRoundMode } from "@freemework/common";
+import { FDecimal, FDecimalRoundMode } from "@freemework/common";
 
 import { assert } from "chai";
 
-import { FDecimalBackendBigNumber } from "../../src/index";
+import { FDecimalBackendBigNumber } from "../../src/index.js";
 
 describe(`toJSON tests`, function () {
 	before(() => { FDecimal.configure(new FDecimalBackendBigNumber(10, FDecimalRoundMode.Round)); });

@@ -2,7 +2,7 @@ import { FDecimal, FDecimalBackend, FDecimalRoundMode } from "@freemework/common
 
 import { assert } from "chai";
 
-import { FDecimalBackendBigNumber } from "../../src/index";
+import { FDecimalBackendBigNumber } from "../../src/index.js";
 
 const fractionalDigits = 2;
 const roundMode = FDecimalRoundMode.Round;

@@ -1,4 +1,6 @@
-export { FDecimalBackendBigNumber } from "./FDecimalBackendBigNumber";
+import "./f_decimal.extension.js";
+
+export { FDecimalBackendBigNumber } from "./FDecimalBackendBigNumber.js";
 
 // import { Financial as FDecimal } from "@zxteam/contract";
 
