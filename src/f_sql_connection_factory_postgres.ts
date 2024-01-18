@@ -214,6 +214,7 @@ export class FSqlConnectionFactoryPostgres extends FInitableBase implements FSql
 	private readonly _url: URL;
 	private readonly _pool: pg.Pool;
 	private readonly _defaultSchema: string;
+	private readonly _databaseName: string;
 	private readonly _log: FLogger;
 	private _connectionCounter: number;
 
@@ -247,6 +248,7 @@ export class FSqlConnectionFactoryPostgres extends FInitableBase implements FSql
 		let pathname = this._url.pathname;
 		while (pathname.length > 0 && pathname[0] === "/") { pathname = pathname.substring(1); }
 		poolConfig.database = pathname;
+		this._databaseName = pathname;
 
 		// Timeouts
 		poolConfig.connectionTimeoutMillis = (opts.connectionTimeoutMillis !== undefined) ? opts.connectionTimeoutMillis : 5000;
@@ -365,7 +367,7 @@ export class FSqlConnectionFactoryPostgres extends FInitableBase implements FSql
 				{
 					"sql.postgres.host": this._url.hostname,
 					"sql.postgres.port": this._url.port,
-					"sql.postgres.db": this._url.pathname,
+					"sql.postgres.db": this._databaseName,
 				}
 			);
 		}
