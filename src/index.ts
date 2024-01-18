@@ -17,3 +17,4 @@ export * from "./sql/index.js";
 export * from "./util/index.js";
 
 export { FEnsure, FEnsureException } from "./f_ensure.js";
+export { FModuleVersionGuard } from "./f_module_version_guard.js";
