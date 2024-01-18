@@ -11,10 +11,10 @@ import { FSqlMigrationSources } from "../src/index.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-describe("FSqlMigrationSources tests", function () {
+describe("f_sql_migration_sources tests", function () {
 
 	it("load() from disk", async function () {
-		const resourcesDir: string = path.join(__dirname, "../test.files/FSqlMigrationSources");
+		const resourcesDir: string = path.join(__dirname, "../test.files/f_sql_migration_sources");
 
 		const migrationSources: FSqlMigrationSources = await FSqlMigrationSources
 			.load(

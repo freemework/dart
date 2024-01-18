@@ -12,7 +12,7 @@ import {
 	FLoggerLabelsExecutionContext,
 } from "@freemework/common";
 
-import { FSqlMigrationSources } from "./FSqlMigrationSources.js";
+import { FSqlMigrationSources } from "./f_sql_migration_sources.js";
 
 export abstract class FSqlMigrationManager {
 	private readonly _sqlConnectionFactory: FSqlConnectionFactory;
@@ -52,58 +52,62 @@ export abstract class FSqlMigrationManager {
 			}, []);
 		}
 
-		await this.sqlConnectionFactory.usingProvider(executionContext, async (sqlConnection: FSqlConnection) => {
-			if (!(await this._isVersionTableExist(executionContext, sqlConnection))) {
-				await this._createVersionTable(executionContext, sqlConnection);
+		await this.sqlConnectionFactory.usingConnection(
+			executionContext,
+			async (usingExecutionContext: FExecutionContext, sqlConnection: FSqlConnection) => {
+				if (!(await this._isVersionTableExist(usingExecutionContext, sqlConnection))) {
+					await this._createVersionTable(usingExecutionContext, sqlConnection);
+				}
 			}
-		});
+		);
 
 		for (const versionName of scheduleVersions) {
-			const versionExecutionContext: FExecutionContext = new FLoggerLabelsExecutionContext(executionContext, {
-				"version": versionName
-			});
+			await this.sqlConnectionFactory.usingConnectionWithTransaction(
+				new FLoggerLabelsExecutionContext(executionContext, {
+					"version": versionName
+				}),
+				async (usingExecutionContext: FExecutionContext, sqlConnection: FSqlConnection) => {
+					const migrationLogger = new FSqlMigrationManager.MigrationLogger(this.logger);
 
-			await this.sqlConnectionFactory.usingProviderWithTransaction(versionExecutionContext, async (sqlConnection: FSqlConnection) => {
-				const migrationLogger = new FSqlMigrationManager.MigrationLogger(this.logger);
+					const versionBundle: FSqlMigrationSources.VersionBundle = migrationSources.getVersionBundle(versionName);
+					const installScriptNames: Array<string> = [...versionBundle.installScriptNames].sort();
+					for (const scriptName of installScriptNames) {
+						const scriptExecutionContext = new FLoggerLabelsExecutionContext(usingExecutionContext, {
+							"script": scriptName
+						});
 
-				const versionBundle: FSqlMigrationSources.VersionBundle = migrationSources.getVersionBundle(versionName);
-				const installScriptNames: Array<string> = [...versionBundle.installScriptNames].sort();
-				for (const scriptName of installScriptNames) {
-					const scriptExecutionContext = new FLoggerLabelsExecutionContext(versionExecutionContext, {
-						"script": scriptName
-					});
-
-					const script: FSqlMigrationSources.Script = versionBundle.getInstallScript(scriptName);
-					switch (script.kind) {
-						case FSqlMigrationSources.Script.Kind.SQL: {
-							migrationLogger.info(scriptExecutionContext, `Execute SQL script: ${script.name}`);
-							migrationLogger.trace(scriptExecutionContext, EOL + script.content);
-							await this._executeMigrationSql(scriptExecutionContext, sqlConnection, migrationLogger, script.content);
-							break;
+						const script: FSqlMigrationSources.Script = versionBundle.getInstallScript(scriptName);
+						switch (script.kind) {
+							case FSqlMigrationSources.Script.Kind.SQL: {
+								migrationLogger.info(scriptExecutionContext, `Execute SQL script: ${script.name}`);
+								migrationLogger.trace(scriptExecutionContext, EOL + script.content);
+								await this._executeMigrationSql(scriptExecutionContext, sqlConnection, migrationLogger, script.content);
+								break;
+							}
+							case FSqlMigrationSources.Script.Kind.JAVASCRIPT: {
+								migrationLogger.info(scriptExecutionContext, `Execute JS script: ${script.name}`);
+								migrationLogger.trace(scriptExecutionContext, EOL + script.content);
+								await this._executeMigrationJavaScript(
+									scriptExecutionContext, sqlConnection, migrationLogger,
+									{
+										content: script.content,
+										file: script.file
+									}
+								);
+								break;
+							}
+							default:
+								migrationLogger.warn(scriptExecutionContext, `Skip script '${versionName}:${script.name}' due unknown kind of script`);
 						}
-						case FSqlMigrationSources.Script.Kind.JAVASCRIPT: {
-							migrationLogger.info(scriptExecutionContext, `Execute JS script: ${script.name}`);
-							migrationLogger.trace(scriptExecutionContext, EOL + script.content);
-							await this._executeMigrationJavaScript(
-								scriptExecutionContext, sqlConnection, migrationLogger,
-								{
-									content: script.content,
-									file: script.file
-								}
-							);
-							break;
-						}
-						default:
-							migrationLogger.warn(scriptExecutionContext, `Skip script '${versionName}:${script.name}' due unknown kind of script`);
 					}
+
+					const logText: string = migrationLogger.flush();
+					await this._insertVersionLog(usingExecutionContext, sqlConnection, versionName, logText);
+
+					const rollbackScripts: Array<FSqlMigrationSources.Script> = versionBundle.rollbackScriptNames.map(scriptName => versionBundle.getRollbackScript(scriptName));
+					await this._insertRollbackScripts(usingExecutionContext, sqlConnection, versionName, rollbackScripts);
 				}
-
-				const logText: string = migrationLogger.flush();
-				await this._insertVersionLog(versionExecutionContext, sqlConnection, versionName, logText);
-
-				const rollbackScripts: Array<FSqlMigrationSources.Script> = versionBundle.rollbackScriptNames.map(scriptName => versionBundle.getRollbackScript(scriptName));
-				await this._insertRollbackScripts(versionExecutionContext, sqlConnection, versionName, rollbackScripts);
-			});
+			);
 		}
 	}
 
@@ -119,8 +123,10 @@ export abstract class FSqlMigrationManager {
 
 		const currentVersion: string | null = await this.getCurrentVersion(executionContext);
 
-		const versionNames: Array<string> = await this.sqlConnectionFactory.usingProvider(executionContext,
-			(sqlConnection: FSqlConnection) => this._listVersions(executionContext, sqlConnection)
+		const versionNames: Array<string> = await this.sqlConnectionFactory.usingConnection(
+			executionContext,
+			(usingExecutionContext: FExecutionContext, sqlConnection: FSqlConnection) =>
+				this._listVersions(usingExecutionContext, sqlConnection)
 		);
 
 		const availableVersions: Array<string> = [...versionNames].sort().reverse(); // from new version to old version
@@ -141,52 +147,53 @@ export abstract class FSqlMigrationManager {
 		}
 
 		for (const versionName of scheduleVersionNames) {
-			const versionExecutionContext: FExecutionContext = new FLoggerLabelsExecutionContext(executionContext, {
-				"version": versionName
-			});
-
-			await this.sqlConnectionFactory.usingProviderWithTransaction(versionExecutionContext, async (sqlConnection: FSqlConnection) => {
-				if (! await this._isVersionLogExist(versionExecutionContext, sqlConnection, versionName)) {
-					this.logger.warn(executionContext, `Skip rollback for version '${versionName}' due this does not present inside database.`);
-					return;
-				}
-
-				const scripts: Array<FSqlMigrationSources.Script> = await this._getRollbackScripts(versionExecutionContext, sqlConnection, versionName);
-				//const versionBundle: FSqlMigrationSources.VersionBundle = this._migrationSources.getVersionBundle(versionName);
-				const rollbackScriptNames: Array<string> = [...scripts.map(s => s.name)].sort().reverse();
-				const scriptsMap: Map<string, FSqlMigrationSources.Script> = scripts.reduce((acc, curr) => { acc.set(curr.name, curr); return acc }, new Map<string, FSqlMigrationSources.Script>());
-				for (const scriptName of rollbackScriptNames) {
-					const scriptExecutionContext = new FLoggerLabelsExecutionContext(versionExecutionContext, {
-						"script": scriptName
-					});
-
-					const script: FSqlMigrationSources.Script = scriptsMap.get(scriptName)!;
-					switch (script.kind) {
-						case FSqlMigrationSources.Script.Kind.SQL: {
-							this.logger.info(scriptExecutionContext, `Execute SQL script: ${script.name}`);
-							this.logger.trace(scriptExecutionContext, EOL + script.content);
-							await this._executeMigrationSql(scriptExecutionContext, sqlConnection, this.logger, script.content);
-							break;
-						}
-						case FSqlMigrationSources.Script.Kind.JAVASCRIPT: {
-							this.logger.info(scriptExecutionContext, `Execute JS script: ${script.name}`);
-							this.logger.trace(scriptExecutionContext, EOL + script.content);
-							await this._executeMigrationJavaScript(
-								scriptExecutionContext, sqlConnection, this.logger,
-								{
-									content: script.content,
-									file: script.file
-								}
-							);
-							break;
-						}
-						default:
-							this.logger.warn(scriptExecutionContext, `Skip script '${versionName}:${script.name}' due unknown kind of script`);
+			await this.sqlConnectionFactory.usingConnectionWithTransaction(
+				new FLoggerLabelsExecutionContext(executionContext, {
+					"version": versionName
+				}),
+				async (usingExecutionContext: FExecutionContext, sqlConnection: FSqlConnection) => {
+					if (! await this._isVersionLogExist(usingExecutionContext, sqlConnection, versionName)) {
+						this.logger.warn(executionContext, `Skip rollback for version '${versionName}' due this does not present inside database.`);
+						return;
 					}
-				}
 
-				await this._removeVersionLog(versionExecutionContext, sqlConnection, versionName);
-			});
+					const scripts: Array<FSqlMigrationSources.Script> = await this._getRollbackScripts(usingExecutionContext, sqlConnection, versionName);
+					//const versionBundle: FSqlMigrationSources.VersionBundle = this._migrationSources.getVersionBundle(versionName);
+					const rollbackScriptNames: Array<string> = [...scripts.map(s => s.name)].sort().reverse();
+					const scriptsMap: Map<string, FSqlMigrationSources.Script> = scripts.reduce((acc, curr) => { acc.set(curr.name, curr); return acc }, new Map<string, FSqlMigrationSources.Script>());
+					for (const scriptName of rollbackScriptNames) {
+						const scriptExecutionContext = new FLoggerLabelsExecutionContext(usingExecutionContext, {
+							"script": scriptName
+						});
+
+						const script: FSqlMigrationSources.Script = scriptsMap.get(scriptName)!;
+						switch (script.kind) {
+							case FSqlMigrationSources.Script.Kind.SQL: {
+								this.logger.info(scriptExecutionContext, `Execute SQL script: ${script.name}`);
+								this.logger.trace(scriptExecutionContext, EOL + script.content);
+								await this._executeMigrationSql(scriptExecutionContext, sqlConnection, this.logger, script.content);
+								break;
+							}
+							case FSqlMigrationSources.Script.Kind.JAVASCRIPT: {
+								this.logger.info(scriptExecutionContext, `Execute JS script: ${script.name}`);
+								this.logger.trace(scriptExecutionContext, EOL + script.content);
+								await this._executeMigrationJavaScript(
+									scriptExecutionContext, sqlConnection, this.logger,
+									{
+										content: script.content,
+										file: script.file
+									}
+								);
+								break;
+							}
+							default:
+								this.logger.warn(scriptExecutionContext, `Skip script '${versionName}:${script.name}' due unknown kind of script`);
+						}
+					}
+
+					await this._removeVersionLog(usingExecutionContext, sqlConnection, versionName);
+				}
+			);
 		}
 	}
 

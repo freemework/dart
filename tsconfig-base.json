@@ -6,7 +6,9 @@
 		"@tsconfig/strictest/tsconfig.json",
 	],
 	"compilerOptions": {
+		"allowJs": false,
 		"alwaysStrict": true,
+		"checkJs": false,
 		"declaration": false,
 		"experimentalDecorators": true,
 		"lib": [
@@ -18,12 +20,12 @@
 		"moduleResolution": "Node",
 		"noImplicitAny": true,
 		"noImplicitThis": true,
-		"target": "es2022",
 		"sourceMap": true,
 		"strict": true,
 		"strictNullChecks": true,
 		"strictPropertyInitialization": true,
 		"strictFunctionTypes": true,
-		"strictBindCallApply": true
+		"strictBindCallApply": true,
+		"target": "es2022"
 	}
 }
