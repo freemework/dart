@@ -4,12 +4,18 @@ import { FSqlConnection } from "./f_sql_connection.js";
 
 export interface FSqlConnectionFactory {
 	create(executionContext: FExecutionContext): Promise<FSqlConnection>;
-	usingProvider<T>(
+	usingConnection<T>(
 		executionContext: FExecutionContext,
-		worker: (sqlConnection: FSqlConnection) => Promise<T>
+		worker: FSqlConnectionFactory.Worker<T>,
 	): Promise<T>;
-	usingProviderWithTransaction<T>(
+	usingConnectionWithTransaction<T>(
 		executionContext: FExecutionContext,
-		worker: (sqlConnection: FSqlConnection) => Promise<T>
+		worker: FSqlConnectionFactory.Worker<T>,
 	): Promise<T>;
+}
+export namespace FSqlConnectionFactory {
+	export type WorkerWithExecutionContext<T> = (executionContext: FExecutionContext, sqlConnection: FSqlConnection) => T | Promise<T>;
+	export type WorkerWithoutExecutionContext<T> = (sqlConnection: FSqlConnection) => T | Promise<T>;
+	export type Worker<T> = WorkerWithExecutionContext<T> | WorkerWithoutExecutionContext<T>;
+
 }
