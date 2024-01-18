@@ -740,7 +740,7 @@ myDescribe(`PostgreSQL Tests (schema:general_test_1_${timestamp})`, function () 
 });
 
 
-myDescribe(`PostgreSQL Tests via usingProvider (schema:general_test_2_${timestamp})`, function () {
+myDescribe(`PostgreSQL Tests via usingConnection (schema:general_test_2_${timestamp})`, function () {
 	let sqlConnectionFactory: FSqlConnectionFactoryPostgres;
 
 	before(async function () {
@@ -778,7 +778,7 @@ myDescribe(`PostgreSQL Tests via usingProvider (schema:general_test_2_${timestam
 
 
 	it("Read TRUE as boolean through executeScalar", function () {
-		return sqlConnectionFactory.usingProvider(FExecutionContext.Default, async (sqlConnection) => {
+		return sqlConnectionFactory.usingConnection(FExecutionContext.Default, async (sqlConnection: FSqlConnection) => {
 			const result = await sqlConnection
 				.statement("SELECT TRUE AS c0, FALSE AS c1 UNION ALL SELECT FALSE, FALSE")
 				.executeScalar(FExecutionContext.Default); // executeScalar() should return first row + first column
@@ -788,7 +788,7 @@ myDescribe(`PostgreSQL Tests via usingProvider (schema:general_test_2_${timestam
 });
 
 
-myDescribe(`PostgreSQL Tests via usingProviderWithTransaction (schema:general_test_3_${timestamp})`, function () {
+myDescribe(`PostgreSQL Tests via usingConnectionWithTransaction (schema:general_test_3_${timestamp})`, function () {
 	let sqlConnectionFactory: FSqlConnectionFactoryPostgres;
 
 	before(async function () {
@@ -825,8 +825,8 @@ myDescribe(`PostgreSQL Tests via usingProviderWithTransaction (schema:general_te
 	});
 
 	it("Read TRUE as boolean through executeScalar", function () {
-		return sqlConnectionFactory.usingProviderWithTransaction(FExecutionContext.Default, async (FSqlConnection) => {
-			const result = await FSqlConnection
+		return sqlConnectionFactory.usingConnectionWithTransaction(FExecutionContext.Default, async (sqlConnection: FSqlConnection) => {
+			const result = await sqlConnection
 				.statement("SELECT TRUE AS c0, FALSE AS c1 UNION ALL SELECT FALSE, FALSE")
 				.executeScalar(FExecutionContext.Default); // executeScalar() should return first row + first column
 			assert.equal(result.asBoolean, true);

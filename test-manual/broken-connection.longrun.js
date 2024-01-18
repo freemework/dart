@@ -40,13 +40,13 @@ function getOpts() {
 }
 (async function main() {
     await (0, common_1.FUsing)(common_1.FExecutionContext.Empty, () => new src_1.FSqlConnectionFactoryPostgres(getOpts()), async (cancellationToken, sqlConnectionFactory) => {
-        await sqlConnectionFactory.usingProvider(cancellationToken, async (sqlConnection) => {
+        await sqlConnectionFactory.usingConnection(cancellationToken, async (sqlConnection) => {
             return (await sqlConnection.statement("SELECT 1").executeScalar(cancellationToken)).asInteger;
         });
         console.log("First query was completed. Please disconnect and connect your network adapter to force terminate SQL connection. Expectation no any unhandled errors.");
         console.log("Sleeping 30 seconds...");
         await (0, common_1.FSleep)(cancellationToken, 30000);
-        await sqlConnectionFactory.usingProvider(cancellationToken, async (sqlConnection) => {
+        await sqlConnectionFactory.usingConnection(cancellationToken, async (sqlConnection) => {
             return (await sqlConnection.statement("SELECT 1").executeScalar(cancellationToken)).asInteger;
         });
         console.log("Second query was completed.");

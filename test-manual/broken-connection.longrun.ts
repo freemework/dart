@@ -51,7 +51,7 @@ function getOpts(): FSqlConnectionFactoryPostgres.Opts {
 		FExecutionContext.Empty,
 		() => new FSqlConnectionFactoryPostgres(getOpts()),
 		async (cancellationToken, sqlConnectionFactory) => {
-			await sqlConnectionFactory.usingProvider(cancellationToken, async (sqlConnection) => {
+			await sqlConnectionFactory.usingConnection(cancellationToken, async (sqlConnection) => {
 				return (await sqlConnection.statement("SELECT 1").executeScalar(cancellationToken)).asInteger;
 			});
 
@@ -59,7 +59,7 @@ function getOpts(): FSqlConnectionFactoryPostgres.Opts {
 			console.log("Sleeping 30 seconds...");
 			await FSleep(cancellationToken, 30000);
 
-			await sqlConnectionFactory.usingProvider(cancellationToken, async (sqlConnection) => {
+			await sqlConnectionFactory.usingConnection(cancellationToken, async (sqlConnection) => {
 				return (await sqlConnection.statement("SELECT 1").executeScalar(cancellationToken)).asInteger;
 			});
 			console.log("Second query was completed.");

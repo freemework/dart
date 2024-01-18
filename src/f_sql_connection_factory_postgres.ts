@@ -22,7 +22,8 @@ import {
 	FSqlExceptionNoSuchRecord,
 	FSqlConnectionFactory,
 	FCancellationExecutionContext,
-	FCancellationException
+	FCancellationException,
+	FLoggerLabelsExecutionContext
 } from "@freemework/common";
 
 // import {  } from "lodash-es";
@@ -209,16 +210,21 @@ pg.types.setTypeParser(PostgresObjectID.timestamp as any, function (stringValue)
 
 
 export class FSqlConnectionFactoryPostgres extends FInitableBase implements FSqlConnectionFactory {
+	public readonly loggingSqlLabels: boolean;
 	private readonly _url: URL;
 	private readonly _pool: pg.Pool;
 	private readonly _defaultSchema: string;
 	private readonly _log: FLogger;
+	private _connectionCounter: number;
 
 	// This implementation wrap package https://www.npmjs.com/package/pg
 	public constructor(opts: FSqlConnectionFactoryPostgres.Opts) {
 		super();
 
+		this._connectionCounter = 0;
+
 		this._log = opts.log !== undefined ? opts.log : FLogger.create(this.constructor.name);
+		this.loggingSqlLabels = opts.loggingSqlLabels !== undefined ? opts.loggingSqlLabels : true;
 
 		switch (opts.url.protocol) {
 			case "postgres:":
@@ -319,6 +325,8 @@ export class FSqlConnectionFactoryPostgres extends FInitableBase implements FSql
 	public async create(executionContext: FExecutionContext): Promise<FSqlConnection> {
 		this.verifyInitializedAndNotDisposed();
 
+		const connectionNumber: number = this._connectionCounter++;
+
 		const cancellationToken: FCancellationToken = FCancellationExecutionContext.of(executionContext).cancellationToken;
 
 		const pgClient = await this._pool.connect();
@@ -331,8 +339,10 @@ export class FSqlConnectionFactoryPostgres extends FInitableBase implements FSql
 
 			await pgClient.query("SET TIME ZONE '00:00'");
 
-			const FSqlConnection: FSqlConnection = new FSqlConnectionPostgres(
+			const FSqlConnection: FSqlConnectionPostgres = new FSqlConnectionPostgres(
 				executionContext,
+				this,
+				connectionNumber,
 				pgClient,
 				async () => {
 					// dispose callback
@@ -348,47 +358,98 @@ export class FSqlConnectionFactoryPostgres extends FInitableBase implements FSql
 		}
 	}
 
-	public usingProvider<T>(
+	private _createSqlLoggerLabelsExecutionContext(executionContext: FExecutionContext) {
+		if (this.loggingSqlLabels) {
+			executionContext = new FLoggerLabelsExecutionContext(
+				executionContext,
+				{
+					"sql.postgres.host": this._url.hostname,
+					"sql.postgres.port": this._url.port,
+					"sql.postgres.db": this._url.pathname,
+				}
+			);
+		}
+		return executionContext;
+	}
+
+	public usingConnection<T>(
 		executionContext: FExecutionContext,
-		worker: (sqlProvider: FSqlConnection) => T | Promise<T>
+		worker: FSqlConnectionFactory.Worker<T>,
 	): Promise<T> {
 		const executionPromise: Promise<T> = (async () => {
-			const FSqlConnection: FSqlConnection = await this.create(executionContext);
+
+			const connectionInitExecutionContext: FExecutionContext = this._createSqlLoggerLabelsExecutionContext(executionContext);
+
+			const sqlConnection: FSqlConnection = await this.create(connectionInitExecutionContext);
+
+			const workerExecutionContext: FExecutionContext = this.loggingSqlLabels
+				? new FLoggerLabelsExecutionContext(
+					connectionInitExecutionContext,
+					{
+						"sql.postgres.connection": (sqlConnection as FSqlConnectionPostgres).connectionNumber.toString()
+					}
+				)
+				: connectionInitExecutionContext;
+
 			try {
-				return await worker(FSqlConnection);
+				let workerResult: T;
+				if (worker.length === 1) {
+					workerResult = await (worker as FSqlConnectionFactory.WorkerWithoutExecutionContext<T>)(sqlConnection);
+				} else if (worker.length === 2) {
+					workerResult = await (worker as FSqlConnectionFactory.WorkerWithExecutionContext<T>)(workerExecutionContext, sqlConnection);
+				} else {
+					throw new FExceptionArgument("Wrong worker function. Expect a function with 1 or 2 arguments.", "worker");
+				}
+
+				return workerResult;
 			} finally {
-				await FSqlConnection.dispose();
+				await sqlConnection.dispose();
 			}
 		})();
 
 		return executionPromise;
 	}
 
-	public usingProviderWithTransaction<T>(
-		executionContext: FExecutionContext, worker: (sqlProvider: FSqlConnection) => T | Promise<T>
+	public usingConnectionWithTransaction<T>(
+		executionContext: FExecutionContext,
+		worker: FSqlConnectionFactory.Worker<T>,
 	): Promise<T> {
-		return this.usingProvider(executionContext, async (FSqlConnection: FSqlConnection) => {
+		return this.usingConnection(executionContext, async (sqlConnection: FSqlConnection) => {
+			const connectionInitExecutionContext: FExecutionContext = this._createSqlLoggerLabelsExecutionContext(executionContext);
+
 			const uncancellableExecutionContext: FExecutionContext = new FCancellationExecutionContext(
 				executionContext,
 				FCancellationToken.Dummy
 			);
 
-			await FSqlConnection.statement("BEGIN TRANSACTION").execute(executionContext);
+			await sqlConnection.statement("BEGIN TRANSACTION").execute(executionContext);
 			try {
-				let result: T;
-				const workerResult = worker(FSqlConnection);
-				if (workerResult instanceof Promise) {
-					result = await workerResult;
+				const workerExecutionContext: FExecutionContext = this.loggingSqlLabels
+					? new FLoggerLabelsExecutionContext(
+						connectionInitExecutionContext,
+						{
+							"sql.postgres.connection": (sqlConnection as FSqlConnectionPostgres).connectionNumber.toString()
+						}
+					)
+					: connectionInitExecutionContext;
+
+				let workerResult: T;
+				if (worker.length === 1) {
+					workerResult = await (worker as FSqlConnectionFactory.WorkerWithoutExecutionContext<T>)(sqlConnection);
+				} else if (worker.length === 2) {
+					workerResult = await (worker as FSqlConnectionFactory.WorkerWithExecutionContext<T>)(workerExecutionContext, sqlConnection);
 				} else {
-					result = workerResult;
+					throw new FExceptionArgument("Wrong worker function. Expect a function with 1 or 2 arguments.", "worker");
 				}
+
 				// We have not to cancel this operation, so pass uncancellableExecutionContext
-				await FSqlConnection.statement("COMMIT TRANSACTION").execute(uncancellableExecutionContext);
-				return result;
+				await sqlConnection.statement("COMMIT TRANSACTION").execute(uncancellableExecutionContext);
+
+				return workerResult;
 			} catch (e) {
 				try {
 					// We have not to cancel this operation, so pass uncancellableExecutionContext
-					await FSqlConnection.statement("ROLLBACK TRANSACTION").execute(uncancellableExecutionContext);
+					await sqlConnection.statement("ROLLBACK TRANSACTION").execute(uncancellableExecutionContext);
 				} catch (e2) {
 					throw new FExceptionAggregate([
 						FException.wrapIfNeeded(e),
@@ -444,6 +505,10 @@ export namespace FSqlConnectionFactoryPostgres {
 		readonly applicationName?: string;
 		readonly log?: FLogger;
 		/**
+		 * @default true
+		 */
+		readonly loggingSqlLabels?: boolean;
+		/**
 		 * @default 5000
 		 */
 		readonly connectionTimeoutMillis?: number;
@@ -455,12 +520,12 @@ export namespace FSqlConnectionFactoryPostgres {
 		/**
 		 * @default true
 		 */
-		keepAlive?: boolean;
+		readonly keepAlive?: boolean;
 
 		/**
 		 * @default 5000
 		 */
-		keepAliveInitialDelayMillis?: number;
+		readonly keepAliveInitialDelayMillis?: number;
 
 		readonly ssl?: "prefer" | {
 			readonly caCert?: Buffer;
@@ -475,15 +540,37 @@ export namespace FSqlConnectionFactoryPostgres {
 class FSqlConnectionPostgres extends FDisposableBase implements FSqlConnection {
 	public readonly pgClient: pg.PoolClient;
 	public readonly log: FLogger;
+	private readonly _factory: FSqlConnectionFactoryPostgres;
 	private readonly _initExecutionContext: FExecutionContext;
 	private readonly _disposer: () => Promise<void>;
-	public constructor(executionContext: FExecutionContext, pgClient: pg.PoolClient, disposer: () => Promise<void>, log: FLogger) {
+	public constructor(
+		executionContext: FExecutionContext,
+		factory: FSqlConnectionFactoryPostgres,
+		public readonly connectionNumber: number,
+		pgClient: pg.PoolClient,
+		disposer: () => Promise<void>,
+		log: FLogger,
+	) {
 		super();
+		this._factory = factory;
 		this.pgClient = pgClient;
 		this._disposer = disposer;
 		this.log = log;
-		this._initExecutionContext = executionContext;
+
+		this._initExecutionContext = this._factory.loggingSqlLabels
+			? new FLoggerLabelsExecutionContext(
+				executionContext,
+				{
+					"sql.postgres.connection": this.connectionNumber.toString()
+				}
+			)
+			: executionContext;
+
 		this.log.trace(this._initExecutionContext, "FSqlConnectionPostgres constructed");
+	}
+
+	public get factory(): FSqlConnectionFactory {
+		return this._factory;
 	}
 
 	public statement(sqlText: string): FSqlStatementPostgres {

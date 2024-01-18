@@ -7,7 +7,7 @@ import {
 
 import { FSqlMigrationManager, FSqlMigrationSources } from "@freemework/sql.misc.migration";
 
-import { FSqlConnectionFactoryPostgres } from "./FSqlConnectionFactoryPostgres.js";
+import { FSqlConnectionFactoryPostgres } from "./f_sql_connection_factory_postgres.js";
 
 export class FSqlMigrationManagerPostgres extends FSqlMigrationManager {
 	private readonly _schema: string;
@@ -18,7 +18,7 @@ export class FSqlMigrationManagerPostgres extends FSqlMigrationManager {
 	}
 
 	public async getCurrentVersion(executionContext: FExecutionContext): Promise<string | null> {
-		return await this.sqlConnectionFactory.usingProvider(executionContext, async (FSqlConnection: FSqlConnection) => {
+		return await this.sqlConnectionFactory.usingConnection(executionContext, async (FSqlConnection: FSqlConnection) => {
 
 			const isExist = await this._isVersionTableExist(executionContext, FSqlConnection);
 			if (isExist === false) { return null; }
