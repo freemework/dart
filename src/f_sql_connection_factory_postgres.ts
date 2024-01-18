@@ -1022,7 +1022,6 @@ class FSqlDataPostgres implements FSqlData {
 			// 	return new Date(this._postgresValue.getTime() - this._postgresValue.getTimezoneOffset() * 60000);
 		} else if (this._fi.dataTypeID === PostgresObjectID.timestamp && typeof this._postgresValue === "string") {
 			// `pg` library make Date with local zone shift, so we need to make opposite changes to retrieve correct date from UTC timestamp
-			console.log("this._postgresValue:", this._postgresValue);
 			return new Date(`${this._postgresValue}+0000`);
 		} else {
 			throw new FExceptionInvalidOperation(this.formatWrongDataTypeMessage(
