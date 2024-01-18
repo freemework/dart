@@ -1,3 +1,4 @@
+import { FCancellationToken } from "../cancellation/index.js";
 import { FExceptionInvalidOperation } from "../exception/f_exception_invalid_operation.js";
 
 export abstract class FExecutionContext {
@@ -16,15 +17,20 @@ export abstract class FExecutionContext {
 	 * Provide default execution context.
 	 */
 	public static get Default(): FExecutionContext {
-		if(FExecutionContext._defaultExecutionContext === null) {
-			throw new FExceptionInvalidOperation(`Default execution context was not set yet. Try to call ${FExecutionContext.name}.setDefaultExecutionContext() before.`);
+		if (FExecutionContext._defaultExecutionContext === null) {
+			// throw new FExceptionInvalidOperation(`Default execution context was not set yet. Try to call ${FExecutionContext.name}.setDefaultExecutionContext() before.`);
+			console.warn(`Default execution context was set to internal default value. We recommend you to call ${FExecutionContext.name}.setDefaultExecutionContext() with your application context.`);
+			FExecutionContext._defaultExecutionContext = new FCancellationExecutionContext(
+				emptyExecutionContext,
+				FCancellationToken.Dummy,
+			);
 		}
 		return FExecutionContext._defaultExecutionContext;
 	}
 
 	public static setDefaultExecutionContext(executionContext: FExecutionContext): void {
-		if(FExecutionContext._defaultExecutionContext !== null) {
-			throw new FExceptionInvalidOperation("Unable to set default execution context twice.");
+		if (FExecutionContext._defaultExecutionContext !== null) {
+			throw new FExceptionInvalidOperation("Unable to set default execution context twice. Please call this method before first access FExecutionContext.Default property.");
 		}
 		FExecutionContext._defaultExecutionContext = executionContext;
 	}
@@ -128,3 +134,6 @@ class _EmptyExecutionContext extends FExecutionContext {
 	public get prevContext(): FExecutionContext | null { return null; }
 }
 const emptyExecutionContext: _EmptyExecutionContext = new _EmptyExecutionContext();
+
+// Import here due to cyclic dependencies
+import { FCancellationExecutionContext } from "../cancellation/f_cancellation_execution_context.js";
