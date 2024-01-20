@@ -21,24 +21,23 @@ export abstract class FDisposable {
 		FExceptionAggregate.throwIfNeeded(innerExceptions);
 	}
 
-	// public static async safeDispose(disposable: any): Promise<void> {
-	// 	if (typeof disposable !== "object" || disposable === null) { return Promise.resolve(); }
-	// 	if (!("dispose" in disposable)) { return Promise.resolve(); }
-	// 	if (typeof disposable.dispose !== "function") { return Promise.resolve(); }
+	public static instanceOf(test: unknown): test is FDisposable {
+		if (test instanceof FDisposable) {
+			return true;
+		}
 
-	// 	return Promise.resolve().then(async () => {
-	// 		try {
-	// 			const disposeResult = (disposable as FDisposable).dispose();
-	// 			if (disposeResult instanceof Promise) {
-	// 				await disposeResult;
-	// 			}
-	// 		} catch (e) {
-	// 			console.error(
-	// 				"Dispose method raised an error. This is unexpected behavior due dispose() should be exception safe. The error was bypassed.",
-	// 				e);
-	// 		}
-	// 	});
-	// }
+		if (
+			typeof test === "object"
+			&& test !== null // {}
+			&& "dispose" in test // { init: ... }
+			&& typeof test.dispose === "function" // { dispose: function(...) {} }
+			&& test.dispose.length === 0 // { dispose: function() {} }
+		) {
+			return true;
+		}
+
+		return false;
+	}
 }
 
 export abstract class FDisposableBase extends FDisposable {

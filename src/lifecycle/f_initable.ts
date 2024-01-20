@@ -36,6 +36,24 @@ export abstract class FInitable extends FDisposable {
 			throw initEx;
 		}
 	}
+
+	public static override instanceOf(test: unknown): test is FInitable {
+		if (test instanceof FInitable) {
+			return true;
+		}
+
+		if (
+			typeof test === "object"
+			&& test !== null // {}
+			&& "init" in test // { init: ... }
+			&& typeof test.init === "function" // { init: function(...) {} }
+			&& test.init.length === 1 // { init: function(probablyExecutionContext) {} }
+		) {
+			return true;
+		}
+
+		return false;
+	}
 }
 
 export abstract class FInitableBase extends FInitable {
@@ -185,7 +203,7 @@ export class FInitableMixin extends FInitableBase {
 			if (name === "onInit" || name === "onDispose") {
 				// Add NOP methods into mixed only if it not implements its
 				if (propertyDescriptor !== undefined) {
-					const existingPropertyDescriptor: PropertyDescriptor | undefined  = Object.getOwnPropertyDescriptor(targetClass.prototype, name);
+					const existingPropertyDescriptor: PropertyDescriptor | undefined = Object.getOwnPropertyDescriptor(targetClass.prototype, name);
 					if (existingPropertyDescriptor === undefined) {
 						Object.defineProperty(targetClass.prototype, name, propertyDescriptor);
 					}

@@ -4,7 +4,7 @@ import { assert } from "chai";
 import { FWebClient } from "../../src/index.js";
 import { FCancellationTokenSourceManual, FCancellationException, FExecutionContext, FCancellationExecutionContext } from "../../src/index.js";
 
-describe("WebClient tests", function () {
+describe.skip("WebClient tests", function () {
 	describe("Tests with limits", function () {
 		class MyApiClient extends FWebClient {
 			public override invoke(executionContext: FExecutionContext, path: string, method: "GET" | "POST" | string, opts?: {

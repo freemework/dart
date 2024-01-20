@@ -1,6 +1,6 @@
 import { assert } from "chai";
 
-import { FDisposableBase } from "../../src/index.js";
+import { FDisposable, FDisposableBase } from "../../src/index.js";
 
 import * as tools from "./tools.js";
 
@@ -162,6 +162,11 @@ describe("FDisposableBase tests", function () {
 		assert.isNotNull(expectedError);
 		assert.instanceOf(expectedError, Error);
 		assert.equal((expectedError as Error).message, "test error");
+	});
+
+	it("Check instanceOf", async function () {
+		const disposable = new TestDisposable();
+		assert.isTrue(FDisposable.instanceOf(disposable));
 	});
 });
 

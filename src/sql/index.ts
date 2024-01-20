@@ -8,5 +8,6 @@ export type { FSqlData } from "./f_sql_data.js";
 export type { FSqlConnection } from "./f_sql_connection.js";
 export type { FSqlConnectionFactory } from "./f_sql_connection_factory.js";
 export type { FSqlConnectionFactoryEmbedded } from "./f_sql_connection_factory_embedded.js";
+export { FSqlConnectionFactoryExecutionContext, FSqlConnectionFactoryExecutionElement } from "./f_sql_connection_factory_execution_context.js";
 export type { FSqlResultRecord, FSqlStatement, FSqlStatementParam } from "./f_sql_statement.js";
 export type { FSqlTemporaryTable } from "./f_sql_temporary_table.js";

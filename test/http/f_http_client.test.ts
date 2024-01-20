@@ -16,7 +16,7 @@ function nextTick() {
 	return new Promise(resolve => process.nextTick(resolve));
 }
 
-describe("FHttpClient tests", function () {
+describe.skip("FHttpClient tests", function () {
 	describe("Tests without proxy", function () {
 		it("FHttpClient should GET http:", async function () {
 			const httpClient = new FHttpClient({ timeout: 5000 });

@@ -2,7 +2,7 @@ import { assert } from "chai";
 
 import { FConfiguration, FConfigurationException, FConfigurationValue } from "../../src/index.js";
 
-describe.only("FConfiguration tests", function () {
+describe("FConfiguration tests", function () {
 	it("factoryJson should should contains proper sourceURI 'configuration:json?data=%7B%22a%22%3A%2242%22%7D'", function () {
 		const data = {
 			"a": "42"
