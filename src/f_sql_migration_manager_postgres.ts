@@ -18,14 +18,14 @@ export class FSqlMigrationManagerPostgres extends FSqlMigrationManager {
 	}
 
 	public async getCurrentVersion(executionContext: FExecutionContext): Promise<string | null> {
-		return await this.sqlConnectionFactory.usingConnection(executionContext, async (FSqlConnection: FSqlConnection) => {
+		return await this.sqlConnectionFactory.usingConnection(executionContext, async (sqlConnection: FSqlConnection) => {
 
-			const isExist = await this._isVersionTableExist(executionContext, FSqlConnection);
+			const isExist = await this._isVersionTableExist(executionContext, sqlConnection);
 			if (isExist === false) { return null; }
 
-			await this._verifyVersionTableStructure(executionContext, FSqlConnection);
+			await this._verifyVersionTableStructure(executionContext, sqlConnection);
 
-			const versionData = await FSqlConnection.statement(
+			const versionData = await sqlConnection.statement(
 				`SELECT "version" FROM "${this.versionTableName}" ORDER BY "version" DESC LIMIT 1`
 			).executeScalarOrNull(executionContext);
 
