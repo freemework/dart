@@ -1,6 +1,6 @@
 {
 	"name": "@freemework/decimal.bignumberjs",
-	"version": "0.12.3",
+	"version": "0.13.0",
 	"description": "decimal.bignumberjs library of the Freemework Project.",
 	"author": {
 		"name": "Freemework Project",
