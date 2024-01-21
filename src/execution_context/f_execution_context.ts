@@ -28,9 +28,9 @@ export abstract class FExecutionContext {
 		return FExecutionContext._defaultExecutionContext;
 	}
 
-	public static setDefaultExecutionContext(executionContext: FExecutionContext): void {
+	public static set Default(executionContext: FExecutionContext) {
 		if (FExecutionContext._defaultExecutionContext !== null) {
-			throw new FExceptionInvalidOperation("Unable to set default execution context twice. Please call this method before first access FExecutionContext.Default property.");
+			throw new FExceptionInvalidOperation("Unable to set FExecutionContext.Default twice. Please set this before first access FExecutionContext.Default property.");
 		}
 		FExecutionContext._defaultExecutionContext = executionContext;
 	}
