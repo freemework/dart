@@ -2,7 +2,7 @@ import { FConfiguration } from "@freemework/common";
 
 import { assert } from "chai";
 
-import { FConfigurationToml } from "../../src";
+import { FConfigurationToml } from "../../src/index.js";
 
 describe("FConfigurationToml basic tests", function () {
 	it("Parse array of float", function () {
@@ -121,10 +121,10 @@ desc = "desc3"
 			.getNamespace("setup")
 			.getArray("model");
 		assert.equal(array.length, 2);
-		assert.equal(array[0].get("title").asString, "model1");
-		assert.equal(array[0].get("desc").asString, "desc1");
-		assert.equal(array[1].get("title").asString, "model3");
-		assert.equal(array[1].get("desc").asString, "desc3");
+		assert.equal(array[0]!.get("title").asString, "model1");
+		assert.equal(array[0]!.get("desc").asString, "desc1");
+		assert.equal(array[1]!.get("title").asString, "model3");
+		assert.equal(array[1]!.get("desc").asString, "desc3");
 	});
 });
 
@@ -147,7 +147,7 @@ describe("FConfigurationToml Regression 0.10.11", function () {
 
 		assert.equal(topics.length, 1);
 
-		const topic: FConfiguration = topics[0];
+		const topic: FConfiguration = topics[0]!;
 
 		const topicKeys: ReadonlyArray<string> = topic.keys;
 

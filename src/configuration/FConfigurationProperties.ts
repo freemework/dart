@@ -1,17 +1,10 @@
-import _ = require("lodash");
-import { JsonMap, parse } from "@iarna/toml";
-
 import { readFile } from "fs";
 import { promisify } from "util";
 import { pathToFileURL } from "url";
 
 const readFileAsync = promisify(readFile);
 
-import {
-	FConfiguration,
-	FConfigurationDictionary,
-	FUtilUnreadonly
-} from "@freemework/common";
+import { FConfigurationDictionary, FUtilUnReadonly } from "@freemework/common";
 
 /**
  * Very similar to Java property files
@@ -38,7 +31,7 @@ export class FConfigurationProperties extends FConfigurationDictionary {
 
 	protected constructor(sourceURI: URL, propertiesDocument: string) {
 
-		const dict: FUtilUnreadonly<FConfigurationDictionary.Data> = {};
+		const dict: FUtilUnReadonly<FConfigurationDictionary.Data> = {};
 
 		const lines = propertiesDocument.toString().split(/(?:\r\n|\r|\n)/g);
 		lines.forEach((line: string) => {

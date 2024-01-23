@@ -6,7 +6,7 @@ const readFileAsync = promisify(fs.readFile);
 const readdirAsync = promisify(fs.readdir);
 const statAsync = promisify(fs.stat);
 
-import { FConfigurationDictionary, FUtilUnreadonly } from "@freemework/common";
+import { FConfigurationDictionary, FUtilUnReadonly } from "@freemework/common";
 import { pathToFileURL } from "url";
 
 /**
@@ -22,7 +22,7 @@ export class FConfigurationDirectory extends FConfigurationDictionary {
 			directory = "/run/secrets";
 		}
 
-		const dict: FUtilUnreadonly<FConfigurationDictionary.Data> = {};
+		const dict: FUtilUnReadonly<FConfigurationDictionary.Data> = {};
 		const sourceDirectory = directory;
 		const files: Array<string> = await readdirAsync(sourceDirectory);
 		await files.reduce(async (p, c) => {

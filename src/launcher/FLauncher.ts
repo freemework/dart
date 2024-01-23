@@ -11,15 +11,14 @@ import {
 } from "@freemework/common";
 
 import {
-	FConfigurationCommandLine,
 	FConfigurationDirectory,
 	FConfigurationEnv,
 	FConfigurationProperties,
 	FConfigurationToml
-} from "../configuration";
+} from "../configuration/index.js";
 
-import { FLauncherException } from "./FLauncherException";
-import { FLauncherRestartRequiredException } from "./FLauncherRestartRequiredException";
+import { FLauncherException } from "./FLauncherException.js";
+import { FLauncherRestartRequiredException } from "./FLauncherRestartRequiredException.js";
 
 export function FLauncher(runtimeFactory: FConfigLessRuntimeFactory): void;
 
@@ -149,7 +148,7 @@ export function FLauncher<TConfiguration>(...args: Array<any>): void {
 			const exitCode: number = ex instanceof FLauncherRestartRequiredException ? ex.exitCode : 127;
 
 
-			if (process.env.NODE_ENV === "development") {
+			if (process.env["NODE_ENV"] === "development") {
 				setTimeout(() => {
 					fireShutdownHooks().finally(function () {
 						process.exit(exitCode);
@@ -173,7 +172,7 @@ export type ConfigurationParser<TConfiguration> = (rawConfiguration: FConfigurat
 export type FLauncherRuntimeFactory<TConfiguration> = (executionContext: FExecutionContext, configuration: TConfiguration) => Promise<FLauncherRuntime>;
 export type FConfigLessRuntimeFactory = (executionContext: FExecutionContext) => Promise<FLauncherRuntime>;
 
-export async function defaultConfigurationLoader(executionContext: FExecutionContext): Promise<FConfiguration> {
+export async function defaultConfigurationLoader(_executionContext: FExecutionContext): Promise<FConfiguration> {
 	const chainItems: Array<FConfiguration> = [];
 	for (const arg of process.argv) {
 		if (arg.startsWith(defaultConfigurationLoader.CONFIG_FILE_ARG)) {

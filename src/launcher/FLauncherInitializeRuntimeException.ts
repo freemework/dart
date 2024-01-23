@@ -1,4 +1,4 @@
-import { FLauncherException } from "./FLauncherException";
+import { FLauncherException } from "./FLauncherException.js";
 
 export class FLauncherInitializeRuntimeException extends FLauncherException {
 	//

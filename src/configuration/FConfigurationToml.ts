@@ -1,4 +1,3 @@
-import _ = require("lodash");
 import { JsonMap, parse } from "@iarna/toml";
 
 import { readFile } from "fs";
@@ -10,7 +9,7 @@ const readFileAsync = promisify(readFile);
 import {
 	FConfiguration,
 	FConfigurationDictionary,
-	FUtilUnreadonly
+	FUtilUnReadonly
 } from "@freemework/common";
 
 export class FConfigurationToml extends FConfigurationDictionary {
@@ -56,7 +55,7 @@ export class FConfigurationToml extends FConfigurationDictionary {
 		arrayIndexesKey: string,
 	) {
 
-		const dict: FUtilUnreadonly<FConfigurationDictionary.Data> = {};
+		const dict: FUtilUnReadonly<FConfigurationDictionary.Data> = {};
 		const tomlData: JsonMap = parse(tomlDocument);
 		function recursiveWalker(sourceData: any, ns: string = ""): void {
 			if (typeof sourceData === "string") {
@@ -87,7 +86,7 @@ export class FConfigurationToml extends FConfigurationDictionary {
 					dict[indexerKey] = indexes.join(" ");
 				}
 			} else {
-				for (const [key, value] of _.entries(sourceData)) {
+				for (const [key, value] of Object.entries(sourceData)) {
 					const fullKey = ns !== "" ? `${ns}.${key}` : key;
 					recursiveWalker(value, fullKey);
 				}

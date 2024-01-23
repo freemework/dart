@@ -1,7 +1,6 @@
 {
 	"editor.detectIndentation": false,
 	"editor.insertSpaces": false,
-	"editor.guides.indentation": true,
 	"editor.lineNumbers": "on",
 	"editor.renderWhitespace": "all",
 	"editor.rulers": [
@@ -19,10 +18,9 @@
 	"files.encoding": "utf8",
 	"files.eol": "\n",
 	"files.exclude": {
-		".dist": true,
-		".nyc_output": true,
-		".package": true,
-		"coverage": true,
+		// ".dist": true,
+		// ".nyc_output": true,
+		// "coverage": true,
 		"node_modules": true,
 		"src/**/*.d.ts": true,
 		"src/**/*.js": true,
@@ -37,19 +35,12 @@
 	},
 	"git.enabled": true,
 	"git.rebaseWhenSync": true,
+	"editor.guides.indentation": true,
 	"cSpell.words": [
 		"Anurin",
-		"Devel",
-		"Flauncher",
-		"freemework",
-		"iarna",
-		"Initable",
-		"lcov",
-		"linklocal",
-		"nodebuffer",
-		"uniquelocal",
-		"Unreadonly",
-		"websockets",
-		"Xfcc"
+		"bignumber",
+		"bignumberjs",
+		"devel",
+		"freemework"
 	]
 }

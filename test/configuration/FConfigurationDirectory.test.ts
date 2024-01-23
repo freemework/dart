@@ -1,11 +1,11 @@
 import { FConfiguration } from "@freemework/common";
 import { assert } from "chai";
 
-import * as path from "path";
-import * as fs from "fs";
-import * as tmp from "tmp";
+import path from "path";
+import fs from "fs";
+import tmp from "tmp";
 
-import { FConfigurationDirectory } from "../../src";
+import { FConfigurationDirectory } from "../../src/index.js";
 
 describe("FConfigurationDirectory tests", function () {
 	let tempDirectoryObj: tmp.DirResult;

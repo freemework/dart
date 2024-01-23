@@ -1,10 +1,10 @@
-import { FConfiguration, FConfigurationDictionary, FConfigurationValue, FUtilUnreadonly } from "@freemework/common";
+import { FConfigurationDictionary, FUtilUnReadonly } from "@freemework/common";
 
 export class FConfigurationEnv extends FConfigurationDictionary {
 	public constructor() {
 		const sourceURI: URL = new URL("configuration:env");
 
-		const dict: FUtilUnreadonly<FConfigurationDictionary.Data> = {};
+		const dict: FUtilUnReadonly<FConfigurationDictionary.Data> = {};
 
 		Object.entries(process.env).forEach(([name, value]) => {
 			// A little bit magic for double underscore "__" (translate it to ".")

@@ -1,8 +1,7 @@
 import { FDisposableBase, FExecutionContext, FChannelSubscriber } from "@freemework/common";
-import * as _ from "lodash";
 import * as WebSocket from "ws";
 
-import * as THE from "../src/index";
+import * as THE from "../src/index.js";
 
 class BinaryEchoChannel extends FDisposableBase implements THE.FWebSocketChannelSupplyEndpoint.BinaryChannel {
 	private readonly _timeout: number;
@@ -20,7 +19,7 @@ class BinaryEchoChannel extends FDisposableBase implements THE.FWebSocketChannel
 		console.log(`${this.constructor.name} constructed`);
 	}
 
-	public async send(executionContext: FExecutionContext, data: Uint8Array): Promise<void> {
+	public async send(_executionContext: FExecutionContext, data: Uint8Array): Promise<void> {
 		await sleep(50);
 		const echoMessage = data.toString();
 		console.log(this._subProtocol, "Receive:", echoMessage);
@@ -191,22 +190,22 @@ function sleep(ms: number): Promise<void> {
 	return new Promise(r => setTimeout(r, ms));
 }
 
-namespace ArrayBufferUtils {
-	export function fromBuffer(buf: Uint8Array): ArrayBuffer {
-		const ab = new ArrayBuffer(buf.length);
-		const view = new Uint8Array(ab);
-		for (let i = 0; i < buf.length; ++i) {
-			view[i] = buf[i];
-		}
-		return ab;
-	}
+// namespace ArrayBufferUtils {
+// 	export function fromBuffer(buf: Uint8Array): ArrayBuffer {
+// 		const ab = new ArrayBuffer(buf.length);
+// 		const view = new Uint8Array(ab);
+// 		for (let i = 0; i < buf.length; ++i) {
+// 			view[i] = buf[i];
+// 		}
+// 		return ab;
+// 	}
 
-	export function toBuffer(ab: ArrayBuffer): Buffer {
-		const buf = Buffer.alloc(ab.byteLength);
-		const view = new Uint8Array(ab);
-		for (let i = 0; i < buf.length; ++i) {
-			buf[i] = view[i];
-		}
-		return buf;
-	}
-}
+// 	export function toBuffer(ab: ArrayBuffer): Buffer {
+// 		const buf = Buffer.alloc(ab.byteLength);
+// 		const view = new Uint8Array(ab);
+// 		for (let i = 0; i < buf.length; ++i) {
+// 			buf[i] = view[i];
+// 		}
+// 		return buf;
+// 	}
+// }

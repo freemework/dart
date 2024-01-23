@@ -13,25 +13,25 @@ export class FConfigurationCommandLine extends FConfiguration {
 	get keys(): readonly string[] {
 		throw new Error("Method not implemented.");
 	}
-	getArray(key: string, indexesName?: string | undefined): FConfiguration[] {
+	getArray(_key: string, _indexesName?: string | undefined): FConfiguration[] {
 		throw new Error("Method not implemented.");
 	}
-	getNamespace(namespaceFull: string): FConfiguration {
+	getNamespace(_namespaceFull: string): FConfiguration {
 		throw new Error("Method not implemented.");
 	}
-	get(key: string, defaultData?: string | null | undefined): FConfigurationValue {
+	get(_key: string, _defaultData?: string | null | undefined): FConfigurationValue {
 		throw new Error("Method not implemented.");
 	}
-	findNamespace(namespaceFull: string): FConfiguration | null {
+	findNamespace(_namespaceFull: string): FConfiguration | null {
 		throw new Error("Method not implemented.");
 	}
-	find(key: string): FConfigurationValue | null {
+	find(_key: string): FConfigurationValue | null {
 		throw new Error("Method not implemented.");
 	}
-	hasNamespace(namespaceFull: string): boolean {
+	hasNamespace(_namespaceFull: string): boolean {
 		throw new Error("Method not implemented.");
 	}
-	has(key: string): boolean {
+	has(_key: string): boolean {
 		throw new Error("Method not implemented.");
 	}
 

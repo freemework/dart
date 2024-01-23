@@ -1,4 +1,4 @@
-import { FLauncherInitializeRuntimeException } from "./FLauncherInitializeRuntimeException";
+import { FLauncherInitializeRuntimeException } from "./FLauncherInitializeRuntimeException.js";
 
 export class FLauncherRestartRequiredException extends FLauncherInitializeRuntimeException {
 	public readonly exitCode: number;

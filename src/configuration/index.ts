@@ -1,8 +1,8 @@
-export { FConfigurationCommandLine } from "./FConfigurationCommandLine";
-export { FConfigurationDirectory } from "./FConfigurationDirectory";
-export { FConfigurationEnv } from "./FConfigurationEnv";
-export { FConfigurationProperties } from "./FConfigurationProperties";
-export { FConfigurationToml } from "./FConfigurationToml";
+export { FConfigurationCommandLine } from "./FConfigurationCommandLine.js";
+export { FConfigurationDirectory } from "./FConfigurationDirectory.js";
+export { FConfigurationEnv } from "./FConfigurationEnv.js";
+export { FConfigurationProperties } from "./FConfigurationProperties.js";
+export { FConfigurationToml } from "./FConfigurationToml.js";
 
 // export function develVirtualFilesConfiguration(configDir: string, develSite: string): FConfiguration {
 // 	if (!configDir) { throw new FExceptionArgument("configDir"); }

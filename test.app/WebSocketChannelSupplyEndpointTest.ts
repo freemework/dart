@@ -1,11 +1,10 @@
 import { FException, FExecutionContext, FChannelSubscriber } from "@freemework/common";
-import * as _ from "lodash";
 import * as WebSocket from "ws";
 
-import * as THE from "../src/index";
+import * as THE from "../src/index.js";
 
 class TestWebSocketChannelsEndpoint extends THE.FWebSocketChannelSupplyEndpoint {
-	protected onOpenBinaryChannel(webSocket: WebSocket, subProtocol: string, channel: THE.FWebSocketChannelSupplyEndpoint.BinaryChannel) {
+	protected onOpenBinaryChannel(_webSocket: WebSocket, subProtocol: string, channel: THE.FWebSocketChannelSupplyEndpoint.BinaryChannel) {
 		let timer: NodeJS.Timeout | null = null;
 		let echoMessage: string;
 		const messageHandler = (executionContext: FExecutionContext, event: FChannelSubscriber.Event<Uint8Array> | FException): Promise<void> => {

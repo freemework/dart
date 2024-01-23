@@ -96,7 +96,7 @@ export namespace FHostingConfiguration {
 		const serverType = configuration.get("type").asString;
 		switch (serverType) {
 			case "http": {
-				let trustProxy: boolean | "loopback" | "linklocal" | "uniquelocal" | undefined = undefined;
+				let trustProxy: boolean | "loopback" | "linklocal" | "uniquelocal" | null = null;
 				if (configuration.has("trustProxy")) {
 					trustProxy = FHostingConfiguration.parseTrustProxy(configuration.get("trustProxy").asString);
 				}
@@ -112,7 +112,7 @@ export namespace FHostingConfiguration {
 						name: serverName,
 						listenHost: configuration.get("listenHost").asString,
 						listenPort: configuration.get("listenPort").asIntegerPositive,
-						trustProxy,
+						...(trustProxy !== null ? { trustProxy } : {}),
 						clientCertificateMode,
 						caCertificates: configuration.get("caCertificates").asString // caCertificates requires for validate client certificates
 					};
@@ -124,7 +124,7 @@ export namespace FHostingConfiguration {
 						name: serverName,
 						listenHost: configuration.get("listenHost").asString,
 						listenPort: configuration.get("listenPort").asIntegerPositive,
-						trustProxy
+						...(trustProxy !== null ? { trustProxy } : {}),
 					};
 
 					return serverOpts;
@@ -133,12 +133,12 @@ export namespace FHostingConfiguration {
 			case "https": {
 				let serverOpts: SecuredWebServer;
 
-				let trustProxy: boolean | "loopback" | "linklocal" | "uniquelocal" | undefined = undefined;
+				let trustProxy: boolean | "loopback" | "linklocal" | "uniquelocal" | null = null;
 				if (configuration.has("trustProxy")) {
 					trustProxy = FHostingConfiguration.parseTrustProxy(configuration.get("trustProxy").asString);
 				}
 
-				let serverKeyPassword: string | undefined = undefined;
+				let serverKeyPassword: string | null = null;
 				if (configuration.has("serverKeyPassword")) {
 					serverKeyPassword = configuration.get("serverKeyPassword").asString;
 				}
@@ -156,8 +156,8 @@ export namespace FHostingConfiguration {
 								listenPort: configuration.get("listenPort").asInteger,
 								serverCertificate: configuration.get("serverCertificate").asString,
 								serverKey: configuration.get("serverKey").asString,
-								serverKeyPassword,
-								trustProxy,
+								...(serverKeyPassword !== null ? { serverKeyPassword } : {}),
+								...(trustProxy !== null ? { trustProxy } : {}),
 								clientCertificateMode: clientCertMode,
 								caCertificates: configuration.get("caCertificates").asString
 							};
@@ -169,9 +169,9 @@ export namespace FHostingConfiguration {
 								listenPort: configuration.get("listenPort").asIntegerPositive,
 								serverCertificate: configuration.get("serverCertificate").asString,
 								serverKey: configuration.get("serverKey").asString,
-								serverKeyPassword,
-								trustProxy,
-								clientCertificateMode: clientCertMode
+								...(serverKeyPassword !== null ? { serverKeyPassword } : {}),
+								...(trustProxy !== null ? { trustProxy } : {}),
+								clientCertificateMode: clientCertMode,
 							};
 						}
 						break;
@@ -185,8 +185,8 @@ export namespace FHostingConfiguration {
 							caCertificates: configuration.get("caCertificates").asString,
 							serverCertificate: configuration.get("serverCertificate").asString,
 							serverKey: configuration.get("serverKey").asString,
-							serverKeyPassword,
-							trustProxy,
+							...(serverKeyPassword !== null ? { serverKeyPassword } : {}),
+							...(trustProxy !== null ? { trustProxy } : {}),
 							clientCertificateMode: clientCertMode
 						};
 						break;
@@ -210,7 +210,7 @@ export namespace FHostingConfiguration {
 				const configurationNamespaceParts: Array<string> = namespaceFull.split(".");
 				if (configurationNamespaceParts.length > 0) {
 					// Use name of configuration index
-					serverName = configurationNamespaceParts[configurationNamespaceParts.length - 1];
+					serverName = configurationNamespaceParts[configurationNamespaceParts.length - 1]!;
 				}
 			}
 

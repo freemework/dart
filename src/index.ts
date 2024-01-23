@@ -4,12 +4,7 @@ import {
 	FExecutionContext,
 	FCancellationExecutionContext,
 	FChannelPublisher,
-	FChannelSubscriber
-} from "@freemework/common";
-
-FModuleVersionGuard(require("../package.json"));
-
-import {
+	FChannelSubscriber,
 	FCancellationToken,
 	FCancellationTokenSourceManual,
 	FException,
@@ -19,24 +14,26 @@ import {
 	FLogger,
 } from "@freemework/common";
 
-import * as express from "express";
-import * as fs from "fs";
-import * as net from "net";
-import * as http from "http";
-import * as https from "https";
-import { unescape as urlDecode } from "querystring";
-import * as WebSocket from "ws";
-import * as _ from "lodash";
-import { pki } from "node-forge";
+import express from 'express';
+import fs from "fs";
+import net from "net";
+import http from "http";
+import https from "https";
+// import { unescape as urlDecode } from "querystring";
+import WebSocket from "ws";
+// import { pki } from "node-forge";
 
-import { FHttpRequestCancellationToken } from "./FHttpRequestCancellationToken";
-import { FHostingConfiguration } from "./FHostingConfiguration";
+import { FHttpRequestCancellationToken } from "./FHttpRequestCancellationToken.js";
+import { FHostingConfiguration } from "./FHostingConfiguration.js";
 
-export { FHostingConfiguration } from "./FHostingConfiguration";
-export { FHttpRequestCancellationToken } from "./FHttpRequestCancellationToken";
+import { packageInfo } from "./package_info.js";
+FModuleVersionGuard(packageInfo);
 
-export * from "./configuration";
-export * from "./launcher";
+export { FHostingConfiguration } from "./FHostingConfiguration.js";
+export { FHttpRequestCancellationToken } from "./FHttpRequestCancellationToken.js";
+
+export * from "./configuration/index.js";
+export * from "./launcher/index.js";
 
 export type FWebServerRequestHandler = http.RequestListener;
 
@@ -61,7 +58,7 @@ export abstract class FAbstractWebServer<TOpts extends FHostingConfiguration.Web
 	private readonly _onUpgrade: (request: http.IncomingMessage, socket: net.Socket, head: Buffer) => void;
 	private readonly _onRequestImpl: http.RequestListener;
 	private readonly _handlers: Map</*bindPath: */string, FWebServerRequestHandler>;
-	private readonly _caCertificates: ReadonlyArray<[pki.Certificate, Buffer]>;
+	// private readonly _caCertificates: ReadonlyArray<[pki.Certificate, Buffer]>;
 	private _rootExpressApplication: express.Application | null;
 
 	public static createFCancellationToken(request: http.IncomingMessage): FCancellationToken {
@@ -90,35 +87,35 @@ export abstract class FAbstractWebServer<TOpts extends FHostingConfiguration.Web
 				if (
 					friendlyOpts.caCertificates === undefined ||
 					!(
-						_.isString(friendlyOpts.caCertificates)
+						typeof friendlyOpts.caCertificates === "string"
 						|| friendlyOpts.caCertificates instanceof Buffer
-						|| _.isArray(friendlyOpts.caCertificates)
+						|| Array.isArray(friendlyOpts.caCertificates)
 					)
 				) {
 					throw new Error("ClientCertificateMode.XFCC required at least one CA certificate");
 				}
 
-				this._caCertificates = parseCertificates(friendlyOpts.caCertificates);
+				// this._caCertificates = parseCertificates(friendlyOpts.caCertificates);
 
 				onXfccRequest = this.onRequestXFCC.bind(this);
 				onXfccUpgrade = this.onUpgradeXFCC.bind(this);
 			} else {
-				if (
-					friendlyOpts.type === "https" &&
-					friendlyOpts.caCertificates !== undefined &&
-					(
-						_.isString(friendlyOpts.caCertificates)
-						|| friendlyOpts.caCertificates instanceof Buffer
-						|| _.isArray(friendlyOpts.caCertificates)
-					)
-				) {
-					this._caCertificates = parseCertificates(friendlyOpts.caCertificates);
-				} else {
-					this._caCertificates = [];
-				}
+				// if (
+				// 	friendlyOpts.type === "https" &&
+				// 	friendlyOpts.caCertificates !== undefined &&
+				// 	(
+				// 		typeof friendlyOpts.caCertificates === "string"
+				// 		|| friendlyOpts.caCertificates instanceof Buffer
+				// 		|| Array.isArray(friendlyOpts.caCertificates)
+				// 	)
+				// ) {
+				// 	this._caCertificates = parseCertificates(friendlyOpts.caCertificates);
+				// } else {
+				// 	this._caCertificates = [];
+				// }
 			}
 		} else {
-			this._caCertificates = [];
+			// this._caCertificates = [];
 		}
 
 		this._onRequestImpl = onXfccRequest !== null ? onXfccRequest : this.onRequestCommon.bind(this);
@@ -187,19 +184,19 @@ export abstract class FAbstractWebServer<TOpts extends FHostingConfiguration.Web
 		await this.onListen();
 	}
 
-	protected get caCertificatesAsPki(): Array<pki.Certificate> {
-		if (this._caCertificates === undefined) {
-			throw new Error("Wrong operation at current state.");
-		}
-		return this._caCertificates.map(tuple => tuple[0]);
-	}
+	// protected get caCertificatesAsPki(): Array<pki.Certificate> {
+	// 	if (this._caCertificates === undefined) {
+	// 		throw new Error("Wrong operation at current state.");
+	// 	}
+	// 	return this._caCertificates.map(tuple => tuple[0]);
+	// }
 
-	protected get caCertificatesAsBuffer(): Array<Buffer> {
-		if (this._caCertificates === undefined) {
-			throw new Error("Wrong operation at current state.");
-		}
-		return this._caCertificates.map(tuple => tuple[1]);
-	}
+	// protected get caCertificatesAsBuffer(): Array<Buffer> {
+	// 	if (this._caCertificates === undefined) {
+	// 		throw new Error("Wrong operation at current state.");
+	// 	}
+	// 	return this._caCertificates.map(tuple => tuple[1]);
+	// }
 
 	protected abstract onListen(): Promise<void>;
 
@@ -279,21 +276,21 @@ export abstract class FAbstractWebServer<TOpts extends FHostingConfiguration.Web
 		const logger: FLogger = this._log;
 
 		const xfccHeaderData = req && req.headers && req.headers["x-forwarded-client-cert"];
-		if (_.isString(xfccHeaderData)) {
+		if (typeof xfccHeaderData === "string") {
 			logger.trace(this.initExecutionContext, () => `X-Forwarded-Client-Cert header: ${xfccHeaderData}`);
 
-			const clientCertPem = urlDecode(xfccHeaderData);
-			const clientCert = pki.certificateFromPem(clientCertPem);
+			// const clientCertPem = urlDecode(xfccHeaderData);
+			// const clientCert = pki.certificateFromPem(clientCertPem);
 
-			for (const caCert of this.caCertificatesAsPki) {
-				try {
-					if (caCert.verify(clientCert)) {
-						return true;
-					}
-				} catch (e) {
-					logger.trace(this.initExecutionContext, "Verify failed.", FException.wrapIfNeeded(e));
-				}
-			}
+			// for (const caCert of this.caCertificatesAsPki) {
+			// 	try {
+			// 		if (caCert.verify(clientCert)) {
+			// 			return true;
+			// 		}
+			// 	} catch (e) {
+			// 		logger.trace(this.initExecutionContext, "Verify failed.", FException.wrapIfNeeded(e));
+			// 	}
+			// }
 		} else {
 			logger.debug(this.initExecutionContext, "Request with no X-Forwarded-Client-Cert header.");
 		}
@@ -383,13 +380,13 @@ export class SecuredWebServer extends FAbstractWebServer<FHostingConfiguration.S
 			key: opts.serverKey instanceof Buffer ? opts.serverKey : fs.readFileSync(opts.serverKey)
 		};
 
-		if (opts.caCertificates !== undefined) {
-			if (_.isString(opts.caCertificates)) {
+		if (opts.caCertificates !== null) {
+			if (typeof opts.caCertificates === "string") {
 				serverOpts.ca = fs.readFileSync(opts.caCertificates);
 			}
 			//serverOpts.ca = this.caCertificatesAsBuffer;
 		}
-		if (opts.serverKeyPassword !== undefined) {
+		if (opts.serverKeyPassword !== null) {
 			serverOpts.passphrase = opts.serverKeyPassword;
 		}
 
@@ -536,7 +533,7 @@ export class FWebSocketChannelSupplyEndpoint extends FServersBindEndpoint {
 		this._connectionCounter = 0;
 	}
 
-	protected onInit(): void {
+	protected override onInit(): void {
 		super.onInit();
 
 		for (const server of this._servers) {
@@ -546,7 +543,7 @@ export class FWebSocketChannelSupplyEndpoint extends FServersBindEndpoint {
 		}
 	}
 
-	protected async onDispose() {
+	protected override async onDispose() {
 		const logger: FLogger = this._log;
 
 		const connections = [...this._connections.values()];
@@ -635,7 +632,7 @@ export class FWebSocketChannelSupplyEndpoint extends FServersBindEndpoint {
 						channelsTuple.binaryChannel = binaryChannel;
 					}
 					await channelsTuple.binaryChannel.onMessage(FCancellationTokenSource.token, data);
-				} else if (_.isString(data)) {
+				} else if (typeof data === "string") {
 					if (channelsTuple.textChannel === undefined) {
 						const textChannel = new _FWebSocketChannelSupplyEndpointHelpers.WebSocketTextChannelImpl(webSocket);
 						try {
@@ -701,7 +698,7 @@ export class FWebSocketChannelSupplyEndpoint extends FServersBindEndpoint {
 	 * depending on the specified protocol).
 	 * @param channel Binary channel instance to be user in inherited class
 	 */
-	protected onOpenBinaryChannel(webSocket: WebSocket, subProtocol: string, channel: FWebSocketChannelSupplyEndpoint.BinaryChannel): void {
+	protected onOpenBinaryChannel(_webSocket: WebSocket, subProtocol: string, _channel: FWebSocketChannelSupplyEndpoint.BinaryChannel): void {
 		throw new FExceptionInvalidOperation(`Binary messages are not supported by the sub-protocol: ${subProtocol}`);
 	}
 
@@ -715,7 +712,7 @@ export class FWebSocketChannelSupplyEndpoint extends FServersBindEndpoint {
 	 * depending on the specified protocol).
 	 * @param channel Text channel instance to be user in inherited class
 	 */
-	protected onOpenTextChannel(webSocket: WebSocket, subProtocol: string, channel: FWebSocketChannelSupplyEndpoint.TextChannel): void {
+	protected onOpenTextChannel(_webSocket: WebSocket, subProtocol: string, _channel: FWebSocketChannelSupplyEndpoint.TextChannel): void {
 		throw new FExceptionInvalidOperation(`Text messages are not supported by the sub-protocol: ${subProtocol}`);
 	}
 }
@@ -775,7 +772,7 @@ export class FWebSocketChannelFactoryEndpoint extends FServersBindEndpoint {
 		}
 	}
 
-	protected onInit(): void {
+	protected override onInit(): void {
 		super.onInit();
 
 		for (const server of this._servers) {
@@ -785,7 +782,7 @@ export class FWebSocketChannelFactoryEndpoint extends FServersBindEndpoint {
 		}
 	}
 
-	protected async onDispose() {
+	protected override async onDispose() {
 		// Prevent open new connection
 		for (const server of this._servers) {
 			await server.destroyWebSocketServer(this._bindPath);
@@ -845,7 +842,7 @@ export class FWebSocketChannelFactoryEndpoint extends FServersBindEndpoint {
 		}> = new Map();
 
 		const handler = async (
-			executionContext: FExecutionContext,
+			_executionContext: FExecutionContext,
 			event: FChannelSubscriber.Event<Uint8Array> | FChannelSubscriber.Event<string> | FException
 		) => {
 			if (event instanceof FException) {
@@ -930,7 +927,7 @@ export class FWebSocketChannelFactoryEndpoint extends FServersBindEndpoint {
 						}
 					}
 					await channelsTuple.binaryChannel.send(FExecutionContext.Empty, data);
-				} else if (_.isString(data)) {
+				} else if (typeof data === "string") {
 					if (channelsTuple.textChannel === undefined) {
 						try {
 							const textChannel: FWebSocketChannelFactoryEndpoint.TextChannel
@@ -998,7 +995,7 @@ export class FWebSocketChannelFactoryEndpoint extends FServersBindEndpoint {
 	 * depending on the specified protocol).
 	 */
 	protected createBinaryChannel(
-		executionContext: FExecutionContext, webSocket: WebSocket, subProtocol: string
+		_executionContext: FExecutionContext, _webSocket: WebSocket, subProtocol: string
 	): Promise<FWebSocketChannelFactoryEndpoint.BinaryChannel> {
 		throw new FExceptionInvalidOperation(`Binary messages are not supported by the sub-protocol: ${subProtocol}`);
 	}
@@ -1013,7 +1010,7 @@ export class FWebSocketChannelFactoryEndpoint extends FServersBindEndpoint {
 	 * depending on the specified protocol).
 	 */
 	protected createTextChannel(
-		executionContext: FExecutionContext, webSocket: WebSocket, subProtocol: string
+		_executionContext: FExecutionContext, _webSocket: WebSocket, subProtocol: string
 	): Promise<FWebSocketChannelFactoryEndpoint.TextChannel> {
 		throw new FExceptionInvalidOperation(`Text messages are not supported by the sub-protocol: ${subProtocol}`);
 	}
@@ -1028,7 +1025,7 @@ export function instanceofWebServer(server: any): server is FWebServer {
 	if (server instanceof SecuredWebServer) { return true; }
 
 	if (
-		process.env.NODE_ENV === "development" &&
+		process.env["NODE_ENV"] === "development" &&
 		"name" in server &&
 		"underlyingServer" in server &&
 		"rootExpressApplication" in server &&
@@ -1063,27 +1060,27 @@ export function createWebServers(
 }
 
 
-function parseCertificate(certificate: Buffer | string): [pki.Certificate, Buffer] {
-	let cert: pki.Certificate;
-	let data: Buffer;
+// function parseCertificate(certificate: Buffer | string): [pki.Certificate, Buffer] {
+// 	let cert: pki.Certificate;
+// 	let data: Buffer;
 
-	if (_.isString(certificate)) {
-		data = fs.readFileSync(certificate);
-		cert = pki.certificateFromPem(data.toString("ascii"));
-	} else {
-		data = certificate;
-		cert = pki.certificateFromPem(certificate.toString("ascii"));
-	}
+// 	if (typeof certificate === "string") {
+// 		data = fs.readFileSync(certificate);
+// 		cert = pki.certificateFromPem(data.toString("ascii"));
+// 	} else {
+// 		data = certificate;
+// 		cert = pki.certificateFromPem(certificate.toString("ascii"));
+// 	}
 
-	return [cert, data];
-}
-function parseCertificates(certificates: Buffer | string | Array<string | Buffer>): Array<[pki.Certificate, Buffer]> {
-	if (certificates instanceof Buffer || _.isString(certificates)) {
-		return [parseCertificate(certificates)];
-	} else {
-		return certificates.map(parseCertificate);
-	}
-}
+// 	return [cert, data];
+// }
+// function parseCertificates(certificates: Buffer | string | Array<string | Buffer>): Array<[pki.Certificate, Buffer]> {
+// 	if (certificates instanceof Buffer || typeof certificates === "string") {
+// 		return [parseCertificate(certificates)];
+// 	} else {
+// 		return certificates.map(parseCertificate);
+// 	}
+// }
 
 namespace _FWebSocketChannelSupplyEndpointHelpers {
 	export class WebSocketChannelBase<TData extends Parameters<WebSocket.WebSocket["send"]>[0]> {
@@ -1113,7 +1110,7 @@ namespace _FWebSocketChannelSupplyEndpointHelpers {
 			}));
 		}
 
-		public async onMessage(cancellationToken: FCancellationToken, data: TData): Promise<void> {
+		public async onMessage(_cancellationToken: FCancellationToken, data: TData): Promise<void> {
 			if (this._isBroken) {
 				console.error("Skip received messages due channel is broken");
 				return;
@@ -1159,7 +1156,7 @@ namespace _FWebSocketChannelSupplyEndpointHelpers {
 			}
 		}
 
-		public send(executionContext: FExecutionContext, data: TData): Promise<void> {
+		public send(_executionContext: FExecutionContext, data: TData): Promise<void> {
 			if (this._isBroken) {
 				throw new FExceptionInvalidOperation("Cannot send message on broken channel");
 			}

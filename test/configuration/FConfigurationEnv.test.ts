@@ -2,7 +2,7 @@ import { assert } from "chai";
 
 import { FConfiguration, FConfigurationException } from "@freemework/common";
 
-import { FConfigurationEnv, FConfigurationToml } from "../../src";
+import { FConfigurationEnv } from "../../src/index.js";
 
 describe("FConfigurationEnv basic tests", function () {
 	it("Should get value of 'a.a.a'", function () {
@@ -18,25 +18,25 @@ describe("FConfigurationEnv basic tests", function () {
 	});
 
 	it("Should get value of 'a__a__a' via 'a.a.a'", function () {
-		process.env.a__a__a = "env-own-a";
+		process.env["a__a__a"] = "env-own-a";
 		try {
 			const config = new FConfigurationEnv();
 
 			// Env 'a__a__a' should loaded as 'a.a.a'.
 			assert.equal(config.get("a.a.a").asString, "env-own-a");
 		} finally {
-			delete process.env.a__a__a;
+			delete process.env["a__a__a"];
 		}
 	});
 
 	it("Should NOT get value of 'a__a__a' via 'a__a__a'", function () {
-		process.env.a__a__a = "env-own-a";
+		process.env["a__a__a"] = "env-own-a";
 		try {
 			const config = new FConfigurationEnv();
 			// Env 'a__a__a' should loaded as 'a.a.a'.
 			assert.throw(() => config.get("a__a__a"), FConfigurationException);
 		} finally {
-			delete process.env.a__a__a;
+			delete process.env["a__a__a"];
 		}
 	});
 });
@@ -56,7 +56,7 @@ describe("FConfigurationEnv Regression 0.10.11", function () {
 
 			assert.equal(topics.length, 1);
 
-			const topic: FConfiguration = topics[0];
+			const topic: FConfiguration = topics[0]!;
 
 			const topicKeys: ReadonlyArray<string> = topic.keys;
 

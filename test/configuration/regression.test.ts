@@ -2,7 +2,7 @@ import { FConfiguration, FConfigurationChain } from "@freemework/common";
 
 import { assert } from "chai";
 
-import {  } from "../../src";
+import {  } from "../../src/index.js";
 
 describe("Regression tests", function () {
 	it("Method key() should works for sub-configuration (bug in 6.0.23)", function () {

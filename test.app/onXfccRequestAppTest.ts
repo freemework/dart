@@ -1,8 +1,8 @@
-import { FDisposable, FDisposableBase, FExecutionContext, FChannelPublisher, FChannelSubscriber } from "@freemework/common";
+import { FDisposableBase, FExecutionContext, FChannelPublisher, FChannelSubscriber } from "@freemework/common";
 import * as http from "http";
-import { FHostingConfiguration } from "../src/FHostingConfiguration";
+import { FHostingConfiguration } from "../src/FHostingConfiguration.js";
 
-import * as THE from "../src/index";
+import * as THE from "../src/index.js";
 
 const masterKey = `-----BEGIN RSA PRIVATE KEY-----
 MIIG5gIBAAKCAYEAo217jokGik9mtuXKVRehYN+iVvn5EukUpfislCJZnSAbiqff

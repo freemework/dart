@@ -5,10 +5,9 @@ import * as fs from "fs";
 import * as tmp from "tmp";
 import { userInfo } from "os";
 
-import { FConfiguration, FExceptionArgument } from "@freemework/common";
+import { FConfiguration } from "@freemework/common";
 
-import * as THE from "../../src";
-import { FConfigurationProperties } from "../../src";
+import { FConfigurationProperties } from "../../src/index.js";
 
 describe("FConfigurationProperties configuration test getString", function () {
 	let tempDirectoryObj: tmp.DirResult;

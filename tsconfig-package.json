@@ -1,14 +1,12 @@
 {
-	"extends": "./tsconfig.json",
+	"extends": "./tsconfig-base.json",
 	"include": [
-		"src/**/*"
+		".dist/src/**/*.ts"
 	],
 	"compilerOptions": {
-		"rootDir": "src",
-		"listFiles": true,
-		"outDir": ".dist/lib/",
-		"inlineSources": true,
+		"listFiles": false,
+		"rootDir": ".dist/src",
 		"sourceMap": true,
-		"sourceRoot": "src"
+		"sourceRoot": ""
 	}
 }
