@@ -189,6 +189,10 @@ class _FConfigurationValue extends FConfigurationValue {
 		super();
 	}
 
+	public toJSON() {
+		return this._value;
+	}
+
 	private assertNotNullValue(
 		value: string | null, callerProperty: Exclude<keyof FConfigurationValue, "sourceURI" | "overridden" | "key">
 	): asserts value is string {
