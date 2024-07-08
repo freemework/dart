@@ -12,7 +12,7 @@ import { pathToFileURL } from "url";
 /**
  * Loading values from files. A filename is used as key name.
  * Main reason for this is https://docs.docker.com/engine/swarm/secrets/
- * @param directory a directory where secret files are placed
+ * @param directory a directory where secret files are placed. Default: /run/secrets
  */
 export class FConfigurationDirectory extends FConfigurationDictionary {
 	public static async read(directory?: string): Promise<FConfigurationDirectory> {

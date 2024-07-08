@@ -1,25 +1,48 @@
-import { JsonMap, parse } from "@iarna/toml";
-
 import { readFile } from "fs";
 import { promisify } from "util";
 import { pathToFileURL } from "url";
 
-const readFileAsync = promisify(readFile);
+// @ts-ignore
+import type IarnaToml from "@iarna/toml";
 
 import {
 	FConfiguration,
 	FConfigurationDictionary,
-	FUtilUnReadonly
+	FException,
+	FExceptionInvalidOperation,
+	FUtilUnReadonly,
 } from "@freemework/common";
+
+const readFileAsync = promisify(readFile);
+
+let parse: ((toml: string) => IarnaToml.JsonMap) | null = null;
+
+// @ts-ignore
+import("@iarna/toml")
+	.then((module) => {
+		parse = module.parse;
+	})
+	.catch((e) => {
+		const ex = FException.wrapIfNeeded(e);
+		function raiseModuleNotFound(): never {
+			throw new FExceptionInvalidOperation(
+				"Unable to use FConfigurationToml. Please install module '@iarna/toml' before.",
+				ex
+			);
+		}
+		parse = raiseModuleNotFound;
+	});
 
 export class FConfigurationToml extends FConfigurationDictionary {
 	public static async fromFile(
 		tomlConfigFile: string,
 		arrayIndexKey: string = FConfiguration.DEFAULT_INDEX_KEY,
-		arrayIndexesKey: string = FConfiguration.DEFAULT_INDEXES_KEY,
+		arrayIndexesKey: string = FConfiguration.DEFAULT_INDEXES_KEY
 	): Promise<FConfigurationToml> {
 		const tomlConfigFileURL: URL = pathToFileURL(tomlConfigFile);
-		const sourceURI: URL = new URL(`configuration+file+toml://${tomlConfigFileURL.pathname}`);
+		const sourceURI: URL = new URL(
+			`configuration+file+toml://${tomlConfigFileURL.pathname}`
+		);
 
 		const fileContent: Buffer = await readFileAsync(tomlConfigFile);
 
@@ -34,10 +57,12 @@ export class FConfigurationToml extends FConfigurationDictionary {
 	public static factory(
 		tomlDocument: string,
 		arrayIndexKey: string = FConfiguration.DEFAULT_INDEX_KEY,
-		arrayIndexesKey: string = FConfiguration.DEFAULT_INDEXES_KEY,
+		arrayIndexesKey: string = FConfiguration.DEFAULT_INDEXES_KEY
 	): FConfigurationToml {
 		const encodedTomlDocument: string = encodeURIComponent(tomlDocument);
-		const sourceURI: URL = new URL(`configuration:toml?data=${encodedTomlDocument}`);
+		const sourceURI: URL = new URL(
+			`configuration:toml?data=${encodedTomlDocument}`
+		);
 
 		return new FConfigurationToml(
 			sourceURI,
@@ -47,16 +72,20 @@ export class FConfigurationToml extends FConfigurationDictionary {
 		);
 	}
 
-
 	protected constructor(
 		sourceURI: URL,
 		tomlDocument: string,
 		arrayIndexKey: string,
-		arrayIndexesKey: string,
+		arrayIndexesKey: string
 	) {
+		if (parse === null) {
+			throw new FExceptionInvalidOperation(
+				"Unable to use FConfigurationToml. Please install module '@iarna/toml' before."
+			);
+		}
 
 		const dict: FUtilUnReadonly<FConfigurationDictionary.Data> = {};
-		const tomlData: JsonMap = parse(tomlDocument);
+		const tomlData: IarnaToml.JsonMap = parse(tomlDocument);
 		function recursiveWalker(sourceData: any, ns: string = ""): void {
 			if (typeof sourceData === "string") {
 				dict[ns] = sourceData;
@@ -71,7 +100,10 @@ export class FConfigurationToml extends FConfigurationDictionary {
 				for (let index = 0; index < sourceData.length; ++index) {
 					const innerSourceData = sourceData[index];
 					let indexName: string;
-					if (typeof (innerSourceData) === "object" && arrayIndexKey in innerSourceData) {
+					if (
+						typeof innerSourceData === "object" &&
+						arrayIndexKey in innerSourceData
+					) {
 						indexName = innerSourceData[arrayIndexKey];
 						delete innerSourceData[arrayIndexKey];
 					} else {
