@@ -3,11 +3,14 @@ import { FException, FExceptionAggregate } from "../exception/index.js";
 import "./tc39.js";
 
 export abstract class FDisposable {
-	public async [Symbol.asyncDispose]() {
-		await this.dispose();
-	}
+	public abstract [Symbol.asyncDispose](): Promise<void>;
 
-	abstract dispose(): Promise<void>;
+	/**
+	 * @deprecated Use [Symbol.asyncDispose]() instead
+	 */
+	public async dispose(): Promise<void> {
+		await this[Symbol.asyncDispose]();
+	}
 
 	public static async disposeAll(...instances: ReadonlyArray<FDisposable>): Promise<void> {
 		const innerExceptions: Array<FException> = [];
@@ -47,7 +50,7 @@ export abstract class FDisposableBase extends FDisposable {
 	public get disposed(): boolean { return this._disposed === true; }
 	public get disposing(): boolean { return this._disposingPromise !== undefined; }
 
-	public dispose(): Promise<void> {
+	public async [Symbol.asyncDispose](): Promise<void> {
 		if (this._disposed !== true) {
 			if (this._disposingPromise === undefined) {
 				this._disposingPromise = Promise.resolve();
@@ -82,6 +85,14 @@ export abstract class FDisposableBase extends FDisposable {
 
 export class FDisposableMixin extends FDisposableBase {
 	public static applyMixin(targetClass: any): void {
+		Object.getOwnPropertySymbols(FDisposableBase.prototype).forEach(name => {
+			const propertyDescriptor: PropertyDescriptor | undefined = Object.getOwnPropertyDescriptor(FDisposableBase.prototype, name);
+
+			if (propertyDescriptor !== undefined) {
+				Object.defineProperty(targetClass.prototype, name, propertyDescriptor);
+			}
+		});
+
 		Object.getOwnPropertyNames(FDisposableBase.prototype).forEach(name => {
 
 			if (name === "constructor") {
@@ -102,7 +113,7 @@ export class FDisposableMixin extends FDisposableBase {
 				// Skip constructor
 				return;
 			}
-			
+
 			const propertyDescriptor: PropertyDescriptor | undefined = Object.getOwnPropertyDescriptor(FDisposableMixin.prototype, name);
 
 			if (name === "onDispose") {
@@ -133,4 +144,18 @@ export class FDisposableMixin extends FDisposableBase {
 		// 1) Restrict to extends the mixin
 		// 2) Restrict to make instances of the mixin
 	}
+}
+
+class FDisposableAdapter extends FDisposable {
+	public constructor(
+		private readonly _dispose: () => void | Promise<void>) {
+		super();
+	}
+
+	public override async [Symbol.asyncDispose](): Promise<void> {
+		await this._dispose;
+	}
+}
+export function makeDisposable(dispose: () => void | Promise<void>): FDisposable {
+	return new FDisposableAdapter(dispose);
 }

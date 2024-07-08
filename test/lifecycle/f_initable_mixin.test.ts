@@ -99,7 +99,7 @@ describe("FInitable tests", function () {
 		assert.isFalse(disposable.disposed);
 		assert.isFalse(disposable.disposing);
 
-		disposable.dispose();
+		disposable[Symbol.asyncDispose]();
 
 		disposable.throwIfNotInitialized(); // should not raise an error
 		assert.throw(() => disposable.verifyNotDisposed());
@@ -150,7 +150,7 @@ describe("FInitable tests", function () {
 		onDisposePromise = defer.promise;
 		try {
 			let disposablePromiseResolved = false;
-			disposable.dispose().then(() => { disposablePromiseResolved = true; });
+			disposable[Symbol.asyncDispose]().then(() => { disposablePromiseResolved = true; });
 
 			assert.isFalse(disposablePromiseResolved);
 			assert.throw(() => disposable.verifyInitializedAndNotDisposed());
@@ -168,7 +168,7 @@ describe("FInitable tests", function () {
 			assert.isTrue(disposable.disposing);
 
 			let secondDisposablePromiseResolved = false;
-			disposable.dispose().then(() => { secondDisposablePromiseResolved = true; });
+			disposable[Symbol.asyncDispose]().then(() => { secondDisposablePromiseResolved = true; });
 
 			assert.isFalse(secondDisposablePromiseResolved);
 
@@ -201,7 +201,7 @@ describe("FInitable tests", function () {
 			assert.isFalse(disposable.disposing);
 
 			let thirdDisposablePromiseResolved = false;
-			disposable.dispose().then(() => { thirdDisposablePromiseResolved = true; });
+			disposable[Symbol.asyncDispose]().then(() => { thirdDisposablePromiseResolved = true; });
 			assert.isFalse(thirdDisposablePromiseResolved);
 			await nextTick();
 			assert.isTrue(thirdDisposablePromiseResolved);
@@ -238,7 +238,7 @@ describe("FInitable tests", function () {
 			assert.isFalse(disposable.disposed);
 			assert.isFalse(disposable.disposing);
 
-			disposable.dispose();
+			disposable[Symbol.asyncDispose]();
 
 			await nextTick();
 
@@ -266,7 +266,7 @@ describe("FInitable tests", function () {
 			let initablePromiseResolved = false;
 			let disposablePromiseResolved = false;
 			disposable.init(FExecutionContext.Empty).then(() => { initablePromiseResolved = true; });
-			disposable.dispose().then(() => { disposablePromiseResolved = true; });
+			disposable[Symbol.asyncDispose]().then(() => { disposablePromiseResolved = true; });
 
 			assert.isFalse(initablePromiseResolved);
 			assert.isFalse(disposablePromiseResolved);
@@ -284,7 +284,7 @@ describe("FInitable tests", function () {
 			assert.isTrue(disposable.disposing);
 
 			let secondDisposablePromiseResolved = false;
-			disposable.dispose().then(() => { secondDisposablePromiseResolved = true; });
+			disposable[Symbol.asyncDispose]().then(() => { secondDisposablePromiseResolved = true; });
 
 			assert.isFalse(secondDisposablePromiseResolved);
 
@@ -313,7 +313,7 @@ describe("FInitable tests", function () {
 			assert.isFalse(disposable.disposing);
 
 			let thirdDisposablePromiseResolved = false;
-			disposable.dispose().then(() => { thirdDisposablePromiseResolved = true; });
+			disposable[Symbol.asyncDispose]().then(() => { thirdDisposablePromiseResolved = true; });
 			assert.isFalse(thirdDisposablePromiseResolved);
 			await nextTick();
 			assert.isTrue(thirdDisposablePromiseResolved);
@@ -329,7 +329,7 @@ describe("FInitable tests", function () {
 
 		disposable.verifyNotDisposed(); // should not raise an error
 
-		const disposablePromise = disposable.dispose();
+		const disposablePromise = disposable[Symbol.asyncDispose]();
 
 		assert.isTrue(disposable.disposed);
 		assert.isFalse(disposable.disposing);
@@ -385,7 +385,7 @@ describe("FInitable tests", function () {
 		await nextTick();
 		assert.isTrue(isSuccess);
 		await initPromise2;
-		await disposable.dispose();
+		await disposable[Symbol.asyncDispose]();
 	});
 
 	it("Should throw error from init()", async function () {
@@ -424,7 +424,7 @@ describe("FInitable tests", function () {
 
 		let expectedError: any = null;
 		try {
-			await initable.dispose();
+			await initable[Symbol.asyncDispose]();
 		} catch (e) {
 			expectedError = e;
 		}

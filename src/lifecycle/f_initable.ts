@@ -7,10 +7,6 @@ import "./tc39.js";
 export abstract class FInitable extends FDisposable {
 	public abstract init(executionContext: FExecutionContext): Promise<void>;
 
-	public async [Symbol.asyncDispose]() {
-		await this.dispose();
-	}
-
 	public static async initAll(executionContext: FExecutionContext, ...instances: ReadonlyArray<FInitable>): Promise<void> {
 		const initializedInstances: Array<FInitable> = [];
 		try {
@@ -99,7 +95,7 @@ export abstract class FInitableBase extends FInitable {
 		return Promise.resolve();
 	}
 
-	public dispose(): Promise<void> {
+	public async [Symbol.asyncDispose](): Promise<void> {
 		if (this._disposed !== true) {
 			if (this._disposingPromise === undefined) {
 				if (this._initializingPromise !== undefined) {
@@ -178,6 +174,14 @@ export abstract class FInitableBase extends FInitable {
 
 export class FInitableMixin extends FInitableBase {
 	public static applyMixin(targetClass: any): void {
+		Object.getOwnPropertySymbols(FInitableBase.prototype).forEach(name => {
+			const propertyDescriptor: PropertyDescriptor | undefined = Object.getOwnPropertyDescriptor(FInitableBase.prototype, name);
+
+			if (propertyDescriptor !== undefined) {
+				Object.defineProperty(targetClass.prototype, name, propertyDescriptor);
+			}
+		});
+
 		Object.getOwnPropertyNames(FInitableBase.prototype).forEach(name => {
 			if (name === "constructor") {
 				// Skip constructor

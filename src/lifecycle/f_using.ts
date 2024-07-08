@@ -22,6 +22,10 @@ export namespace FUsing {
 
 	export type Result<T> = T | Promise<T>;
 }
+
+/**
+ * @deprecated Use TypeScript 5.2 introduces a new keyword - 'using'. See https://github.com/tc39/proposal-explicit-resource-management
+ */
 export function FUsing<TResource extends FInitable | FDisposable, TResult>(
 	executionContext: FExecutionContext,
 	resourceFactory: FUsing.ResourceInitializer<TResource>,

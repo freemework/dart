@@ -34,7 +34,7 @@ describe("FDisposableMixin tests", function () {
 		onDisposePromise = defer.promise;
 		try {
 			let disposablePromiseResolved = false;
-			disposable.dispose().then(() => { disposablePromiseResolved = true; });
+			disposable[Symbol.asyncDispose]().then(() => { disposablePromiseResolved = true; });
 
 			assert.isFalse(disposablePromiseResolved);
 			assert.throw(() => disposable.throwIfDisposed());
@@ -48,7 +48,7 @@ describe("FDisposableMixin tests", function () {
 			assert.isTrue(disposable.disposing);
 
 			let secondDisposablePromiseResolved = false;
-			disposable.dispose().then(() => { secondDisposablePromiseResolved = true; });
+			disposable[Symbol.asyncDispose]().then(() => { secondDisposablePromiseResolved = true; });
 
 			assert.isFalse(secondDisposablePromiseResolved);
 
@@ -76,7 +76,7 @@ describe("FDisposableMixin tests", function () {
 			assert.isFalse(disposable.disposing);
 
 			let thirdDisposablePromiseResolved = false;
-			disposable.dispose().then(() => { thirdDisposablePromiseResolved = true; });
+			disposable[Symbol.asyncDispose]().then(() => { thirdDisposablePromiseResolved = true; });
 			assert.isFalse(thirdDisposablePromiseResolved);
 			await tools.nextTick();
 			assert.isTrue(thirdDisposablePromiseResolved);
@@ -92,7 +92,7 @@ describe("FDisposableMixin tests", function () {
 
 		disposable.throwIfDisposed(); // should not raise an error
 
-		const disposablePromise = disposable.dispose();
+		const disposablePromise = disposable[Symbol.asyncDispose]();
 
 		assert.isTrue(disposable.disposed);
 		assert.isFalse(disposable.disposing);
@@ -125,7 +125,7 @@ describe("FDisposableMixin tests", function () {
 
 		let expectedError: any = null;
 		try {
-			await disposable.dispose();
+			await disposable[Symbol.asyncDispose]();
 		} catch (e) {
 			expectedError = e;
 		}
