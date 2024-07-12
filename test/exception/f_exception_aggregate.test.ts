@@ -1,6 +1,5 @@
 import { FException, FExceptionAggregate } from "../../src/index.js";
 
-import { EOL } from "os";
 import { assert } from "chai";
 
 describe("FExceptionAggregate test", function () {
@@ -38,7 +37,7 @@ describe("FExceptionAggregate test", function () {
 
 		assert.equal(aggrError.message, "One or more errors occurred.");
 		assert.equal(
-			aggrError.toString().split(EOL)[0],
+			aggrError.toString().split("\n")[0],
 			"FExceptionAggregate: One or more errors occurred. ---> FException: Err1",
 		);
 	});

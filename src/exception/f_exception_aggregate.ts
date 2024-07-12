@@ -1,5 +1,3 @@
-import { EOL } from "os";
-
 import { FException } from "./f_exception.js";
 
 export class FExceptionAggregate extends FException {
@@ -45,6 +43,6 @@ export class FExceptionAggregate extends FException {
 		if (this.innerExceptions.length > 0) {
 		  messages.push(...this.innerExceptions.map((e) => e.toString()));
 		}
-		return messages.join(EOL);
+		return messages.join("\n");
 	  }
 }

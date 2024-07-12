@@ -1,6 +1,5 @@
 import { FException } from "../../src/index.js";
 
-import { EOL } from "os";
 import { assert } from "chai";
 
 describe("FException test", function () {
@@ -49,7 +48,7 @@ describe("FException test", function () {
 		assert.equal(testEx.innerException!.message, "Inner1");
 		assert.equal(testEx.innerException!.innerException!.message, "Inner2");
 		assert.equal(
-			testEx.toString().split(EOL)[0],
+			testEx.toString().split("\n")[0],
 			"FException: Main ---> FException: Inner1 ---> FException: Inner2",
 		);
 
