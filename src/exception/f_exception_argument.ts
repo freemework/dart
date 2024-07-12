@@ -14,7 +14,11 @@ export class FExceptionArgument extends FException {
 				super(`Wrong argument '${paramName}'`);
 			}
 		} else {
-			super("Wrong argument");
+			if (message !== undefined) {
+				super(`Wrong argument. ${message}`, innerException);
+			} else {
+				super("Wrong argument");
+			}
 		}
 	}
 }
