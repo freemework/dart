@@ -153,7 +153,7 @@ class FDisposableAdapter extends FDisposable {
 	}
 
 	public override async [Symbol.asyncDispose](): Promise<void> {
-		await this._dispose;
+		await this._dispose();
 	}
 }
 export function makeDisposable(dispose: () => void | Promise<void>): FDisposable {
