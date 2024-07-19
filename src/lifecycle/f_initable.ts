@@ -109,19 +109,20 @@ export abstract class FInitableBase extends FInitable {
 					return this._disposingPromise;
 				} else {
 					this._disposingPromise = Promise.resolve();
-					const onDisposeResult = this.onDispose();
-					if (onDisposeResult instanceof Promise) {
-						this._disposingPromise = this._disposingPromise
-							.then(() => onDisposeResult)
-							.finally(() => {
-								delete this._disposingPromise;
-								this._disposed = true;
-							});
-						return this._disposingPromise;
-					} else {
-						this._disposed = true;
-						delete this._disposingPromise;
+					if (this._initialized) {
+						const onDisposeResult = this.onDispose();
+						if (onDisposeResult instanceof Promise) {
+							this._disposingPromise = this._disposingPromise
+								.then(() => onDisposeResult)
+								.finally(() => {
+									delete this._disposingPromise;
+									this._disposed = true;
+								});
+							return this._disposingPromise;
+						}
 					}
+					this._disposed = true;
+					delete this._disposingPromise;
 				}
 			} else {
 				return this._disposingPromise;
