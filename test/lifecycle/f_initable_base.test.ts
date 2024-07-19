@@ -31,6 +31,9 @@ describe("Initable tests", function () {
 	let onDisposePromise: Promise<void> | null = null;
 
 	class TestInitable extends FInitableBase {
+		public _onInitCalled: boolean = false;
+		public _onDisposeCalled: boolean = false;
+
 		public override verifyNotDisposed() {
 			super.verifyNotDisposed();
 		}
@@ -42,12 +45,14 @@ describe("Initable tests", function () {
 		}
 
 		protected onInit(): void | Promise<void> {
+			this._onInitCalled = true;
 			if (onInitPromise) {
 				return onInitPromise;
 			}
 		}
 
 		protected onDispose(): void | Promise<void> {
+			this._onDisposeCalled = true;
 			if (onDisposePromise) {
 				return onDisposePromise;
 			}
@@ -452,5 +457,20 @@ describe("Initable tests", function () {
 		const initable = new TestInitable();
 		assert.isTrue(FInitable.instanceOf(initable));
 		assert.isTrue(FDisposable.instanceOf(initable));
+	});
+
+	it("Should not call onDispose is not initialized", async function () {
+		const initable = new TestInitable();
+		await initable.init(FExecutionContext.Default);
+		await initable[Symbol.asyncDispose]();
+		assert.isTrue(initable._onInitCalled);
+		assert.isTrue(initable._onDisposeCalled);
+	});
+
+	it("Should not call onDispose is not initialized", async function () {
+		const initable = new TestInitable();
+		await initable[Symbol.asyncDispose]();
+		assert.isFalse(initable._onInitCalled);
+		assert.isFalse(initable._onDisposeCalled);
 	});
 });
