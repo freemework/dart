@@ -321,15 +321,15 @@ export class UnsecuredWebServer extends FAbstractWebServer<FHostingConfiguration
 
 		const server: http.Server = this._httpServer;
 		return new Promise<void>((resolve, reject) => {
-			logger.info(this.initExecutionContext, "Starting Web Server...");
+			logger.info(this.initExecutionContext, () => `Starting Web Server '${this._name}' ...`);
 			server
 				.on("listening", () => {
 					const address = server.address();
 					if (address !== null) {
 						if (typeof address === "string") {
-							logger.info(this.initExecutionContext, () => `Web Server was started on ${address}`);
+							logger.info(this.initExecutionContext, () => `Web Server '${this._name}' was started on ${address}`);
 						} else {
-							logger.info(this.initExecutionContext, () => address.family + " Web Server was started on http://" + address.address + ":" + address.port);
+							logger.info(this.initExecutionContext, () => `${address.family} Web Server '${this._name}' was started on http://" + ${address.address}:${address.port}`);
 						}
 					}
 					resolve();
@@ -418,15 +418,15 @@ export class SecuredWebServer extends FAbstractWebServer<FHostingConfiguration.S
 
 		const server: https.Server = this._httpsServer;
 		return new Promise((resolve, reject) => {
-			logger.info(this.initExecutionContext, "Starting Web Server...");
+			logger.info(this.initExecutionContext, () => `Starting Web Server '${this._name}' ...`);
 			server
 				.on("listening", () => {
 					const address = server.address();
 					if (address !== null) {
 						if (typeof address === "string") {
-							logger.info(this.initExecutionContext, () => `Web Server was started on ${address}`);
+							logger.info(this.initExecutionContext, () => `Web Server '${this._name}' was started on ${address}`);
 						} else {
-							logger.info(this.initExecutionContext, () => address.family + " Web Server was started on https://" + address.address + ":" + address.port);
+							logger.info(this.initExecutionContext, () => `${address.family} Web Server '${this._name}' was started on https://${address.address}:${address.port}`);
 						}
 					}
 					resolve();
