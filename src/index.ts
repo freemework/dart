@@ -329,7 +329,7 @@ export class UnsecuredWebServer extends FAbstractWebServer<FHostingConfiguration
 						if (typeof address === "string") {
 							logger.info(this.initExecutionContext, () => `Web Server '${this._name}' was started on ${address}`);
 						} else {
-							logger.info(this.initExecutionContext, () => `${address.family} Web Server '${this._name}' was started on http://" + ${address.address}:${address.port}`);
+							logger.info(this.initExecutionContext, () => `${address.family} Web Server '${this._name}' was started on http://${address.address}:${address.port}`);
 						}
 					}
 					resolve();
@@ -440,24 +440,15 @@ export class SecuredWebServer extends FAbstractWebServer<FHostingConfiguration.S
 		const logger: FLogger = this._log;
 		logger.debug(this.initExecutionContext, "SecuredWebServer#onDispose()");
 		const server = this._httpsServer;
-		const address = server.address();
-		if (address !== null) {
-			if (typeof address === "string") {
-				logger.info(this.initExecutionContext, () => "Stopping Web Server https://" + address + "...");
-			} else {
-				logger.info(this.initExecutionContext, () => "Stopping " + address.family + " Web Server https://" + address.address + ":" + address.port + "...");
-			}
-		} else {
-			logger.info(this.initExecutionContext, "Stopping Web Server...");
-		}
+		logger.info(this.initExecutionContext, () => `Stopping Web Server  '${this._name}' ...`);
 		await new Promise<void>((destroyResolve) => {
 			server.close((e) => {
 				if (e) {
 					const ex: FException = FException.wrapIfNeeded(e);
-					logger.warn(this.initExecutionContext, () => `The Web Server was stopped with error: ${ex.message}`);
-					logger.debug(this.initExecutionContext, "The Web Server was stopped with error", ex);
+					logger.warn(this.initExecutionContext, () => `The Web Server '${this._name}' was stopped with error: ${ex.message}`);
+					logger.debug(this.initExecutionContext, () => `The Web Server '${this._name}' was stopped with error`, ex);
 				} else {
-					logger.info(this.initExecutionContext, "The Web Server was stopped");
+					logger.info(this.initExecutionContext, () => `The Web Server '${this._name}' was stopped`);
 				}
 				destroyResolve();
 			});
