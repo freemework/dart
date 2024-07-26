@@ -344,4 +344,42 @@ describe("FConfiguration Negative test", function () {
 		assert.instanceOf(ex, FConfigurationException);
 		assert.equal((<FConfigurationException>ex).key, "url");
 	});
+	it(`getNamespace() should raise error about missing "a" namespace`, () => {
+		const config: FConfiguration = FConfiguration.factoryJson({
+			// Empty config data
+		});
+
+		let ex;
+		try {
+			config.getNamespace("a");
+		} catch (err) {
+			ex = err;
+		}
+
+		assert.isDefined(ex);
+		assert.instanceOf(ex, FConfigurationException);
+		assert.equal((<FConfigurationException>ex).message, "There are a problem with configuration key 'a'. Namespace 'a' was not found in the configuration.");
+	});
+
+	it(`getArray() should raise error about missing "a.b" namespace`, () => {
+		const config: FConfiguration = FConfiguration.factoryJson({
+			"a": {
+				// Fake runtime data
+				"fake": "42"
+			}
+		});
+
+		const ns: FConfiguration = config.getNamespace("a");
+
+		let ex;
+		try {
+			ns.getArray("b");
+		} catch (err) {
+			ex = err;
+		}
+
+		assert.isDefined(ex);
+		assert.instanceOf(ex, FConfigurationException);
+		assert.equal((<FConfigurationException>ex).message, "There are a problem with configuration key 'a.b'. Namespace 'a.b' was not found in the configuration.");
+	});
 });
