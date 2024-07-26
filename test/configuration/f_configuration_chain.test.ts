@@ -192,4 +192,48 @@ describe("FConfigurationChain tests", function () {
 		assert.equal(arrayConfigs[1]!.get("type").asString, "rest2");
 		assert.equal(arrayConfigs[1]!.get("servers").asString, "main2");
 	});
+
+	it(`getNamespace() should raise error about missing "a" namespace`, () => {
+		const config: FConfiguration = FConfiguration.factoryJson({
+			// Empty config data
+		});
+
+		const chainConfiguration = new FConfigurationChain(config);
+
+		let ex;
+		try {
+			chainConfiguration.getNamespace("a");
+		} catch (err) {
+			ex = err;
+		}
+
+		assert.isDefined(ex);
+		assert.instanceOf(ex, FConfigurationException);
+		assert.equal((<FConfigurationException>ex).message, "There are a problem with configuration key 'a'. Namespace 'a' was not found in the configuration.");
+	});
+
+	it(`getArray() should raise error about missing "a.b" namespace`, () => {
+		const config: FConfiguration = FConfiguration.factoryJson({
+			"a": {
+				// Fake runtime data
+				"fake": "42"
+			}
+		});
+
+		const chainConfiguration = new FConfigurationChain(config);
+
+		const ns: FConfiguration = chainConfiguration.getNamespace("a");
+
+		let ex;
+		try {
+			ns.getArray("b");
+		} catch (err) {
+			ex = err;
+		}
+
+		assert.isDefined(ex);
+		assert.instanceOf(ex, FConfigurationException);
+		assert.equal((<FConfigurationException>ex).message, "There are a problem with configuration key 'a.b'. Namespace 'a.b' was not found in the configuration.");
+	});
+
 });

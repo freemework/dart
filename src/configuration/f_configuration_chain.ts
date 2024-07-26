@@ -42,14 +42,13 @@ export class FConfigurationChain extends FConfiguration {
 	}
 
 	public getArray(key: string, indexesName: string = FConfiguration.DEFAULT_INDEXES_KEY): Array<FConfiguration> {
-		const arrayIndexesKey = `${key}.${indexesName}`;
-		const arrayIndexes: Array<string> = this.get(arrayIndexesKey).asString
+		const arrayNS = this.getNamespace(key);
+		const arrayIndexes: Array<string> = arrayNS.get(indexesName).asString
 			.split(" ")
 			.filter(s => s !== "");
 
 		const arrayNamespaces: Array<FConfiguration> = arrayIndexes.map(s => {
-			const arrayItemNamespaceKey = `${key}.${s}`;
-			return this.getNamespace(arrayItemNamespaceKey);
+			return arrayNS.getNamespace(s);
 		});
 
 		return arrayNamespaces;
