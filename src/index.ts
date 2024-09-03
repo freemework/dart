@@ -73,7 +73,7 @@ export abstract class FAbstractWebServer<TOpts extends FHostingSettings.WebServe
 		this._listenPort = opts.listenPort;
 		this._log = opts.log !== undefined ? opts.log : FLogger.create(this.constructor.name);
 		this._trustProxy = opts.trustProxy !== undefined ? opts.trustProxy : false;
-		this._handleUpgrade = opts.handleUpgrade ? opts.handleUpgrade : true;
+		this._handleUpgrade = opts.handleUpgrade !== undefined ? opts.handleUpgrade : true;
 		this._webSockets = {};
 		this._handlers = new Map();
 		this._rootExpressApplication = null;
