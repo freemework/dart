@@ -43,6 +43,9 @@
 		"Configless",
 		"devel",
 		"freemework",
-		"iarna"
+		"iarna",
+		"Initable",
+		"linklocal",
+		"uniquelocal"
 	]
 }
