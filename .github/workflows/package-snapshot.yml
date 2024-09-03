@@ -3,7 +3,7 @@ name: NodeJS Snapshot Package
 on:
   push:
     branches:
-      - 'src-common-typescript-*'
+      - 'src-common-typescript#dev'
 
 jobs:
   tests:
