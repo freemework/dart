@@ -12,6 +12,13 @@ export namespace FHostingConfiguration {
 		 * See http://expressjs.com/en/4x/api.html#trust.proxy.options.table
 		 */
 		readonly trustProxy?: boolean | "loopback" | "linklocal" | "uniquelocal";
+		/**
+		 * @default true
+		 * 
+		 * Handle HTTP Upgrade to switch a connection into a WebSocket.
+		 * See more https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Upgrade
+		 */
+		readonly handleUpgrade?: boolean;
 	}
 
 	export interface UnsecuredBaseWebServer extends WebServerBase {

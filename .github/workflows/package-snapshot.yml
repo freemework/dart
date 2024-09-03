@@ -3,7 +3,7 @@ name: NodeJS Snapshot Package
 on:
   push:
     branches:
-      - '*'
+      - 'src-hosting-typescript#dev'
 
 jobs:
   tests:

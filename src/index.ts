@@ -53,9 +53,10 @@ export abstract class FAbstractWebServer<TOpts extends FHostingConfiguration.Web
 	protected readonly _name: string;
 	protected readonly _listenHost: string;
 	protected readonly _listenPort: number;
-	protected readonly _websockets: { [bindPath: string]: WebSocket.Server };
+	protected readonly _webSockets: { [bindPath: string]: WebSocket.Server };
 	protected readonly _log: FLogger;
-	private readonly _onUpgrade: (request: http.IncomingMessage, socket: net.Socket, head: Buffer) => void;
+	protected readonly _handleUpgrade: boolean;
+	private readonly _onUpgrade: ((request: http.IncomingMessage, socket: net.Socket, head: Buffer) => void) | null;
 	private readonly _onRequestImpl: http.RequestListener;
 	private readonly _handlers: Map</*bindPath: */string, FWebServerRequestHandler>;
 	// private readonly _caCertificates: ReadonlyArray<[pki.Certificate, Buffer]>;
@@ -72,7 +73,8 @@ export abstract class FAbstractWebServer<TOpts extends FHostingConfiguration.Web
 		this._listenPort = opts.listenPort;
 		this._log = opts.log !== undefined ? opts.log : FLogger.create(this.constructor.name);
 		this._trustProxy = opts.trustProxy !== undefined ? opts.trustProxy : false;
-		this._websockets = {};
+		this._handleUpgrade = opts.handleUpgrade ? opts.handleUpgrade : true;
+		this._webSockets = {};
 		this._handlers = new Map();
 		this._rootExpressApplication = null;
 
@@ -119,7 +121,12 @@ export abstract class FAbstractWebServer<TOpts extends FHostingConfiguration.Web
 		}
 
 		this._onRequestImpl = onXfccRequest !== null ? onXfccRequest : this.onRequestCommon.bind(this);
-		this._onUpgrade = onXfccUpgrade !== null ? onXfccUpgrade : this.onUpgradeCommon.bind(this);
+		this._onUpgrade = this._handleUpgrade
+			? (onXfccUpgrade !== null
+				? onXfccUpgrade
+				: this.onUpgradeCommon.bind(this)
+			)
+			: null;
 	}
 
 	/**
@@ -154,15 +161,15 @@ export abstract class FAbstractWebServer<TOpts extends FHostingConfiguration.Web
 
 	public createWebSocketServer(bindPath: string): WebSocket.Server {
 		const websocketServer: WebSocket.Server = new WebSocket.Server({ noServer: true });
-		this._websockets[bindPath] = websocketServer;
+		this._webSockets[bindPath] = websocketServer;
 		return websocketServer;
 	}
 	public async destroyWebSocketServer(bindPath: string): Promise<void> {
 		const logger: FLogger = this._log;
 
-		const webSocketServer = this._websockets[bindPath];
+		const webSocketServer = this._webSockets[bindPath];
 		if (webSocketServer !== undefined) {
-			delete this._websockets[bindPath];
+			delete this._webSockets[bindPath];
 			await new Promise<void>((resolve) => {
 				webSocketServer.close((err) => {
 					if (err !== undefined) {
@@ -180,7 +187,9 @@ export abstract class FAbstractWebServer<TOpts extends FHostingConfiguration.Web
 	}
 
 	protected async onInit(): Promise<void> {
-		this.underlyingServer.on("upgrade", this._onUpgrade);
+		if (this._onUpgrade !== null) {
+			this.underlyingServer.on("upgrade", this._onUpgrade);
+		}
 		await this.onListen();
 	}
 
@@ -248,17 +257,19 @@ export abstract class FAbstractWebServer<TOpts extends FHostingConfiguration.Web
 
 		const urlPath = req.url;
 		if (urlPath !== undefined) {
-			const wss = this._websockets[urlPath];
+			const wss = this._webSockets[urlPath];
 			if (wss !== undefined) {
 				logger.debug(this.initExecutionContext, () => `Upgrade the server on url path '${urlPath}' for WebSocket server.`);
 				wss.handleUpgrade(req, socket, head, function (ws) {
 					wss.emit("connection", ws, req);
 				});
 			} else {
-				socket.destroy();
+				// Proposal of https://github.com/freemework/freemework/issues/8
+				// socket.destroy();
 			}
 		} else {
-			socket.destroy();
+			// Proposal of https://github.com/freemework/freemework/issues/8
+			// socket.destroy();
 		}
 	}
 
