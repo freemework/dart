@@ -3,7 +3,7 @@ name: NodeJS Snapshot Package
 on:
   push:
     branches:
-      - '*'
+      - 'src-sql_misc_migration-typescript#dev'
 
 jobs:
   tests:
