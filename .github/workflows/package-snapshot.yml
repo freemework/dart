@@ -3,7 +3,7 @@ name: NodeJS Snapshot Package
 on:
   push:
     branches:
-      - '*'
+      - 'src-sql_postgres-typescript#dev'
 
 jobs:
   tests:
