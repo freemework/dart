@@ -46,6 +46,7 @@
 		"iarna",
 		"Initable",
 		"linklocal",
-		"uniquelocal"
+		"uniquelocal",
+		"XFCC"
 	]
 }

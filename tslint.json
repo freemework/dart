@@ -28,7 +28,7 @@
 					"protected-instance-method",
 					"private-constructor",
 					"private-instance-method"
-				  ]
+				]
 			}
 		],
 		"no-arg": true,

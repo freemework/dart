@@ -3,8 +3,8 @@ import {
 	FDisposable,
 	FExecutionContext,
 	FCancellationExecutionContext,
-	FChannelPublisher,
-	FChannelSubscriber,
+	type FChannelPublisher,
+	type FChannelSubscriber,
 	FCancellationToken,
 	FCancellationTokenSourceManual,
 	FException,
@@ -24,12 +24,12 @@ import WebSocket from "ws";
 // import { pki } from "node-forge";
 
 import { FHttpRequestCancellationToken } from "./FHttpRequestCancellationToken.js";
-import { FHostingConfiguration } from "./FHostingConfiguration.js";
+import { FHostingSettings } from "./f_hosting_settings.js";
 
 import { packageInfo } from "./package_info.js";
 FModuleVersionGuard(packageInfo);
 
-export { FHostingConfiguration } from "./FHostingConfiguration.js";
+export { FHostingSettings, FHostingConfiguration } from "./f_hosting_settings.js";
 export { FHttpRequestCancellationToken } from "./FHttpRequestCancellationToken.js";
 
 export * from "./configuration/index.js";
@@ -46,7 +46,7 @@ export interface FWebServer extends FInitableBase {
 	destroyWebSocketServer(bindPath: string): Promise<void>;
 }
 
-export abstract class FAbstractWebServer<TOpts extends FHostingConfiguration.WebServerBase | FHostingConfiguration.WebServer>
+export abstract class FAbstractWebServer<TOpts extends FHostingSettings.WebServerBase | FHostingSettings.WebServer>
 	extends FInitableBase implements FWebServer {
 	public abstract readonly underlyingServer: http.Server | https.Server;
 	protected readonly _trustProxy: boolean | "loopback" | "linklocal" | "uniquelocal";
@@ -81,10 +81,10 @@ export abstract class FAbstractWebServer<TOpts extends FHostingConfiguration.Web
 		let onXfccRequest: http.RequestListener | null = null;
 		let onXfccUpgrade: ((request: http.IncomingMessage, socket: net.Socket, head: Buffer) => void) | null = null;
 		if ("type" in opts) {
-			const friendlyOpts = opts as FHostingConfiguration.WebServer;
+			const friendlyOpts = opts as FHostingSettings.WebServer;
 			if (
 				"clientCertificateMode" in friendlyOpts &&
-				friendlyOpts.clientCertificateMode === FHostingConfiguration.ClientCertificateMode.XFCC
+				friendlyOpts.clientCertificateMode === FHostingSettings.ClientCertificateMode.XFCC
 			) {
 				if (
 					friendlyOpts.caCertificates === undefined ||
@@ -310,10 +310,10 @@ export abstract class FAbstractWebServer<TOpts extends FHostingConfiguration.Web
 	}
 }
 
-export class UnsecuredWebServer extends FAbstractWebServer<FHostingConfiguration.UnsecuredWebServer> {
+export class UnsecuredWebServer extends FAbstractWebServer<FHostingSettings.UnsecuredWebServer> {
 	private readonly _httpServer: http.Server;
 
-	public constructor(opts: FHostingConfiguration.UnsecuredWebServer) {
+	public constructor(opts: FHostingSettings.UnsecuredWebServer) {
 		super(opts);
 
 		// Make HTTP server instance
@@ -379,10 +379,10 @@ export class UnsecuredWebServer extends FAbstractWebServer<FHostingConfiguration
 	}
 }
 
-export class SecuredWebServer extends FAbstractWebServer<FHostingConfiguration.SecuredWebServer> {
+export class SecuredWebServer extends FAbstractWebServer<FHostingSettings.SecuredWebServer> {
 	private readonly _httpsServer: https.Server;
 
-	public constructor(opts: FHostingConfiguration.SecuredWebServer) {
+	public constructor(opts: FHostingSettings.SecuredWebServer) {
 		super(opts);
 
 		// Make HTTPS server instance
@@ -402,12 +402,12 @@ export class SecuredWebServer extends FAbstractWebServer<FHostingConfiguration.S
 		}
 
 		switch (opts.clientCertificateMode) {
-			case FHostingConfiguration.ClientCertificateMode.NONE:
-			case FHostingConfiguration.ClientCertificateMode.XFCC: // XFCC handled by AbstractWebServer
+			case FHostingSettings.ClientCertificateMode.NONE:
+			case FHostingSettings.ClientCertificateMode.XFCC: // XFCC handled by AbstractWebServer
 				serverOpts.requestCert = false;
 				serverOpts.rejectUnauthorized = false;
 				break;
-			case FHostingConfiguration.ClientCertificateMode.REQUEST:
+			case FHostingSettings.ClientCertificateMode.REQUEST:
 				serverOpts.requestCert = true;
 				serverOpts.rejectUnauthorized = false;
 				break;
@@ -471,7 +471,7 @@ export abstract class FBindEndpoint extends FInitableBase {
 	protected readonly _bindPath: string;
 
 	public constructor(
-		opts: FHostingConfiguration.BindEndpoint
+		opts: FHostingSettings.BindEndpoint
 	) {
 		super();
 		this._bindPath = opts.bindPath;
@@ -491,7 +491,7 @@ export abstract class FServersBindEndpoint extends FBindEndpoint {
 
 	public constructor(
 		servers: ReadonlyArray<FWebServer>,
-		opts: FHostingConfiguration.BindEndpoint
+		opts: FHostingSettings.BindEndpoint
 	) {
 		super(opts);
 		this._servers = servers;
@@ -519,7 +519,7 @@ export class FWebSocketChannelSupplyEndpoint extends FServersBindEndpoint {
 
 	public constructor(
 		servers: ReadonlyArray<FWebServer>,
-		opts: FHostingConfiguration.WebSocketEndpoint
+		opts: FHostingSettings.WebSocketEndpoint
 	) {
 		super(servers, opts);
 		this._log = FLogger.create(this.constructor.name);
@@ -746,7 +746,7 @@ export class FWebSocketChannelFactoryEndpoint extends FServersBindEndpoint {
 
 	public constructor(
 		servers: ReadonlyArray<FWebServer>,
-		opts: FHostingConfiguration.WebSocketEndpoint,
+		opts: FHostingSettings.WebSocketEndpoint,
 		autoCreateChannels?: {
 			binary?: boolean,
 			text?: boolean
@@ -1042,7 +1042,7 @@ export function instanceofWebServer(server: any): server is FWebServer {
 	return false;
 }
 
-export function createWebServer(serverOpts: FHostingConfiguration.WebServer): FWebServer {
+export function createWebServer(serverOpts: FHostingSettings.WebServer): FWebServer {
 	switch (serverOpts.type) {
 		case "http":
 			return new UnsecuredWebServer(serverOpts);
@@ -1056,7 +1056,7 @@ export function createWebServer(serverOpts: FHostingConfiguration.WebServer): FW
 }
 
 export function createWebServers(
-	serversOpts: ReadonlyArray<FHostingConfiguration.WebServer>
+	serversOpts: ReadonlyArray<FHostingSettings.WebServer>
 ): ReadonlyArray<FWebServer> {
 	return serversOpts.map(serverOpts => createWebServer(serverOpts));
 }
