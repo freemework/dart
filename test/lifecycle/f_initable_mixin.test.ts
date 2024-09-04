@@ -55,94 +55,150 @@ describe("FInitable tests", function () {
 	interface TestInitable extends FInitableMixin { }
 	FInitableMixin.applyMixin(TestInitable);
 
-	it("Positive test onInit(): void and onDispose(): void", async function () {
-		const disposable = new TestInitable();
-		assert.isFalse(disposable.initialized);
-		assert.isFalse(disposable.initializing);
-		assert.isFalse(disposable.disposed);
-		assert.isFalse(disposable.disposing);
+	it("Positive test onInit(): void and onDispose(): void via [Symbol.asyncDispose]()", async function () {
+		const initable = new TestInitable();
+		assert.isFalse(initable.initialized);
+		assert.isFalse(initable.initializing);
+		assert.isFalse(initable.disposed);
+		assert.isFalse(initable.disposing);
 
-		disposable.verifyNotDisposed(); // should not raise an error
-		assert.throw(() => disposable.throwIfNotInitialized()); // should raise an error
-		assert.throw(() => disposable.verifyInitializedAndNotDisposed()); // should raise an error
+		initable.verifyNotDisposed(); // should not raise an error
+		assert.throw(() => initable.throwIfNotInitialized()); // should raise an error
+		assert.throw(() => initable.verifyInitializedAndNotDisposed()); // should raise an error
 
-		const initPromise = disposable.init(FExecutionContext.Empty);
+		const initPromise = initable.init(FExecutionContext.Empty);
 
-		assert.isTrue(disposable.initialized);
-		assert.isFalse(disposable.initializing);
-		assert.isFalse(disposable.disposed);
-		assert.isFalse(disposable.disposing);
+		assert.isTrue(initable.initialized);
+		assert.isFalse(initable.initializing);
+		assert.isFalse(initable.disposed);
+		assert.isFalse(initable.disposing);
 
-		disposable.verifyNotDisposed(); // should not raise an error
-		disposable.throwIfNotInitialized(); // should not raise an error
-		disposable.verifyInitializedAndNotDisposed(); // should not raise an error
+		initable.verifyNotDisposed(); // should not raise an error
+		initable.throwIfNotInitialized(); // should not raise an error
+		initable.verifyInitializedAndNotDisposed(); // should not raise an error
 
 		await nextTick();
 
-		disposable.verifyNotDisposed(); // should not raise an error
-		disposable.throwIfNotInitialized(); // should not raise an error
-		disposable.verifyInitializedAndNotDisposed(); // should not raise an error
+		initable.verifyNotDisposed(); // should not raise an error
+		initable.throwIfNotInitialized(); // should not raise an error
+		initable.verifyInitializedAndNotDisposed(); // should not raise an error
 
-		assert.isTrue(disposable.initialized);
-		assert.isFalse(disposable.initializing);
-		assert.isFalse(disposable.disposed);
-		assert.isFalse(disposable.disposing);
+		assert.isTrue(initable.initialized);
+		assert.isFalse(initable.initializing);
+		assert.isFalse(initable.disposed);
+		assert.isFalse(initable.disposing);
 
 		await initPromise;
 
-		disposable.verifyNotDisposed(); // should not raise an error
-		disposable.throwIfNotInitialized(); // should not raise an error
-		disposable.verifyInitializedAndNotDisposed(); // should not raise an error
+		initable.verifyNotDisposed(); // should not raise an error
+		initable.throwIfNotInitialized(); // should not raise an error
+		initable.verifyInitializedAndNotDisposed(); // should not raise an error
 
-		assert.isTrue(disposable.initialized);
-		assert.isFalse(disposable.initializing);
-		assert.isFalse(disposable.disposed);
-		assert.isFalse(disposable.disposing);
+		assert.isTrue(initable.initialized);
+		assert.isFalse(initable.initializing);
+		assert.isFalse(initable.disposed);
+		assert.isFalse(initable.disposing);
 
-		disposable[Symbol.asyncDispose]();
+		initable[Symbol.asyncDispose]();
 
-		disposable.throwIfNotInitialized(); // should not raise an error
-		assert.throw(() => disposable.verifyNotDisposed());
-		assert.throw(() => disposable.verifyInitializedAndNotDisposed());
+		initable.throwIfNotInitialized(); // should not raise an error
+		assert.throw(() => initable.verifyNotDisposed());
+		assert.throw(() => initable.verifyInitializedAndNotDisposed());
 
-		assert.isTrue(disposable.initialized);
-		assert.isFalse(disposable.initializing);
-		assert.isTrue(disposable.disposed);
-		assert.isFalse(disposable.disposing);
+		assert.isTrue(initable.initialized);
+		assert.isFalse(initable.initializing);
+		assert.isTrue(initable.disposed);
+		assert.isFalse(initable.disposing);
 	});
 
-	it("Positive test onInit(): void and onDispose(): Promise<void>", async function () {
-		const disposable = new TestInitable();
-		assert.isFalse(disposable.initialized);
-		assert.isFalse(disposable.initializing);
-		assert.isFalse(disposable.disposed);
-		assert.isFalse(disposable.disposing);
+	it("Positive test onInit(): void and onDispose(): void via dispose()", async function () {
+		const initable = new TestInitable();
+		assert.isFalse(initable.initialized);
+		assert.isFalse(initable.initializing);
+		assert.isFalse(initable.disposed);
+		assert.isFalse(initable.disposing);
 
-		disposable.verifyNotDisposed(); // should not raise an error
-		assert.throw(() => disposable.throwIfNotInitialized()); // should raise an error
-		assert.throw(() => disposable.verifyInitializedAndNotDisposed()); // should raise an error
+		initable.verifyNotDisposed(); // should not raise an error
+		assert.throw(() => initable.throwIfNotInitialized()); // should raise an error
+		assert.throw(() => initable.verifyInitializedAndNotDisposed()); // should raise an error
 
-		const initPromise = disposable.init(FExecutionContext.Empty);
+		const initPromise = initable.init(FExecutionContext.Empty);
 
-		assert.isTrue(disposable.initialized);
-		assert.isFalse(disposable.initializing);
-		assert.isFalse(disposable.disposed);
-		assert.isFalse(disposable.disposing);
+		assert.isTrue(initable.initialized);
+		assert.isFalse(initable.initializing);
+		assert.isFalse(initable.disposed);
+		assert.isFalse(initable.disposing);
 
-		disposable.verifyNotDisposed(); // should not raise an error
-		disposable.throwIfNotInitialized(); // should not raise an error
-		disposable.verifyInitializedAndNotDisposed(); // should not raise an error
+		initable.verifyNotDisposed(); // should not raise an error
+		initable.throwIfNotInitialized(); // should not raise an error
+		initable.verifyInitializedAndNotDisposed(); // should not raise an error
 
 		await nextTick();
 
-		disposable.verifyNotDisposed(); // should not raise an error
-		disposable.throwIfNotInitialized(); // should not raise an error
-		disposable.verifyInitializedAndNotDisposed(); // should not raise an error
+		initable.verifyNotDisposed(); // should not raise an error
+		initable.throwIfNotInitialized(); // should not raise an error
+		initable.verifyInitializedAndNotDisposed(); // should not raise an error
 
-		assert.isTrue(disposable.initialized);
-		assert.isFalse(disposable.initializing);
-		assert.isFalse(disposable.disposed);
-		assert.isFalse(disposable.disposing);
+		assert.isTrue(initable.initialized);
+		assert.isFalse(initable.initializing);
+		assert.isFalse(initable.disposed);
+		assert.isFalse(initable.disposing);
+
+		await initPromise;
+
+		initable.verifyNotDisposed(); // should not raise an error
+		initable.throwIfNotInitialized(); // should not raise an error
+		initable.verifyInitializedAndNotDisposed(); // should not raise an error
+
+		assert.isTrue(initable.initialized);
+		assert.isFalse(initable.initializing);
+		assert.isFalse(initable.disposed);
+		assert.isFalse(initable.disposing);
+
+		initable.dispose();
+
+		initable.throwIfNotInitialized(); // should not raise an error
+		assert.throw(() => initable.verifyNotDisposed());
+		assert.throw(() => initable.verifyInitializedAndNotDisposed());
+
+		assert.isTrue(initable.initialized);
+		assert.isFalse(initable.initializing);
+		assert.isTrue(initable.disposed);
+		assert.isFalse(initable.disposing);
+	});
+
+	it("Positive test onInit(): void and onDispose(): Promise<void> via [Symbol.asyncDispose]()", async function () {
+		const initable = new TestInitable();
+		assert.isFalse(initable.initialized);
+		assert.isFalse(initable.initializing);
+		assert.isFalse(initable.disposed);
+		assert.isFalse(initable.disposing);
+
+		initable.verifyNotDisposed(); // should not raise an error
+		assert.throw(() => initable.throwIfNotInitialized()); // should raise an error
+		assert.throw(() => initable.verifyInitializedAndNotDisposed()); // should raise an error
+
+		const initPromise = initable.init(FExecutionContext.Empty);
+
+		assert.isTrue(initable.initialized);
+		assert.isFalse(initable.initializing);
+		assert.isFalse(initable.disposed);
+		assert.isFalse(initable.disposing);
+
+		initable.verifyNotDisposed(); // should not raise an error
+		initable.throwIfNotInitialized(); // should not raise an error
+		initable.verifyInitializedAndNotDisposed(); // should not raise an error
+
+		await nextTick();
+
+		initable.verifyNotDisposed(); // should not raise an error
+		initable.throwIfNotInitialized(); // should not raise an error
+		initable.verifyInitializedAndNotDisposed(); // should not raise an error
+
+		assert.isTrue(initable.initialized);
+		assert.isFalse(initable.initializing);
+		assert.isFalse(initable.disposed);
+		assert.isFalse(initable.disposing);
 
 		await initPromise;
 
@@ -150,25 +206,25 @@ describe("FInitable tests", function () {
 		onDisposePromise = defer.promise;
 		try {
 			let disposablePromiseResolved = false;
-			disposable[Symbol.asyncDispose]().then(() => { disposablePromiseResolved = true; });
+			initable[Symbol.asyncDispose]().then(() => { disposablePromiseResolved = true; });
 
 			assert.isFalse(disposablePromiseResolved);
-			assert.throw(() => disposable.verifyInitializedAndNotDisposed());
-			assert.throw(() => disposable.verifyNotDisposed());
+			assert.throw(() => initable.verifyInitializedAndNotDisposed());
+			assert.throw(() => initable.verifyNotDisposed());
 
 			await nextTick();
 
 			assert.isFalse(disposablePromiseResolved);
-			assert.throw(() => disposable.verifyInitializedAndNotDisposed());
-			assert.throw(() => disposable.verifyNotDisposed());
+			assert.throw(() => initable.verifyInitializedAndNotDisposed());
+			assert.throw(() => initable.verifyNotDisposed());
 
-			assert.isTrue(disposable.initialized);
-			assert.isFalse(disposable.initializing);
-			assert.isFalse(disposable.disposed);
-			assert.isTrue(disposable.disposing);
+			assert.isTrue(initable.initialized);
+			assert.isFalse(initable.initializing);
+			assert.isFalse(initable.disposed);
+			assert.isTrue(initable.disposing);
 
 			let secondDisposablePromiseResolved = false;
-			disposable[Symbol.asyncDispose]().then(() => { secondDisposablePromiseResolved = true; });
+			initable[Symbol.asyncDispose]().then(() => { secondDisposablePromiseResolved = true; });
 
 			assert.isFalse(secondDisposablePromiseResolved);
 
@@ -176,32 +232,131 @@ describe("FInitable tests", function () {
 
 			assert.isFalse(disposablePromiseResolved);
 			assert.isFalse(secondDisposablePromiseResolved);
-			assert.throw(() => disposable.verifyInitializedAndNotDisposed());
-			assert.throw(() => disposable.verifyNotDisposed());
-			assert.isTrue(disposable.initialized);
-			assert.isFalse(disposable.initializing);
-			assert.isFalse(disposable.disposed);
-			assert.isTrue(disposable.disposing);
+			assert.throw(() => initable.verifyInitializedAndNotDisposed());
+			assert.throw(() => initable.verifyNotDisposed());
+			assert.isTrue(initable.initialized);
+			assert.isFalse(initable.initializing);
+			assert.isFalse(initable.disposed);
+			assert.isTrue(initable.disposing);
 
 			defer.resolve();
 
 			assert.isFalse(disposablePromiseResolved);
 			assert.isFalse(secondDisposablePromiseResolved);
-			assert.throw(() => disposable.verifyInitializedAndNotDisposed());
-			assert.throw(() => disposable.verifyNotDisposed());
+			assert.throw(() => initable.verifyInitializedAndNotDisposed());
+			assert.throw(() => initable.verifyNotDisposed());
 
 			await nextTick();
 
 			assert.isTrue(disposablePromiseResolved);
 			assert.isTrue(secondDisposablePromiseResolved);
-			assert.throw(() => disposable.verifyInitializedAndNotDisposed());
-			assert.throw(() => disposable.verifyNotDisposed());
+			assert.throw(() => initable.verifyInitializedAndNotDisposed());
+			assert.throw(() => initable.verifyNotDisposed());
 
-			assert.isTrue(disposable.disposed);
-			assert.isFalse(disposable.disposing);
+			assert.isTrue(initable.disposed);
+			assert.isFalse(initable.disposing);
 
 			let thirdDisposablePromiseResolved = false;
-			disposable[Symbol.asyncDispose]().then(() => { thirdDisposablePromiseResolved = true; });
+			initable[Symbol.asyncDispose]().then(() => { thirdDisposablePromiseResolved = true; });
+			assert.isFalse(thirdDisposablePromiseResolved);
+			await nextTick();
+			assert.isTrue(thirdDisposablePromiseResolved);
+		} finally {
+			onDisposePromise = null;
+		}
+	});
+
+	it("Positive test onInit(): void and onDispose(): Promise<void> via dispose()", async function () {
+		const initable = new TestInitable();
+		assert.isFalse(initable.initialized);
+		assert.isFalse(initable.initializing);
+		assert.isFalse(initable.disposed);
+		assert.isFalse(initable.disposing);
+
+		initable.verifyNotDisposed(); // should not raise an error
+		assert.throw(() => initable.throwIfNotInitialized()); // should raise an error
+		assert.throw(() => initable.verifyInitializedAndNotDisposed()); // should raise an error
+
+		const initPromise = initable.init(FExecutionContext.Empty);
+
+		assert.isTrue(initable.initialized);
+		assert.isFalse(initable.initializing);
+		assert.isFalse(initable.disposed);
+		assert.isFalse(initable.disposing);
+
+		initable.verifyNotDisposed(); // should not raise an error
+		initable.throwIfNotInitialized(); // should not raise an error
+		initable.verifyInitializedAndNotDisposed(); // should not raise an error
+
+		await nextTick();
+
+		initable.verifyNotDisposed(); // should not raise an error
+		initable.throwIfNotInitialized(); // should not raise an error
+		initable.verifyInitializedAndNotDisposed(); // should not raise an error
+
+		assert.isTrue(initable.initialized);
+		assert.isFalse(initable.initializing);
+		assert.isFalse(initable.disposed);
+		assert.isFalse(initable.disposing);
+
+		await initPromise;
+
+		const defer = Deferred.create();
+		onDisposePromise = defer.promise;
+		try {
+			let disposablePromiseResolved = false;
+			initable.dispose().then(() => { disposablePromiseResolved = true; });
+
+			assert.isFalse(disposablePromiseResolved);
+			assert.throw(() => initable.verifyInitializedAndNotDisposed());
+			assert.throw(() => initable.verifyNotDisposed());
+
+			await nextTick();
+
+			assert.isFalse(disposablePromiseResolved);
+			assert.throw(() => initable.verifyInitializedAndNotDisposed());
+			assert.throw(() => initable.verifyNotDisposed());
+
+			assert.isTrue(initable.initialized);
+			assert.isFalse(initable.initializing);
+			assert.isFalse(initable.disposed);
+			assert.isTrue(initable.disposing);
+
+			let secondDisposablePromiseResolved = false;
+			initable.dispose().then(() => { secondDisposablePromiseResolved = true; });
+
+			assert.isFalse(secondDisposablePromiseResolved);
+
+			await nextTick();
+
+			assert.isFalse(disposablePromiseResolved);
+			assert.isFalse(secondDisposablePromiseResolved);
+			assert.throw(() => initable.verifyInitializedAndNotDisposed());
+			assert.throw(() => initable.verifyNotDisposed());
+			assert.isTrue(initable.initialized);
+			assert.isFalse(initable.initializing);
+			assert.isFalse(initable.disposed);
+			assert.isTrue(initable.disposing);
+
+			defer.resolve();
+
+			assert.isFalse(disposablePromiseResolved);
+			assert.isFalse(secondDisposablePromiseResolved);
+			assert.throw(() => initable.verifyInitializedAndNotDisposed());
+			assert.throw(() => initable.verifyNotDisposed());
+
+			await nextTick();
+
+			assert.isTrue(disposablePromiseResolved);
+			assert.isTrue(secondDisposablePromiseResolved);
+			assert.throw(() => initable.verifyInitializedAndNotDisposed());
+			assert.throw(() => initable.verifyNotDisposed());
+
+			assert.isTrue(initable.disposed);
+			assert.isFalse(initable.disposing);
+
+			let thirdDisposablePromiseResolved = false;
+			initable.dispose().then(() => { thirdDisposablePromiseResolved = true; });
 			assert.isFalse(thirdDisposablePromiseResolved);
 			await nextTick();
 			assert.isTrue(thirdDisposablePromiseResolved);
@@ -214,49 +369,49 @@ describe("FInitable tests", function () {
 		const defer = Deferred.create();
 		onInitPromise = defer.promise;
 		try {
-			const disposable = new TestInitable();
-			assert.isFalse(disposable.initialized);
-			assert.isFalse(disposable.initializing);
-			assert.isFalse(disposable.disposed);
-			assert.isFalse(disposable.disposing);
+			const initable = new TestInitable();
+			assert.isFalse(initable.initialized);
+			assert.isFalse(initable.initializing);
+			assert.isFalse(initable.disposed);
+			assert.isFalse(initable.disposing);
 
-			disposable.verifyNotDisposed(); // should not raise an error
-			assert.throw(() => disposable.throwIfNotInitialized()); // should raise an error
-			assert.throw(() => disposable.verifyInitializedAndNotDisposed()); // should raise an error
+			initable.verifyNotDisposed(); // should not raise an error
+			assert.throw(() => initable.throwIfNotInitialized()); // should raise an error
+			assert.throw(() => initable.verifyInitializedAndNotDisposed()); // should raise an error
 
-			disposable.init(FExecutionContext.Empty);
+			initable.init(FExecutionContext.Empty);
 
-			assert.isFalse(disposable.initialized);
-			assert.isTrue(disposable.initializing);
-			assert.isFalse(disposable.disposed);
-			assert.isFalse(disposable.disposing);
+			assert.isFalse(initable.initialized);
+			assert.isTrue(initable.initializing);
+			assert.isFalse(initable.disposed);
+			assert.isFalse(initable.disposing);
 
 			defer.resolve();
 
-			assert.isFalse(disposable.initialized);
-			assert.isTrue(disposable.initializing);
-			assert.isFalse(disposable.disposed);
-			assert.isFalse(disposable.disposing);
+			assert.isFalse(initable.initialized);
+			assert.isTrue(initable.initializing);
+			assert.isFalse(initable.disposed);
+			assert.isFalse(initable.disposing);
 
-			disposable[Symbol.asyncDispose]();
+			initable[Symbol.asyncDispose]();
 
 			await nextTick();
 
-			assert.isTrue(disposable.initialized);
-			assert.isFalse(disposable.initializing);
-			assert.isTrue(disposable.disposed);
-			assert.isFalse(disposable.disposing);
+			assert.isTrue(initable.initialized);
+			assert.isFalse(initable.initializing);
+			assert.isTrue(initable.disposed);
+			assert.isFalse(initable.disposing);
 		} finally {
 			onInitPromise = null;
 		}
 	});
 
-	it("Positive test onInit(): Promise<void> and onDispose(): Promise<void>", async function () {
-		const disposable = new TestInitable();
-		assert.isFalse(disposable.disposed);
-		assert.isFalse(disposable.disposing);
+	it("Positive test onInit(): Promise<void> and onDispose(): Promise<void> via [Symbol.asyncDispose]()", async function () {
+		const initable = new TestInitable();
+		assert.isFalse(initable.disposed);
+		assert.isFalse(initable.disposing);
 
-		disposable.verifyNotDisposed(); // should not raise an error
+		initable.verifyNotDisposed(); // should not raise an error
 
 		const initDefer = Deferred.create();
 		const disposeDefer = Deferred.create();
@@ -265,26 +420,26 @@ describe("FInitable tests", function () {
 		try {
 			let initablePromiseResolved = false;
 			let disposablePromiseResolved = false;
-			disposable.init(FExecutionContext.Empty).then(() => { initablePromiseResolved = true; });
-			disposable[Symbol.asyncDispose]().then(() => { disposablePromiseResolved = true; });
+			initable.init(FExecutionContext.Empty).then(() => { initablePromiseResolved = true; });
+			initable[Symbol.asyncDispose]().then(() => { disposablePromiseResolved = true; });
 
 			assert.isFalse(initablePromiseResolved);
 			assert.isFalse(disposablePromiseResolved);
-			assert.throw(() => disposable.verifyNotDisposed());
+			assert.throw(() => initable.verifyNotDisposed());
 
 			await nextTick();
 
 			assert.isFalse(initablePromiseResolved);
 			assert.isFalse(disposablePromiseResolved);
-			assert.throw(() => disposable.verifyNotDisposed());
+			assert.throw(() => initable.verifyNotDisposed());
 
-			assert.isFalse(disposable.initialized);
-			assert.isFalse(disposable.disposed);
-			assert.isTrue(disposable.initializing);
-			assert.isTrue(disposable.disposing);
+			assert.isFalse(initable.initialized);
+			assert.isFalse(initable.disposed);
+			assert.isTrue(initable.initializing);
+			assert.isTrue(initable.disposing);
 
 			let secondDisposablePromiseResolved = false;
-			disposable[Symbol.asyncDispose]().then(() => { secondDisposablePromiseResolved = true; });
+			initable[Symbol.asyncDispose]().then(() => { secondDisposablePromiseResolved = true; });
 
 			assert.isFalse(secondDisposablePromiseResolved);
 
@@ -292,28 +447,28 @@ describe("FInitable tests", function () {
 
 			assert.isFalse(disposablePromiseResolved);
 			assert.isFalse(secondDisposablePromiseResolved);
-			assert.throw(() => disposable.verifyNotDisposed());
-			assert.isFalse(disposable.disposed);
-			assert.isTrue(disposable.disposing);
+			assert.throw(() => initable.verifyNotDisposed());
+			assert.isFalse(initable.disposed);
+			assert.isTrue(initable.disposing);
 
 			initDefer.resolve();
 			disposeDefer.resolve();
 
 			assert.isFalse(disposablePromiseResolved);
 			assert.isFalse(secondDisposablePromiseResolved);
-			assert.throw(() => disposable.verifyNotDisposed());
+			assert.throw(() => initable.verifyNotDisposed());
 
 			await nextTick();
 
 			assert.isTrue(disposablePromiseResolved);
 			assert.isTrue(secondDisposablePromiseResolved);
-			assert.throw(() => disposable.verifyNotDisposed());
+			assert.throw(() => initable.verifyNotDisposed());
 
-			assert.isTrue(disposable.disposed);
-			assert.isFalse(disposable.disposing);
+			assert.isTrue(initable.disposed);
+			assert.isFalse(initable.disposing);
 
 			let thirdDisposablePromiseResolved = false;
-			disposable[Symbol.asyncDispose]().then(() => { thirdDisposablePromiseResolved = true; });
+			initable[Symbol.asyncDispose]().then(() => { thirdDisposablePromiseResolved = true; });
 			assert.isFalse(thirdDisposablePromiseResolved);
 			await nextTick();
 			assert.isTrue(thirdDisposablePromiseResolved);
@@ -322,70 +477,207 @@ describe("FInitable tests", function () {
 		}
 	});
 
-	it("Positive test onDispose(): void", async function () {
-		const disposable = new TestInitable();
-		assert.isFalse(disposable.disposed);
-		assert.isFalse(disposable.disposing);
+	it("Positive test onInit(): Promise<void> and onDispose(): Promise<void> via dispose()", async function () {
+		const initable = new TestInitable();
+		assert.isFalse(initable.disposed);
+		assert.isFalse(initable.disposing);
 
-		disposable.verifyNotDisposed(); // should not raise an error
+		initable.verifyNotDisposed(); // should not raise an error
 
-		const disposablePromise = disposable[Symbol.asyncDispose]();
+		const initDefer = Deferred.create();
+		const disposeDefer = Deferred.create();
+		onInitPromise = initDefer.promise;
+		onDisposePromise = disposeDefer.promise;
+		try {
+			let initablePromiseResolved = false;
+			let disposablePromiseResolved = false;
+			initable.init(FExecutionContext.Empty).then(() => { initablePromiseResolved = true; });
+			initable.dispose().then(() => { disposablePromiseResolved = true; });
 
-		assert.isTrue(disposable.disposed);
-		assert.isFalse(disposable.disposing);
+			assert.isFalse(initablePromiseResolved);
+			assert.isFalse(disposablePromiseResolved);
+			assert.throw(() => initable.verifyNotDisposed());
 
-		assert.throw(() => disposable.verifyNotDisposed());
+			await nextTick();
+
+			assert.isFalse(initablePromiseResolved);
+			assert.isFalse(disposablePromiseResolved);
+			assert.throw(() => initable.verifyNotDisposed());
+
+			assert.isFalse(initable.initialized);
+			assert.isFalse(initable.disposed);
+			assert.isTrue(initable.initializing);
+			assert.isTrue(initable.disposing);
+
+			let secondDisposablePromiseResolved = false;
+			initable.dispose().then(() => { secondDisposablePromiseResolved = true; });
+
+			assert.isFalse(secondDisposablePromiseResolved);
+
+			await nextTick();
+
+			assert.isFalse(disposablePromiseResolved);
+			assert.isFalse(secondDisposablePromiseResolved);
+			assert.throw(() => initable.verifyNotDisposed());
+			assert.isFalse(initable.disposed);
+			assert.isTrue(initable.disposing);
+
+			initDefer.resolve();
+			disposeDefer.resolve();
+
+			assert.isFalse(disposablePromiseResolved);
+			assert.isFalse(secondDisposablePromiseResolved);
+			assert.throw(() => initable.verifyNotDisposed());
+
+			await nextTick();
+
+			assert.isTrue(disposablePromiseResolved);
+			assert.isTrue(secondDisposablePromiseResolved);
+			assert.throw(() => initable.verifyNotDisposed());
+
+			assert.isTrue(initable.disposed);
+			assert.isFalse(initable.disposing);
+
+			let thirdDisposablePromiseResolved = false;
+			initable.dispose().then(() => { thirdDisposablePromiseResolved = true; });
+			assert.isFalse(thirdDisposablePromiseResolved);
+			await nextTick();
+			assert.isTrue(thirdDisposablePromiseResolved);
+		} finally {
+			onDisposePromise = null;
+		}
+	});
+
+	it("Positive test onDispose(): void via [Symbol.asyncDispose]()", async function () {
+		const initable = new TestInitable();
+		assert.isFalse(initable.disposed);
+		assert.isFalse(initable.disposing);
+
+		initable.verifyNotDisposed(); // should not raise an error
+
+		const disposablePromise = initable[Symbol.asyncDispose]();
+
+		assert.isTrue(initable.disposed);
+		assert.isFalse(initable.disposing);
+
+		assert.throw(() => initable.verifyNotDisposed());
 
 		await nextTick();
 
-		assert.throw(() => disposable.verifyNotDisposed());
+		assert.throw(() => initable.verifyNotDisposed());
 
-		assert.isTrue(disposable.disposed);
-		assert.isFalse(disposable.disposing);
+		assert.isTrue(initable.disposed);
+		assert.isFalse(initable.disposing);
 
 		await disposablePromise;
 
-		assert.throw(() => disposable.verifyNotDisposed());
+		assert.throw(() => initable.verifyNotDisposed());
 
-		assert.isTrue(disposable.disposed);
-		assert.isFalse(disposable.disposing);
+		assert.isTrue(initable.disposed);
+		assert.isFalse(initable.disposing);
 	});
 
-	it("Twice call of init()", async function () {
-		onInitPromise = Promise.resolve();
+	it("Positive test onDispose(): void via dispose()", async function () {
+		const initable = new TestInitable();
+		assert.isFalse(initable.disposed);
+		assert.isFalse(initable.disposing);
 
-		const disposable = new TestInitable();
+		initable.verifyNotDisposed(); // should not raise an error
 
-		const initPromise1 = disposable.init(FExecutionContext.Empty);
+		const disposablePromise = initable.dispose();
+
+		assert.isTrue(initable.disposed);
+		assert.isFalse(initable.disposing);
+
+		assert.throw(() => initable.verifyNotDisposed());
 
 		await nextTick();
 
-		disposable.verifyNotDisposed(); // should not raise an error
-		disposable.throwIfNotInitialized(); // should not raise an error
-		disposable.verifyInitializedAndNotDisposed(); // should not raise an error
+		assert.throw(() => initable.verifyNotDisposed());
 
-		assert.isTrue(disposable.initialized);
-		assert.isFalse(disposable.initializing);
-		assert.isFalse(disposable.disposed);
-		assert.isFalse(disposable.disposing);
+		assert.isTrue(initable.disposed);
+		assert.isFalse(initable.disposing);
+
+		await disposablePromise;
+
+		assert.throw(() => initable.verifyNotDisposed());
+
+		assert.isTrue(initable.disposed);
+		assert.isFalse(initable.disposing);
+	});
+
+	it("Twice call of init() via [Symbol.asyncDispose]()", async function () {
+		onInitPromise = Promise.resolve();
+
+		const initable = new TestInitable();
+
+		const initPromise1 = initable.init(FExecutionContext.Empty);
+
+		await nextTick();
+
+		initable.verifyNotDisposed(); // should not raise an error
+		initable.throwIfNotInitialized(); // should not raise an error
+		initable.verifyInitializedAndNotDisposed(); // should not raise an error
+
+		assert.isTrue(initable.initialized);
+		assert.isFalse(initable.initializing);
+		assert.isFalse(initable.disposed);
+		assert.isFalse(initable.disposing);
 
 		await initPromise1;
 
-		disposable.verifyNotDisposed(); // should not raise an error
-		disposable.throwIfNotInitialized(); // should not raise an error
-		disposable.verifyInitializedAndNotDisposed(); // should not raise an error
+		initable.verifyNotDisposed(); // should not raise an error
+		initable.throwIfNotInitialized(); // should not raise an error
+		initable.verifyInitializedAndNotDisposed(); // should not raise an error
 
-		assert.isTrue(disposable.initialized);
-		assert.isFalse(disposable.initializing);
-		assert.isFalse(disposable.disposed);
-		assert.isFalse(disposable.disposing);
+		assert.isTrue(initable.initialized);
+		assert.isFalse(initable.initializing);
+		assert.isFalse(initable.disposed);
+		assert.isFalse(initable.disposing);
 
 		let isSuccess = false;
-		const initPromise2 = disposable.init(FExecutionContext.Empty).finally(() => { isSuccess = true; });
+		const initPromise2 = initable.init(FExecutionContext.Empty).finally(() => { isSuccess = true; });
 		await nextTick();
 		assert.isTrue(isSuccess);
 		await initPromise2;
-		await disposable[Symbol.asyncDispose]();
+		await initable[Symbol.asyncDispose]();
+	});
+
+	it("Twice call of init() via dispose()", async function () {
+		onInitPromise = Promise.resolve();
+
+		const initable = new TestInitable();
+
+		const initPromise1 = initable.init(FExecutionContext.Empty);
+
+		await nextTick();
+
+		initable.verifyNotDisposed(); // should not raise an error
+		initable.throwIfNotInitialized(); // should not raise an error
+		initable.verifyInitializedAndNotDisposed(); // should not raise an error
+
+		assert.isTrue(initable.initialized);
+		assert.isFalse(initable.initializing);
+		assert.isFalse(initable.disposed);
+		assert.isFalse(initable.disposing);
+
+		await initPromise1;
+
+		initable.verifyNotDisposed(); // should not raise an error
+		initable.throwIfNotInitialized(); // should not raise an error
+		initable.verifyInitializedAndNotDisposed(); // should not raise an error
+
+		assert.isTrue(initable.initialized);
+		assert.isFalse(initable.initializing);
+		assert.isFalse(initable.disposed);
+		assert.isFalse(initable.disposing);
+
+		let isSuccess = false;
+		const initPromise2 = initable.init(FExecutionContext.Empty).finally(() => { isSuccess = true; });
+		await nextTick();
+		assert.isTrue(isSuccess);
+		await initPromise2;
+		await initable.dispose();
 	});
 
 	it("Should throw error from init()", async function () {
@@ -410,7 +702,7 @@ describe("FInitable tests", function () {
 		assert.equal((expectedError as Error).message, "test error");
 	});
 
-	it("Should throw error from dispose()", async function () {
+	it("Should throw error from dispose() via [Symbol.asyncDispose]", async function () {
 		class MyInitable implements FInitable {
 			protected onInit(): Promise<void> { return Promise.resolve(); }
 			protected onDispose(): Promise<void> { return Promise.reject(new Error("test error")); }
@@ -425,6 +717,30 @@ describe("FInitable tests", function () {
 		let expectedError: any = null;
 		try {
 			await initable[Symbol.asyncDispose]();
+		} catch (e) {
+			expectedError = e;
+		}
+
+		assert.isNotNull(expectedError);
+		assert.instanceOf(expectedError, Error);
+		assert.equal((expectedError as Error).message, "test error");
+	});
+
+	it("Should throw error from dispose() via dispose()", async function () {
+		class MyInitable implements FInitable {
+			protected onInit(): Promise<void> { return Promise.resolve(); }
+			protected onDispose(): Promise<void> { return Promise.reject(new Error("test error")); }
+		}
+		interface MyInitable extends FInitableMixin { }
+		FInitableMixin.applyMixin(MyInitable);
+
+		const initable = new MyInitable();
+
+		await initable.init(FExecutionContext.Empty);
+
+		let expectedError: any = null;
+		try {
+			await initable.dispose();
 		} catch (e) {
 			expectedError = e;
 		}
