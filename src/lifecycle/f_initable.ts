@@ -1,6 +1,6 @@
 import { FDisposable } from "./f_disposable.js";
 import { FExecutionContext } from "../execution_context/f_execution_context.js";
-import { FException, FExceptionAggregate } from "../exception/index.js";
+import { FException, FExceptionAggregate, FExceptionInvalidOperation } from "../exception/index.js";
 
 import "./tc39.js";
 
@@ -175,29 +175,33 @@ export abstract class FInitableBase extends FInitable {
 
 export class FInitableMixin extends FInitableBase {
 	public static applyMixin(targetClass: any): void {
-		Object.getOwnPropertySymbols(FInitableBase.prototype).forEach(name => {
-			const propertyDescriptor: PropertyDescriptor | undefined = Object.getOwnPropertyDescriptor(FInitableBase.prototype, name);
+		let sourceType = FInitableBase;
+		while (sourceType.prototype !== undefined) {
+			Object.getOwnPropertySymbols(sourceType.prototype).forEach(name => {
+				const propertyDescriptor: PropertyDescriptor | undefined = Object.getOwnPropertyDescriptor(sourceType.prototype, name);
 
-			if (propertyDescriptor !== undefined) {
-				Object.defineProperty(targetClass.prototype, name, propertyDescriptor);
-			}
-		});
+				if (propertyDescriptor !== undefined) {
+					Object.defineProperty(targetClass.prototype, name, propertyDescriptor);
+				}
+			});
 
-		Object.getOwnPropertyNames(FInitableBase.prototype).forEach(name => {
-			if (name === "constructor") {
-				// Skip constructor
-				return;
-			}
+			Object.getOwnPropertyNames(sourceType.prototype).forEach(name => {
+				if (name === "constructor") {
+					// Skip constructor
+					return;
+				}
 
-			const propertyDescriptor: PropertyDescriptor | undefined = Object.getOwnPropertyDescriptor(FInitableBase.prototype, name);
+				const propertyDescriptor: PropertyDescriptor | undefined = Object.getOwnPropertyDescriptor(sourceType.prototype, name);
 
-			if (propertyDescriptor !== undefined) {
-				Object.defineProperty(targetClass.prototype, name, propertyDescriptor);
-			}
-		});
+				if (propertyDescriptor !== undefined) {
+					Object.defineProperty(targetClass.prototype, name, propertyDescriptor);
+				}
+			});
+
+			sourceType = Object.getPrototypeOf(sourceType);
+		}
 
 		Object.getOwnPropertyNames(FInitableMixin.prototype).forEach(name => {
-
 			if (name === "constructor") {
 				// Skip constructor
 				return;
@@ -246,5 +250,6 @@ export class FInitableMixin extends FInitableBase {
 		// Private constructor has two kinds of responsibility
 		// 1) Restrict to extends the mixin
 		// 2) Restrict to make instances of the mixin
+		throw new FExceptionInvalidOperation("Private constructor");
 	}
 }
