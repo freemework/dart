@@ -95,7 +95,7 @@ export abstract class FInitableBase extends FInitable {
 		return Promise.resolve();
 	}
 
-	public async [Symbol.asyncDispose](): Promise<void> {
+	public async dispose(): Promise<void> {
 		if (this._disposed !== true) {
 			if (this._disposingPromise === undefined) {
 				if (this._initializingPromise !== undefined) {

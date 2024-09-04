@@ -3,14 +3,11 @@ import { FException, FExceptionAggregate, FExceptionInvalidOperation } from "../
 import "./tc39.js";
 
 export abstract class FDisposable {
-	public abstract [Symbol.asyncDispose](): Promise<void>;
-
-	/**
-	 * @deprecated Use [Symbol.asyncDispose]() instead
-	 */
-	public async dispose(): Promise<void> {
-		await this[Symbol.asyncDispose]();
+	public async [Symbol.asyncDispose](): Promise<void> {
+		await this.dispose();
 	}
+
+	public abstract dispose(): Promise<void>;
 
 	public static async disposeAll(...instances: ReadonlyArray<FDisposable>): Promise<void> {
 		const innerExceptions: Array<FException> = [];
@@ -50,7 +47,7 @@ export abstract class FDisposableBase extends FDisposable {
 	public get disposed(): boolean { return this._disposed === true; }
 	public get disposing(): boolean { return this._disposingPromise !== undefined; }
 
-	public async [Symbol.asyncDispose](): Promise<void> {
+	public async dispose(): Promise<void> {
 		if (this._disposed !== true) {
 			if (this._disposingPromise === undefined) {
 				this._disposingPromise = Promise.resolve();
@@ -158,7 +155,7 @@ class FDisposableAdapter extends FDisposable {
 		super();
 	}
 
-	public override async [Symbol.asyncDispose](): Promise<void> {
+	public override async dispose(): Promise<void> {
 		await this._dispose();
 	}
 }
