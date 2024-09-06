@@ -357,9 +357,9 @@ export class UnsecuredWebServer extends FAbstractWebServer<FHostingSettings.Unse
 		const address = server.address();
 		if (address !== null) {
 			if (typeof address === "string") {
-				logger.info(this.initExecutionContext, () => "Stopping Web Server http://" + address + "...");
+				logger.info(this.initExecutionContext, () => `Stopping Web Server '${this._name}' http://${address}...`);
 			} else {
-				logger.info(this.initExecutionContext, () => "Stopping " + address.family + " Web Server http://" + address.address + ":" + address.port + "...");
+				logger.info(this.initExecutionContext, () => `Stopping ${address.family} Web Server '${this._name}' http://${address.address}:${address.port}...`);
 			}
 		} else {
 			logger.info(this.initExecutionContext, "Stopping Web Server...");
@@ -368,8 +368,8 @@ export class UnsecuredWebServer extends FAbstractWebServer<FHostingSettings.Unse
 			server.close((e) => {
 				if (e) {
 					const ex: FException = FException.wrapIfNeeded(e);
-					logger.warn(this.initExecutionContext, () => `The Web Server was stopped with error: ${ex.message}`);
-					logger.debug(this.initExecutionContext, "The Web Server was stopped with error", ex);
+					logger.warn(this.initExecutionContext, () => `The Web Server '${this._name}' was stopped with error: ${ex.message}`);
+					logger.debug(this.initExecutionContext, () => `The Web Server '${this._name}' was stopped with error`, ex);
 				} else {
 					logger.info(this.initExecutionContext, "The Web Server was stopped");
 				}
