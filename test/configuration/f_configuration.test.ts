@@ -220,6 +220,34 @@ describe("FConfiguration tests", function () {
 	});
 });
 
+describe("FConfigurationValue Tests", function () {
+	let config: FConfiguration;
+
+	beforeEach(async () => {
+		config = FConfiguration.factoryJson({
+			"a.b.c.url": "http://127.0.0.1",
+		});
+	});
+
+	it("Should contain full key name via namespace 'a'", function () {
+		const innerConfiguration: FConfiguration = config.getNamespace("a");
+		const urlConfigurationValue: FConfigurationValue = innerConfiguration.get("b.c.url");
+		assert.equal(urlConfigurationValue.key, "a.b.c.url");
+	});
+
+	it("Should contain full key name via namespace 'a.b'", function () {
+		const innerConfiguration: FConfiguration = config.getNamespace("a.b");
+		const urlConfigurationValue: FConfigurationValue = innerConfiguration.get("c.url");
+		assert.equal(urlConfigurationValue.key, "a.b.c.url");
+	});
+
+	it("Should contain full key name via namespace 'a.b.c'", function () {
+		const innerConfiguration: FConfiguration = config.getNamespace("a.b.c");
+		const urlConfigurationValue: FConfigurationValue = innerConfiguration.get("url");
+		assert.equal(urlConfigurationValue.key, "a.b.c.url");
+	});
+});
+
 describe("FConfiguration Negative test", function () {
 	let config: FConfiguration;
 
@@ -335,14 +363,15 @@ describe("FConfiguration Negative test", function () {
 				.getNamespace("a")
 				.getNamespace("b")
 				.getNamespace("c")
-				.get("url").asUrl;
+				.get("url")
+				.asUrl;
 		} catch (err) {
 			ex = err;
 		}
 
 		assert.isDefined(ex);
 		assert.instanceOf(ex, FConfigurationException);
-		assert.equal((<FConfigurationException>ex).key, "url");
+		assert.equal((<FConfigurationException>ex).key, "a.b.c.url");
 	});
 	it(`getNamespace() should raise error about missing "a" namespace`, () => {
 		const config: FConfiguration = FConfiguration.factoryJson({
