@@ -371,8 +371,12 @@ export class FConfigurationDictionary extends FConfiguration {
 	public find(key: string): FConfigurationValue | null {
 		if (key in this._dict) {
 			const valueData = this._dict[key]!;
+
+			const namespaceFull = this.namespaceFull;
+			const fullKey = namespaceFull !== null ? `${namespaceFull}.${key}` : key;
+
 			const value: FConfigurationValue = FConfigurationValue.factory(
-				key,
+				fullKey,
 				valueData,
 				this.sourceURI,
 				null
@@ -407,6 +411,9 @@ export class FConfigurationDictionary extends FConfiguration {
 	}
 
 	public get(key: string, defaultData?: string | null): FConfigurationValue {
+		const namespaceFull = this.namespaceFull;
+		const fullKey = namespaceFull !== null ? `${namespaceFull}.${key}` : key;
+
 		if (key in this._dict) {
 			let valueData = this._dict[key];
 
@@ -415,12 +422,12 @@ export class FConfigurationDictionary extends FConfiguration {
 			}
 
 			const value: FConfigurationValue = FConfigurationValue.factory(
-				key, valueData!, this.sourceURI, null
+				fullKey, valueData!, this.sourceURI, null
 			);
 			return value;
 		} else if (defaultData !== undefined) {
 			const value: FConfigurationValue = FConfigurationValue.factory(
-				key, defaultData, this.sourceURI, null
+				fullKey, defaultData, this.sourceURI, null
 			);
 			return value;
 		} else {
