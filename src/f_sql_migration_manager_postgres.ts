@@ -37,6 +37,22 @@ export class FSqlMigrationManagerPostgres extends FSqlMigrationManager {
 		});
 	}
 
+	public async listVersions(executionContext: FExecutionContext): Promise<Array<string>> {
+		return await this.sqlConnectionFactory.usingConnection(executionContext, async (sqlConnection: FSqlConnection) => {
+
+			const isExist = await this._isVersionTableExist(executionContext, sqlConnection);
+			if (isExist === false) { return []; }
+
+			await this._verifyVersionTableStructure(executionContext, sqlConnection);
+
+			const versionRows: ReadonlyArray<FSqlResultRecord> = await sqlConnection
+				.statement(`SELECT "version" FROM "${this.versionTableName}" ORDER BY "version" DESC`)
+				.executeQuery(executionContext);
+
+				return versionRows.map(versionRow => versionRow.get("version").asString);
+		});
+	}
+
 	protected async _createVersionTable(executionContext: FExecutionContext, sqlProvider: FSqlConnection): Promise<void> {
 		await sqlProvider.statement(`CREATE SCHEMA IF NOT EXISTS "${this._schema}"`).execute(executionContext);
 
