@@ -1,6 +1,6 @@
 {
 	"name": "@freemework/sql.postgres",
-	"version": "0.14.8",
+	"version": "0.14.10",
 	"description": "Postgres SQL Facade library of the Freemework Project.",
 	"author": {
 		"name": "Freemework Project",
@@ -30,7 +30,7 @@
 		"url": "https://github.com/freemework/sql.postgres/issues"
 	},
 	"engines": {
-		"node": ">=16.0.0 <22"
+		"node": ">=16.0.0 <23"
 	},
 	"homepage": "https://docs.freemework.org/#common?lang=typescript",
 	"type": "module",
@@ -42,25 +42,25 @@
 		"test:only": "tsc && mocha --require source-map-support/register \"test/**/*.test.js\" --recursive --timeout 30000"
 	},
 	"dependencies": {
-		"@freemework/common": "^0.14.8",
-		"@freemework/sql.misc.migration": "^0.14.8",
-		"@types/node": "^22.5.2",
-		"pg": "^8.12.0"
+		"@freemework/common": "^0.14.10",
+		"@freemework/sql.misc.migration": "^0.14.10",
+		"@types/node": "^22.8.0",
+		"pg": "^8.13.1"
 	},
 	"devDependencies": {
-		"@freemework/decimal.bignumberjs": "^0.14.8",
+		"@freemework/decimal.bignumberjs": "^0.14.10",
 		"@tsconfig/node22": "^22.0.0",
 		"@tsconfig/strictest": "^2.0.5",
-		"@types/chai": "^4.3.19",
-		"@types/lodash": "^4.17.7",
-		"@types/mocha": "^10.0.7",
+		"@types/chai": "^5.0.0",
+		"@types/lodash": "^4.17.12",
+		"@types/mocha": "^10.0.9",
 		"@types/mustache": "^4.2.5",
-		"@types/pg": "^8.11.8",
+		"@types/pg": "^8.11.10",
 		"c8": "^10.1.2",
-		"chai": "^5.1.1",
+		"chai": "^5.1.2",
 		"mocha": "^10.7.3",
 		"mustache": "^4.2.0",
 		"source-map-support": "^0.5.21",
-		"typescript": "^5.5.4"
+		"typescript": "^5.6.3"
 	}
 }
