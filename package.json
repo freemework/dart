@@ -1,6 +1,6 @@
 {
 	"name": "@freemework/decimal.bignumberjs",
-	"version": "0.14.8",
+	"version": "0.14.10",
 	"description": "decimal.bignumberjs library of the Freemework Project.",
 	"author": {
 		"name": "Freemework Project",
@@ -30,7 +30,7 @@
 		"url": "https://github.com/freemework/decimal/issues"
 	},
 	"engines": {
-		"node": ">=16.0.0 <22"
+		"node": ">=16.0.0 <23"
 	},
 	"homepage": "https://docs.freemework.org/#common?lang=typescript",
 	"type": "module",
@@ -42,19 +42,19 @@
 		"test:only": "tsc && mocha --require source-map-support/register \"test/**/*.test.js\" --recursive --timeout 30000"
 	},
 	"dependencies": {
-		"@freemework/common": "^0.14.8",
-		"@types/node": "^22.5.2",
+		"@freemework/common": "^0.14.10",
+		"@types/node": "^22.8.0",
 		"bignumber.js": "^9.1.2"
 	},
 	"devDependencies": {
 		"@tsconfig/node22": "^22.0.0",
 		"@tsconfig/strictest": "^2.0.5",
-		"@types/chai": "^4.3.19",
-		"@types/mocha": "^10.0.7",
+		"@types/chai": "^5.0.0",
+		"@types/mocha": "^10.0.9",
 		"c8": "^10.1.2",
-		"chai": "^5.1.1",
+		"chai": "^5.1.2",
 		"mocha": "^10.7.3",
 		"source-map-support": "^0.5.21",
-		"typescript": "^5.5.4"
+		"typescript": "^5.6.3"
 	}
 }
