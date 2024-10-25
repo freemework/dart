@@ -122,6 +122,10 @@ export abstract class FSqlMigrationManager {
 		});
 
 		const currentVersion: string | null = await this.getCurrentVersion(executionContext);
+		if (currentVersion === null) {
+			this.logger.warn(executionContext, `Skip rollback due to no any installed versions`);
+			return;
+		}
 
 		const versionNames: Array<string> = await this.sqlConnectionFactory.usingConnection(
 			executionContext,
@@ -132,12 +136,10 @@ export abstract class FSqlMigrationManager {
 		const availableVersions: Array<string> = [...versionNames].sort().reverse(); // from new version to old version
 		let scheduleVersionNames: Array<string> = availableVersions;
 
-		if (currentVersion !== null) {
-			scheduleVersionNames = scheduleVersionNames.reduce<Array<string>>(
-				(p, c) => { if (c <= currentVersion) { p.push(c); } return p; },
-				[]
-			);
-		}
+		scheduleVersionNames = scheduleVersionNames.reduce<Array<string>>(
+			(p, c) => { if (c <= currentVersion) { p.push(c); } return p; },
+			[]
+		);
 
 		if (targetVersion !== undefined) {
 			scheduleVersionNames = scheduleVersionNames.reduceRight<Array<string>>(
@@ -202,6 +204,13 @@ export abstract class FSqlMigrationManager {
 	 * @param cancellationToken Allows to request cancel of the operation.
 	 */
 	public abstract getCurrentVersion(executionContext: FExecutionContext): Promise<string | null>;
+
+
+	/**
+	 * Gets list of installed versions of the database.
+	 * @param cancellationToken Allows to request cancel of the operation.
+	 */
+	public abstract listVersions(executionContext: FExecutionContext): Promise<Array<string>>;
 
 	protected get sqlConnectionFactory(): FSqlConnectionFactory { return this._sqlConnectionFactory; }
 
