@@ -10,13 +10,13 @@ export class FLimitInternalTimeSpanLimit extends FInternalLimitSyncBase {
 	private _activeTokenDefers: Array<FLimitTokenDeferred>;
 	private readonly _delay: number;
 	private readonly _clearTimeoutFunc: (handle?: number) => void;
-	private readonly _setTimeoutFunc: (handler: TimerHandler, timeout?: number) => number;
+	private readonly _setTimeoutFunc: (handler: Function, timeout?: number) => number;
 	private readonly _timers: Array<number> = [];
 
 	public constructor(delay: number, hitCount: number,
 		stubs: {
 			clearTimeoutFunc: (handle?: number) => void,
-			setTimeoutFunc: (handler: TimerHandler, timeout?: number) => number
+			setTimeoutFunc: (handler: Function, timeout?: number) => number
 		}
 			= {
 				clearTimeoutFunc: (...args) => clearTimeout(...args),

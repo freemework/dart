@@ -7,7 +7,7 @@ import { FLimitInternalTimeSpanLimit } from "../../src/limit/internal/f_limit_in
 
 class SetTimeoutStub {
 	private readonly _clearTimeoutStub: (handle?: number) => void;
-	private readonly _setTimeoutStub: (handler: TimerHandler, timeout?: number) => number;
+	private readonly _setTimeoutStub: (handler: Function, timeout?: number) => number;
 	private readonly _map: { [stubId: string]: [number, Function] };
 	private _index: number = 0;
 	private _currentOffset = 0;
@@ -17,7 +17,7 @@ class SetTimeoutStub {
 			if (typeof handle !== "number") { throw new Error("Not supported handler"); }
 			delete this._map[handle.toString()];
 		};
-		this._setTimeoutStub = (handler: TimerHandler, timeout?: number): number => {
+		this._setTimeoutStub = (handler: Function, timeout?: number): number => {
 			if (typeof handler !== "function") { throw new Error("Not supported handler"); }
 			const stubId = ++this._index;
 			const friendlyTimeout = timeout ? timeout + this._currentOffset : this._currentOffset;
