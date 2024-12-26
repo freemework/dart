@@ -4,6 +4,27 @@ import { FExecutionContext } from "../execution_context/index.js";
 
 import { FChannelEvent } from "./FChannelEvent.js";
 
+/**
+ * @example
+ * //
+ * // Following example shown how to use the Mixin class.
+ * // SomeEventSource is a general class that extends from another class, so it 
+ * // is impossible to inherit FChannelEventImpl (due to not supported class
+ * // multiple inheritance). By the way we may use Mixin approach...
+ * //
+ * class SomeEventSource extends Something {
+ *    protected onAddFirstHandler(): void {  } // define in needed
+ *    protected onRemoveLastHandler(): void { } // define in needed
+ * 
+ *    public async someActivity(executionContext: FExecutionContext): Promise<void> {
+ *      const eventData: BroadcastMessage = {};
+ *      await this.notify(executionContext, { data: eventData }); // Call all registered callbacks.
+ *      // Here we guaranteed all consumers processed the message without exceptions.
+ *    }
+ * }
+ * interface SomeEventSource extends FChannelEventMixin<ApplicationPageContext> { }
+ * FChannelEventMixin.applyMixin(SomeEventSource);
+ */
 export class FChannelEventMixin<
 	TData = Uint8Array,
 	TEvent extends FChannelEvent.Event<TData> = FChannelEvent.Event<TData>> implements FChannelEvent<TData, TEvent> {
@@ -11,25 +32,25 @@ export class FChannelEventMixin<
 
 	public static applyMixin(targetClass: any): void {
 		Object.getOwnPropertyNames(FChannelEventMixin.prototype).forEach(name => {
-			const propertyDescr = Object.getOwnPropertyDescriptor(FChannelEventMixin.prototype, name);
+			const propertyDescriptor = Object.getOwnPropertyDescriptor(FChannelEventMixin.prototype, name);
 
 			if (name === "constructor") {
 				// Skip constructor
 				return;
 			}
 			if (name === "onAddFirstHandler" || name === "onRemoveLastHandler") {
-				// Add NOP methods into mixed only if it not implements its
-				if (propertyDescr !== undefined) {
-					const existingPropertyDescr = Object.getOwnPropertyDescriptor(targetClass.prototype, name);
-					if (existingPropertyDescr === undefined) {
-						Object.defineProperty(targetClass.prototype, name, propertyDescr);
+				// Add NOP methods into mixed only if targetClass does not implement its
+				if (propertyDescriptor !== undefined) {
+					const existingPropertyDescriptor = Object.getOwnPropertyDescriptor(targetClass.prototype, name);
+					if (existingPropertyDescriptor === undefined) {
+						Object.defineProperty(targetClass.prototype, name, propertyDescriptor);
 					}
 				}
 				return;
 			}
 
-			if (propertyDescr !== undefined) {
-				Object.defineProperty(targetClass.prototype, name, propertyDescr);
+			if (propertyDescriptor !== undefined) {
+				Object.defineProperty(targetClass.prototype, name, propertyDescriptor);
 			}
 		});
 	}
