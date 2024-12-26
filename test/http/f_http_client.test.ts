@@ -4,20 +4,120 @@ import {
 	FCancellationExecutionContext,
 	FExceptionInvalidOperation,
 	FExecutionContext,
-	FHttpClient
+	FHttpClient,
+	FDisposable,
+	FDisposableBase
 } from "../../src/index.js";
 
 import { assert } from "chai";
+import { Suite } from "mocha";
 
 import { Socket, Server } from "net";
-import * as http from "http";
+import {
+	OutgoingHttpHeaders,
+	createServer,
+} from "http";
 
 function nextTick() {
 	return new Promise(resolve => process.nextTick(resolve));
 }
 
-describe.skip("FHttpClient tests", function () {
-	describe("Tests without proxy", function () {
+namespace HttpServerContext {
+	export type CreateFunction = (response: Response) => Instance;
+	export interface Response {
+		readonly status: number;
+		readonly headers: OutgoingHttpHeaders;
+		readonly body: Uint8Array;
+	}
+	export interface Instance extends FDisposable {
+		readonly baseURL: URL;
+	}
+}
+type UsingHttpServerContext = HttpServerContext.CreateFunction;
+
+function describeWithHttpServer(title: string, fn: (this: Suite, usingHttpServerContext: UsingHttpServerContext) => void): Suite {
+	const baseURL = new URL("http://127.0.0.1:8080");
+
+	return describe(title, function () {
+		let httpServer: Server | null = null;
+		const contexts: Array<HttpServerContext> = [];
+
+		before(async () => {
+			// runs before all tests in this block
+			const newHttpServer = createServer((_req, res) => {
+				const friendlyResponse = contexts.length > 0 ? contexts[0]! : null;
+				if (friendlyResponse !== null) {
+					res.writeHead(friendlyResponse.status, friendlyResponse.headers);
+					res.write(Buffer.from(friendlyResponse.body));
+				} else {
+					res.writeHead(500, {});
+				}
+				res.end();
+			});
+
+			await new Promise<void>((resolve, reject) => {
+				newHttpServer
+					.on("listening", () => {
+						resolve();
+					})
+					.on("error", reject)
+					.listen(
+						Number.parseInt(baseURL.port),
+						baseURL.hostname,
+					);
+			});
+
+			httpServer = newHttpServer;
+		});
+
+		after(async () => {
+			// runs after all tests in this block
+			const oldHttpServer = httpServer;
+			if (oldHttpServer !== null) {
+				await new Promise<void>((destroyResolve) => {
+					oldHttpServer.close((e) => {
+						if (e) {
+							console.error(e.message, e);
+						}
+						destroyResolve();
+					});
+				});
+			}
+		});
+
+		class HttpServerContext extends FDisposableBase implements HttpServerContext.Instance, HttpServerContext.Response {
+			public constructor(
+				private readonly _response: HttpServerContext.Response,
+			) {
+				super();
+
+				contexts.push(this);
+			}
+
+			public get baseURL(): URL { return new URL(baseURL); }
+
+			public get status(): number { return this._response.status; }
+			public get headers(): OutgoingHttpHeaders { return this._response.headers; }
+			public get body(): Uint8Array { return this._response.body; }
+
+			protected override onDispose(): void | Promise<void> {
+				const head = contexts.pop();
+				if (head !== this) {
+					throw new FExceptionInvalidOperation("BUG Detected. Pls contact developers of the code.");
+				}
+			}
+		}
+
+		function createHttpServerContext(response: HttpServerContext.Response): HttpServerContext {
+			return new HttpServerContext(response,);
+		}
+
+		fn.call(this, createHttpServerContext);
+	});
+}
+
+describe("FHttpClient tests", function () {
+	describe.skip("Tests without proxy", function () {
 		it("FHttpClient should GET http:", async function () {
 			const httpClient = new FHttpClient({ timeout: 5000 });
 			await httpClient.invoke(FExecutionContext.Default, {
@@ -69,7 +169,7 @@ describe.skip("FHttpClient tests", function () {
 		it("Should handle HTTP 301 as normal response", async function () {
 			const listeningDefer: any = {};
 			listeningDefer.promise = new Promise(r => { listeningDefer.resolve = r; });
-			const fakeServer = new http.Server((_, res) => {
+			const fakeServer = createServer((_, res) => {
 				res.writeHead(301, "Fake moved");
 				res.end("Fake data");
 			});
@@ -92,6 +192,8 @@ describe.skip("FHttpClient tests", function () {
 				await closeDefer.promise;
 			}
 		});
+
+
 
 		describe("Error handling tests", async function () {
 			/*
@@ -212,7 +314,7 @@ describe.skip("FHttpClient tests", function () {
 			it("Should handle HTTP 404 as WebError", async function () {
 				const listeningDefer: any = {};
 				listeningDefer.promise = new Promise(r => { listeningDefer.resolve = r; });
-				const fakeServer = new http.Server((_, res) => {
+				const fakeServer = createServer((_, res) => {
 					res.writeHead(404, "Fake not found");
 					res.end("Fake data");
 				});
@@ -242,7 +344,7 @@ describe.skip("FHttpClient tests", function () {
 			it("Should provide requestObject on WebError for application/json content", async function () {
 				const listeningDefer: any = {};
 				listeningDefer.promise = new Promise(r => { listeningDefer.resolve = r; });
-				const fakeServer = new http.Server((_, res) => {
+				const fakeServer = createServer((_, res) => {
 					res.writeHead(404, "Fake not found");
 					res.end("Fake data");
 				});
@@ -280,7 +382,7 @@ describe.skip("FHttpClient tests", function () {
 			it("Should NOT provide requestObject on WebError for non application/json content", async function () {
 				const listeningDefer: any = {};
 				listeningDefer.promise = new Promise(r => { listeningDefer.resolve = r; });
-				const fakeServer = new http.Server((_, res) => {
+				const fakeServer = createServer((_, res) => {
 					res.writeHead(404, "Fake not found");
 					res.end("Fake data");
 				});
@@ -353,6 +455,65 @@ describe.skip("FHttpClient tests", function () {
 				url: new URL("https://poloniex.com/public?command=returnTicker")
 			});
 			assert.hasAnyKeys(JSON.parse(res.toString()), ["BTC_BCN", "BTC_ZEC", "ETH_ZEC"]);
+		});
+	});
+
+	describeWithHttpServer("Integration test", function (createHttpServerContext: HttpServerContext.CreateFunction) {
+
+		it("Should parse body with explicit charset utf-8", async function () {
+			// < HTTP/1.1 400 Bad Request
+			// < Content-Type: application/json; charset=utf-8
+			// < X-Request-Id: 7963aa48-2510-436a-8850-b3508676534c
+			// < Date: Mon, 23 Dec 2024 12:53:01 GMT
+			await using httpServerContext = createHttpServerContext({
+				status: 400,
+				headers: {
+					"Content-Type": "application/json; charset=utf-8",
+					"X-Request-Id": "7963aa48-2510-436a-8850-b3508676534c",
+					"Date": "Mon, 23 Dec 2024 12:53:01 GMT",
+				},
+				body: Buffer.from('{"message":"Bad Request","code":1001}', "utf-8"),
+			});
+
+
+			const httpClient = new FHttpClient({ timeout: 5000 });
+
+			let expectedError: unknown | null = null
+
+			try {
+				// > POST /v1/orders/a11596a1-fc32-459c-97a3-8b4b7923a0c0/verify-otp HTTP/1.1
+				// > User-Agent: curl/8.6.0
+				// > Accept: */*
+				// > Content-Type: application/json
+				await httpClient.invoke(FExecutionContext.Default, {
+					method: "POST",
+					url: new URL("v1/orders/a11596a1-fc32-459c-97a3-8b4b7923a0c0/verify-otp", httpServerContext.baseURL),
+					headers: {
+						"Content-Type": "application/json; charset=utf-8",
+						"User-Agent": "curl/8.6.0",
+						"Accept": "*/*",
+					},
+					body: Buffer.from('{"code":"436458"}', "utf-8"),
+				});
+			} catch (e) {
+				expectedError = e;
+			}
+
+			assert.instanceOf(expectedError, FHttpClient.WebError);
+
+			{
+				const reqData: any = (expectedError as FHttpClient.WebError).requestObject;
+				assert.isString(reqData.code);
+				assert.strictEqual(reqData.code, "436458");
+			}
+
+			{
+				const resData: any = (expectedError as FHttpClient.WebError).object;
+				assert.isNumber(resData.code);
+				assert.isString(resData.message);
+				assert.strictEqual(resData.code, 1001);
+				assert.strictEqual(resData.message, "Bad Request");
+			}
 		});
 	});
 });
