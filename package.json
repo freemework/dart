@@ -1,6 +1,6 @@
 {
 	"name": "@freemework/common",
-	"version": "0.14.10",
+	"version": "0.14.11",
 	"description": "Common library of the Freemework Project.",
 	"author": {
 		"name": "Freemework Project",
@@ -43,15 +43,19 @@
 	"devDependencies": {
 		"@tsconfig/node22": "^22.0.0",
 		"@tsconfig/strictest": "^2.0.5",
-		"@types/chai": "^5.0.0",
-		"@types/mocha": "^10.0.9",
-		"@types/node": "^22.8.0",
+		"@types/chai": "^5.0.1",
+		"@types/content-type": "^1.1.8",
+		"@types/mocha": "^10.0.10",
+		"@types/node": "^22.10.2",
 		"@types/sinon": "^17.0.3",
-		"c8": "^10.1.2",
-		"chai": "^5.1.1",
-		"mocha": "^10.7.3",
+		"c8": "^10.1.3",
+		"chai": "^5.1.2",
+		"mocha": "^11.0.1",
 		"sinon": "^19.0.2",
 		"source-map-support": "^0.5.21",
-		"typescript": "^5.6.3"
+		"typescript": "^5.7.2"
+	},
+	"dependencies": {
+		"content-type": "^1.0.5"
 	}
 }

@@ -1,5 +1,9 @@
 import * as http from "http";
 import * as https from "https";
+import {
+	ParsedMediaType,
+	parse as contentTypeParse,
+} from "content-type";
 
 import { FCancellationExecutionContext, FCancellationException, FCancellationToken } from "../cancellation/index.js";
 import { FChannelInvoke } from "../channel/index.js";
@@ -99,7 +103,7 @@ export class FHttpClient implements FHttpClient.HttpInvokeChannel {
 			};
 
 			try {
-				cancellationToken.throwIfCancellationRequested(); // Shoud raise error
+				cancellationToken.throwIfCancellationRequested(); // Will raise error, we want to reject this Promise exactly with cancellation exception.
 			} catch (e) {
 				return reject(e);
 			}
@@ -281,7 +285,8 @@ export namespace FHttpClient {
 
 		public constructor(
 			url: URL, method: string,
-			requestHeaders: http.OutgoingHttpHeaders, requestBody: Uint8Array,
+			requestHeaders: http.OutgoingHttpHeaders,
+			requestBody: Uint8Array,
 			errorMessage: string,
 			innerException?: FException
 		) {
@@ -296,27 +301,7 @@ export namespace FHttpClient {
 		public get method(): string { return this._method; }
 		public get requestHeaders(): http.OutgoingHttpHeaders { return this._requestHeaders; }
 		public get requestBody(): Uint8Array { return this._requestBody; }
-		public get requestObject(): any {
-			const requestHeaders: http.OutgoingHttpHeaders = this.requestHeaders;
-			let contentType: string | null = null;
-			if (requestHeaders !== null) {
-				const contentTypeHeaderName = Object.keys(requestHeaders).find(header => header.toLowerCase() === "content-type");
-				if (contentTypeHeaderName !== undefined) {
-					const headerValue = requestHeaders[contentTypeHeaderName];
-					if (typeof headerValue === "string") {
-						contentType = headerValue;
-					}
-				}
-			}
-
-			if (contentType !== "application/json") {
-				throw new FExceptionInvalidOperation("Wrong operation. The property available only for 'application/json' content type requests.");
-			}
-
-			const requestBody: Buffer = this.requestBody instanceof Buffer ? this.requestBody : Buffer.from(this.requestBody);
-
-			return JSON.parse(requestBody.toString("utf-8"));
-		}
+		public get requestObject(): any { return parseJsonBody(this.requestBody, this.requestHeaders); }
 	}
 
 	/**
@@ -346,14 +331,7 @@ export namespace FHttpClient {
 		public get statusDescription(): string { return this._statusDescription; }
 		public get headers(): http.IncomingHttpHeaders { return this._responseHeaders; }
 		public get body(): Uint8Array { return this._responseBody; }
-		public get object(): any {
-			const headers: http.IncomingHttpHeaders = this.headers;
-			const contentTypeHeaderName: string | undefined = Object.keys(headers).find(header => header.toLowerCase() === "content-type");
-			if (contentTypeHeaderName !== undefined && headers[contentTypeHeaderName] !== "application/json") {
-				throw new FExceptionInvalidOperation("Wrong operation. The property available only for 'application/json' content type responses.");
-			}
-			return JSON.parse(this.body.toString());
-		}
+		public get object(): any { return parseJsonBody(this.body, this.headers); }
 	}
 
 	/**
@@ -364,9 +342,9 @@ export namespace FHttpClient {
 		public constructor(
 			url: URL, method: string,
 			requestHeaders: http.OutgoingHttpHeaders, requestBody: Uint8Array,
-			erroMessage: string, innerException?: FException
+			errorMessage: string, innerException?: FException
 		) {
-			super(url, method, requestHeaders, requestBody, erroMessage, innerException);
+			super(url, method, requestHeaders, requestBody, errorMessage, innerException);
 		}
 
 		public get code(): string | null {
@@ -383,4 +361,33 @@ export namespace FHttpClient {
 			return null;
 		}
 	}
+}
+
+
+function parseJsonBody(body: Buffer | Uint8Array, headers: http.IncomingHttpHeaders | http.OutgoingHttpHeaders): any {
+	let contentType: ParsedMediaType | null = null;
+	if (headers !== null) {
+		const contentTypeHeaderName = Object.keys(headers).find(header => header.toLowerCase() === "content-type");
+		if (contentTypeHeaderName !== undefined) {
+			const headerValue = headers[contentTypeHeaderName];
+			if (typeof headerValue === "string") {
+				contentType = contentTypeParse(headerValue);
+			}
+		}
+	}
+
+	if (
+		contentType === null
+		|| contentType.type !== "application/json"
+		|| (
+			"charset" in contentType.parameters
+			&& contentType.parameters["charset"].toLowerCase() !== "utf-8"
+		)
+	) {
+		throw new FExceptionInvalidOperation("Wrong operation. The property available only for UTF-8 'application/json' content type.");
+	}
+
+	const friendlyBody: Buffer = body instanceof Buffer ? body : Buffer.from(body);
+
+	return JSON.parse(friendlyBody.toString("utf-8"));
 }

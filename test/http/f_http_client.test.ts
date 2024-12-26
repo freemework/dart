@@ -193,8 +193,6 @@ describe("FHttpClient tests", function () {
 			}
 		});
 
-
-
 		describe("Error handling tests", async function () {
 			/*
 				Possible socket errors:
